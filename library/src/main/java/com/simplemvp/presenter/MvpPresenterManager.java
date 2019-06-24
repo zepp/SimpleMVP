@@ -14,39 +14,51 @@ import com.simplemvp.common.MvpState;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-/* данный класс управляет представителями и позволяет для любого представления получить
- * соответствующего представителя */
+/**
+ * This class keeps presenter instances and instantiate ones by request
+ */
 public final class MvpPresenterManager {
-    private static volatile MvpPresenterManager manager;
+    private static volatile MvpPresenterManager instance;
     private final String tag = getClass().getSimpleName();
     private final Context context;
+    private final ExecutorService executor;
     private final Map<Class<? extends MvpPresenter<?>>, MvpPresenter<?>> map;
 
     private MvpPresenterManager(Context context) {
         this.context = context;
+        this.executor = Executors.newSingleThreadExecutor();
         this.map = new HashMap<>();
     }
 
     public static MvpPresenterManager getInstance(Context context) {
-        if (manager == null) {
+        if (instance == null) {
             synchronized (MvpPresenterManager.class) {
-                if (manager == null) {
-                    manager = new MvpPresenterManager(context.getApplicationContext());
+                if (instance == null) {
+                    instance = new MvpPresenterManager(context.getApplicationContext());
                 }
             }
         }
-        return manager;
+        return instance;
     }
 
-    // создаёт или возвращает ссылку на представителя
-    public <P extends MvpPresenter<S>, S extends MvpState> P gewPresenterInstance(Class<P> pClass,
+    /**
+     * This method returns presenter instance of desired type. At the current moment there could be
+     * only one instance per type.
+     *
+     * @param pClass class of presenter
+     * @param sClass class of state
+     * @return new presenter
+     */
+    public <P extends MvpPresenter<S>, S extends MvpState> P getPresenterInstance(Class<P> pClass,
                                                                                   Class<S> sClass) {
         synchronized (map) {
             P presenter = (P) map.get(pClass);
             if (presenter == null) {
                 S state = newState(sClass);
-                presenter = newPresenter(pClass, sClass, state);
+                presenter = PresenterHandler.newProxy(executor, newPresenter(pClass, sClass, state));
                 map.put(pClass, presenter);
                 Log.d(tag, "new presenter: " + presenter);
             }
@@ -54,8 +66,12 @@ public final class MvpPresenterManager {
         }
     }
 
-    // удаляет ссылку на представителя, делая его таким образом доступным для GC
-    public <P extends MvpPresenter<S>, S extends MvpState> void releasePresenter(P presenter) {
+    /**
+     * This method releases presenter instance to be garbage collected
+     *
+     * @param presenter instance to be released if one has no attached views
+     */
+    public void releasePresenter(MvpPresenter<?> presenter) {
         if (presenter.isDetached()) {
             Log.d(tag, "release presenter: " + presenter);
             synchronized (map) {
