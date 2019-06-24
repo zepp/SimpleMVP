@@ -25,7 +25,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     protected final String tag = getClass().getSimpleName();
     protected final Context context;
     protected final ExecutorService executor;
-    protected final List<MvpView> views = new CopyOnWriteArrayList<>();
+    protected final List<MvpView<?, S>> views = new CopyOnWriteArrayList<>();
     protected final Handler handler;
     protected final Resources resources;
     protected final S state;
@@ -39,7 +39,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     }
 
     // добавляет представление в список клиентов текущего представителя
-    public void attach(MvpView view) {
+    public void attach(MvpView<?, S> view) {
         synchronized (views) {
             views.add(view);
             if (views.size() == 1) {
@@ -50,7 +50,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     }
 
     // удаляет представление из списка клиентов текущего представления
-    public void detach(MvpView view) {
+    public void detach(MvpView<?, S> view) {
         synchronized (views) {
             views.remove(view);
             if (views.size() == 0) {
@@ -72,17 +72,17 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     // копия делается с целью избежания ситуации, когда состояние изменяется в процессе отображения
     public void commit() {
         if (state.isChanged() || state.isInitial()) {
-            MvpState snapshot = getStateSnapshot();
+            S snapshot = getStateSnapshot();
             state.clearChanged();
             state.clearInitial();
-            for (MvpView view : views) {
+            for (MvpView<?, S> view : views) {
                 handler.post(() -> view.post(snapshot));
             }
         }
     }
 
     public void finish() {
-        for (MvpView view : views) {
+        for (MvpView<?, S> view : views) {
             handler.post(view::finish);
         }
     }
@@ -120,9 +120,9 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         Log.d(tag, "onStop");
     }
 
-    protected MvpState getStateSnapshot() {
+    protected S getStateSnapshot() {
         try {
-            return state.clone();
+            return (S) state.clone();
         } catch (CloneNotSupportedException e) {
             return null;
         }

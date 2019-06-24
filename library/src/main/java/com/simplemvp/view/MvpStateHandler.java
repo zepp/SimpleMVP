@@ -11,22 +11,21 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.presenter.MvpState;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-final class MvpStateHandler<P extends MvpPresenter<S>, S extends MvpState> implements LifecycleObserver {
+final class MvpStateHandler<S extends MvpState> implements LifecycleObserver {
     private final static int QUEUE_SIZE = 8;
     private final String tag = getClass().getSimpleName();
-    private final MvpView<P, S> view;
+    private final MvpView<?, S> view;
     private final Queue<S> queue = new LinkedList<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean isResumed;
 
-    MvpStateHandler(MvpView<P, S> view) {
+    MvpStateHandler(MvpView<?, S> view) {
         this.view = view;
     }
 

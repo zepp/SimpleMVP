@@ -10,9 +10,9 @@ import android.support.annotation.IdRes;
 import com.simplemvp.presenter.MvpState;
 
 public interface MvpPresenter<S extends MvpState> {
-    void attach(MvpView view);
+    void attach(MvpView<?, S> view);
 
-    void detach(MvpView view);
+    void detach(MvpView<?, S> view);
 
     boolean isDetached();
 

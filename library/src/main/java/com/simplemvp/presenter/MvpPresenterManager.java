@@ -20,7 +20,7 @@ public final class MvpPresenterManager {
     private static volatile MvpPresenterManager manager;
     private final String tag = getClass().getSimpleName();
     private final Context context;
-    private final Map<Class<? extends MvpPresenter>, MvpPresenter> map;
+    private final Map<Class<? extends MvpPresenter<?>>, MvpPresenter<?>> map;
 
     private MvpPresenterManager(Context context) {
         this.context = context;

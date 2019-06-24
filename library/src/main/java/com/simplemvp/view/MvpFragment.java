@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 public abstract class MvpFragment<P extends MvpBasePresenter<S>, S extends MvpState> extends Fragment
         implements MvpView<P, S>, View.OnClickListener, AdapterView.OnItemSelectedListener {
     protected ExecutorService executor;
-    protected MvpStateHandler<P, S> stateHandler;
+    protected MvpStateHandler<S> stateHandler;
     protected MvpPresenterManager manager;
     protected P presenter;
 
