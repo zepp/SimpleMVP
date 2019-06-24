@@ -16,11 +16,7 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.presenter.MvpPresenterManager;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends MvpState> extends DialogFragment implements MvpView<P, S>, View.OnClickListener {
-    protected ExecutorService executor;
     protected MvpStateHandler<S> stateHandler;
     protected MvpPresenterManager manager;
     protected P presenter;
@@ -28,7 +24,6 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        executor = Executors.newSingleThreadExecutor();
         stateHandler = new MvpStateHandler<>(this);
         getLifecycle().addObserver(stateHandler);
         manager = MvpPresenterManager.getInstance(getContext());
@@ -62,6 +57,6 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
 
     @Override
     public void onClick(View v) {
-        executor.execute(() -> presenter.onViewClicked(v.getId()));
+        presenter.onViewClicked(v.getId());
     }
 }

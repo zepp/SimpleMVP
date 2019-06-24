@@ -16,13 +16,9 @@ import com.simplemvp.common.MvpView;
 import com.simplemvp.presenter.MvpBasePresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /* Базовый класс для всех Activity, которые реализуют паттерн MVP */
 public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpState> extends AppCompatActivity
         implements MvpView<P, S>, View.OnClickListener {
-    protected ExecutorService executor;
     protected MvpStateHandler<S> stateHandler;
     protected MvpPresenterManager manager;
     protected P presenter;
@@ -31,7 +27,6 @@ public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpSt
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
-        executor = Executors.newSingleThreadExecutor();
         stateHandler = new MvpStateHandler<>(this);
         getLifecycle().addObserver(stateHandler);
         manager = MvpPresenterManager.getInstance(this);
@@ -58,17 +53,17 @@ public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpSt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        executor.execute(() -> presenter.onOptionsItemSelected(item.getItemId()));
+        presenter.onOptionsItemSelected(item.getItemId());
         return true;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        executor.execute(() -> presenter.onActivityResult(requestCode, resultCode, data));
+        presenter.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onClick(View v) {
-        executor.execute(() -> presenter.onViewClicked(v.getId()));
+        presenter.onViewClicked(v.getId());
     }
 }
