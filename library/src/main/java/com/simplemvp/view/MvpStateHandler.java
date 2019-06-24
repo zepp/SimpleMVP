@@ -11,8 +11,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
-import com.simplemvp.presenter.MvpState;
 
 import java.util.LinkedList;
 import java.util.Queue;

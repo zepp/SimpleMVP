@@ -9,6 +9,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.simplemvp.common.MvpPresenter;
+import com.simplemvp.common.MvpState;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

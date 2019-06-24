@@ -11,10 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.presenter.MvpBasePresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
-import com.simplemvp.presenter.MvpState;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

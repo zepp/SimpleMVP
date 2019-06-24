@@ -7,7 +7,6 @@ package com.simplemvp.common;
 import android.support.annotation.LayoutRes;
 
 import com.simplemvp.presenter.MvpPresenterManager;
-import com.simplemvp.presenter.MvpState;
 
 // интерфейс описывающий представление
 public interface MvpView<P extends MvpPresenter<S>, S extends MvpState> {

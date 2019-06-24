@@ -12,9 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.simplemvp.common.MvpPresenter;
+import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.presenter.MvpPresenterManager;
-import com.simplemvp.presenter.MvpState;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

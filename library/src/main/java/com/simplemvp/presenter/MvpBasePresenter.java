@@ -14,6 +14,7 @@ import android.support.annotation.CallSuper;
 import android.util.Log;
 
 import com.simplemvp.common.MvpPresenter;
+import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 
 import java.util.List;
@@ -74,7 +75,6 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         if (state.isChanged() || state.isInitial()) {
             S snapshot = getStateSnapshot();
             state.clearChanged();
-            state.clearInitial();
             for (MvpView<?, S> view : views) {
                 handler.post(() -> view.post(snapshot));
             }
