@@ -80,6 +80,10 @@ public final class MvpPresenterManager {
         }
     }
 
+    ExecutorService getExecutor() {
+        return executor;
+    }
+
     private <P extends MvpPresenter<S>, S extends MvpState> P newPresenter(Class<P> pClass, Class<S> sClass, S state) {
         try {
             return pClass.getConstructor(Context.class, sClass).newInstance(context, state);

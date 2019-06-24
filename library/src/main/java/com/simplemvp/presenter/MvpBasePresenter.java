@@ -20,10 +20,10 @@ import com.simplemvp.common.MvpView;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleObserver, MvpPresenter<S> {
     protected final String tag = getClass().getSimpleName();
+    protected final MvpPresenterManager manager;
     protected final Context context;
     protected final ExecutorService executor;
     protected final List<MvpView<?, S>> views = new CopyOnWriteArrayList<>();
@@ -32,30 +32,31 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     protected final S state;
 
     public MvpBasePresenter(Context context, S state) {
+        this.manager = MvpPresenterManager.getInstance(context);
         this.context = context;
-        this.executor = Executors.newSingleThreadExecutor();
+        this.executor = manager.getExecutor();
         this.state = state;
         this.handler = new Handler(Looper.getMainLooper());
         this.resources = context.getResources();
     }
 
     // добавляет представление в список клиентов текущего представителя
-    public void attach(MvpView<?, S> view) {
+    public final void attach(MvpView<?, S> view) {
         synchronized (views) {
             views.add(view);
             if (views.size() == 1) {
-                executor.submit(this::onStart);
+                executor.execute(this::onStart);
             }
         }
         handler.post(() -> view.post(getStateSnapshot()));
     }
 
     // удаляет представление из списка клиентов текущего представления
-    public void detach(MvpView<?, S> view) {
+    public final void detach(MvpView<?, S> view) {
         synchronized (views) {
             views.remove(view);
             if (views.size() == 0) {
-                executor.submit(this::onStop);
+                executor.execute(this::onStop);
             }
         }
     }
