@@ -25,7 +25,7 @@ public final class MvpPresenterManager {
     private final String tag = getClass().getSimpleName();
     private final Context context;
     private final ExecutorService executor;
-    private final Map<Class<? extends MvpPresenter<?>>, MvpPresenter<?>> map;
+    private final Map<Integer, MvpPresenter<?>> map;
 
     private MvpPresenterManager(Context context) {
         this.context = context;
@@ -59,7 +59,7 @@ public final class MvpPresenterManager {
             if (presenter == null) {
                 S state = newState(sClass);
                 presenter = PresenterHandler.newProxy(executor, newPresenter(pClass, sClass, state));
-                map.put(pClass, presenter);
+                map.put(presenter.getId(), presenter);
                 Log.d(tag, "new presenter: " + presenter);
             }
             return presenter;
@@ -75,7 +75,7 @@ public final class MvpPresenterManager {
         if (presenter.isDetached()) {
             Log.d(tag, "release presenter: " + presenter);
             synchronized (map) {
-                map.remove(presenter.getClass());
+                map.remove(presenter.getId());
             }
         }
     }

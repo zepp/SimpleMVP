@@ -19,6 +19,7 @@ import com.simplemvp.common.MvpViewImplementation;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is a base class for any MVP presenter. It has basic implementation of interface methods that
@@ -32,8 +33,10 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     protected final Context context;
     protected final Resources resources;
     protected final S state;
+    protected final int id;
     private final List<MvpViewImplementation<S, ?>> implementations = new CopyOnWriteArrayList<>();
     private final ExecutorService executor;
+    private final AtomicInteger lastId = new AtomicInteger();
 
     public MvpBasePresenter(Context context, S state) {
         this.manager = MvpPresenterManager.getInstance(context);
@@ -41,6 +44,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         this.executor = manager.getExecutor();
         this.state = state;
         this.resources = context.getResources();
+        this.id = lastId.incrementAndGet();
     }
 
     /**
@@ -80,6 +84,11 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     @Override
     public final boolean isDetached() {
         return implementations.isEmpty();
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     /**
