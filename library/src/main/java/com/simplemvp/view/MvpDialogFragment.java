@@ -14,20 +14,21 @@ import android.view.ViewGroup;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
+import com.simplemvp.common.MvpViewImplementation;
 import com.simplemvp.presenter.MvpPresenterManager;
 
-public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends MvpState> extends DialogFragment implements MvpView<P, S>, View.OnClickListener {
-    protected MvpStateHandler<S> stateHandler;
+public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends MvpState> extends DialogFragment implements MvpView<S, P> {
+    protected MvpViewImpl<S, P> viewImpl;
     protected MvpPresenterManager manager;
     protected P presenter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stateHandler = new MvpStateHandler<>(this);
-        getLifecycle().addObserver(stateHandler);
         manager = MvpPresenterManager.getInstance(getContext());
         presenter = onInitPresenter(manager);
+        viewImpl = new MvpViewImpl<>(this, presenter);
+        getLifecycle().addObserver(viewImpl);
         presenter.attach(this);
     }
 
@@ -42,21 +43,16 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
         super.onDestroy();
         presenter.detach(this);
         manager.releasePresenter(presenter);
-        getLifecycle().removeObserver(stateHandler);
+        getLifecycle().removeObserver(viewImpl);
     }
 
     @Override
-    public void post(S state) {
-        stateHandler.post(state);
+    public MvpViewImplementation<S, P> getViewImpl() {
+        return viewImpl;
     }
 
     @Override
     public void finish() {
         getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
-    }
-
-    @Override
-    public void onClick(View v) {
-        presenter.onViewClicked(v.getId());
     }
 }

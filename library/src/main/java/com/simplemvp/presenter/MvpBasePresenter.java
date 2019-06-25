@@ -8,8 +8,6 @@ import android.arch.lifecycle.LifecycleObserver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.CallSuper;
 import android.util.Log;
 
@@ -26,8 +24,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     protected final MvpPresenterManager manager;
     protected final Context context;
     protected final ExecutorService executor;
-    protected final List<MvpView<?, S>> views = new CopyOnWriteArrayList<>();
-    protected final Handler handler;
+    protected final List<MvpView<S, ?>> views = new CopyOnWriteArrayList<>();
     protected final Resources resources;
     protected final S state;
 
@@ -36,23 +33,22 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         this.context = context;
         this.executor = manager.getExecutor();
         this.state = state;
-        this.handler = new Handler(Looper.getMainLooper());
         this.resources = context.getResources();
     }
 
     // добавляет представление в список клиентов текущего представителя
-    public final void attach(MvpView<?, S> view) {
+    public final void attach(MvpView<S, ?> view) {
         synchronized (views) {
             views.add(view);
             if (views.size() == 1) {
                 executor.execute(this::onStart);
             }
         }
-        handler.post(() -> view.post(getStateSnapshot()));
+        view.getViewImpl().post(getStateSnapshot());
     }
 
     // удаляет представление из списка клиентов текущего представления
-    public final void detach(MvpView<?, S> view) {
+    public final void detach(MvpView<S, ?> view) {
         synchronized (views) {
             views.remove(view);
             if (views.size() == 0) {
@@ -76,15 +72,15 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         if (state.isChanged() || state.isInitial()) {
             S snapshot = getStateSnapshot();
             state.clearChanged();
-            for (MvpView<?, S> view : views) {
-                handler.post(() -> view.post(snapshot));
+            for (MvpView<S, ?> view : views) {
+                view.getViewImpl().post(snapshot);
             }
         }
     }
 
     public void finish() {
-        for (MvpView<?, S> view : views) {
-            handler.post(view::finish);
+        for (MvpView<S, ?> view : views) {
+            view.getViewImpl().finish();
         }
     }
 

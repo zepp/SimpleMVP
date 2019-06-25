@@ -12,27 +12,27 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
+import com.simplemvp.common.MvpViewImplementation;
 import com.simplemvp.presenter.MvpBasePresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 /* Базовый класс для всех фрагментов, которые реализуют паттерн MVP */
 public abstract class MvpFragment<P extends MvpBasePresenter<S>, S extends MvpState> extends Fragment
-        implements MvpView<P, S>, View.OnClickListener, AdapterView.OnItemSelectedListener {
-    protected MvpStateHandler<S> stateHandler;
+        implements MvpView<S, P> {
+    protected MvpViewImpl<S, P> viewImpl;
     protected MvpPresenterManager manager;
     protected P presenter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stateHandler = new MvpStateHandler<>(this);
-        getLifecycle().addObserver(stateHandler);
         manager = MvpPresenterManager.getInstance(getContext());
         presenter = onInitPresenter(manager);
+        viewImpl = new MvpViewImpl<>(this, presenter);
+        getLifecycle().addObserver(viewImpl);
         presenter.attach(this);
     }
 
@@ -47,12 +47,12 @@ public abstract class MvpFragment<P extends MvpBasePresenter<S>, S extends MvpSt
         super.onDestroy();
         presenter.detach(this);
         manager.releasePresenter(presenter);
-        getLifecycle().removeObserver(stateHandler);
+        getLifecycle().removeObserver(viewImpl);
     }
 
     @Override
-    public void post(S state) {
-        stateHandler.post(state);
+    public MvpViewImplementation<S, P> getViewImpl() {
+        return viewImpl;
     }
 
     @Override
@@ -69,19 +69,5 @@ public abstract class MvpFragment<P extends MvpBasePresenter<S>, S extends MvpSt
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         presenter.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onClick(View v) {
-        presenter.onViewClicked(v.getId());
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        presenter.onItemSelected(adapterView.getId(), adapterView.getItemAtPosition(i));
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
     }
 }

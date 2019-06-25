@@ -9,17 +9,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
+import com.simplemvp.common.MvpViewImplementation;
 import com.simplemvp.presenter.MvpBasePresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 /* Базовый класс для всех Activity, которые реализуют паттерн MVP */
 public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpState> extends AppCompatActivity
-        implements MvpView<P, S>, View.OnClickListener {
-    protected MvpStateHandler<S> stateHandler;
+        implements MvpView<S, P> {
+    protected MvpViewImpl<S, P> viewImpl;
     protected MvpPresenterManager manager;
     protected P presenter;
 
@@ -27,10 +27,10 @@ public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpSt
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
-        stateHandler = new MvpStateHandler<>(this);
-        getLifecycle().addObserver(stateHandler);
         manager = MvpPresenterManager.getInstance(this);
         presenter = onInitPresenter(manager);
+        viewImpl = new MvpViewImpl<>(this, presenter);
+        getLifecycle().addObserver(viewImpl);
         presenter.attach(this);
     }
 
@@ -41,15 +41,13 @@ public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpSt
         if (isFinishing()) {
             manager.releasePresenter(presenter);
         }
-        getLifecycle().removeObserver(stateHandler);
-
+        getLifecycle().removeObserver(viewImpl);
     }
 
     @Override
-    public void post(S state) {
-        stateHandler.post(state);
+    public MvpViewImplementation<S, P> getViewImpl() {
+        return viewImpl;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -60,10 +58,5 @@ public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpSt
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         presenter.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onClick(View v) {
-        presenter.onViewClicked(v.getId());
     }
 }
