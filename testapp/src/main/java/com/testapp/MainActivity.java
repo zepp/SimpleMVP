@@ -28,6 +28,11 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     }
 
     @Override
+    public int getMenuId() {
+        return R.menu.menu_main;
+    }
+
+    @Override
     public void onStateChanged(MainState state) {
 
     }
@@ -60,8 +65,8 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu);
+        menu.findItem(R.id.action_settings).setOnMenuItemClickListener(getViewImpl());
         return true;
     }
 

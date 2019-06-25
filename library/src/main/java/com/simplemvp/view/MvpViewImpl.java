@@ -12,6 +12,7 @@ import android.support.annotation.IdRes;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -59,6 +60,12 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public void onClick(View v) {
         presenter.onViewClicked(v.getId());
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        presenter.onOptionsItemSelected(item.getItemId());
+        return true;
     }
 
     @Override

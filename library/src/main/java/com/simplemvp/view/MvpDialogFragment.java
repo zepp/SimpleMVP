@@ -60,4 +60,9 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
     public void finish() {
         getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
     }
+
+    @Override
+    public int getMenuId() {
+        return 0;
+    }
 }

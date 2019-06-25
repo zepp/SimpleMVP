@@ -6,9 +6,12 @@ package com.simplemvp.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.simplemvp.common.MvpPresenter;
@@ -45,6 +48,17 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         getLifecycle().removeObserver(viewImpl);
     }
 
+    @CallSuper
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (getMenuId() != 0) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(getMenuId(), menu);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public MvpViewImplementation<S, P> getViewImpl() {
         return viewImpl;
@@ -69,5 +83,10 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         presenter.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public int getMenuId() {
+        return 0;
     }
 }

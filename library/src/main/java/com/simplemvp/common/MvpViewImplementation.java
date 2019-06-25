@@ -5,6 +5,7 @@ package com.simplemvp.common;
 
 import android.arch.lifecycle.LifecycleObserver;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -15,7 +16,8 @@ import android.widget.AdapterView;
  * @param <P> presenter type
  */
 public interface MvpViewImplementation<S extends MvpState, P extends MvpPresenter<S>>
-        extends LifecycleObserver, View.OnClickListener, AdapterView.OnItemSelectedListener {
+        extends LifecycleObserver, View.OnClickListener, MenuItem.OnMenuItemClickListener,
+        AdapterView.OnItemSelectedListener {
 
     /**
      * This method posts new state to parent view

@@ -5,6 +5,7 @@
 package com.simplemvp.common;
 
 import android.support.annotation.LayoutRes;
+import android.support.annotation.MenuRes;
 
 import com.simplemvp.presenter.MvpPresenterManager;
 
@@ -22,6 +23,14 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
      */
     @LayoutRes
     int getLayoutId();
+
+    /**
+     * This methods returns menu ID to be inflated by Activity
+     *
+     * @return
+     */
+    @MenuRes
+    int getMenuId();
 
     /**
      * This method returns presenter which current view is attached to
