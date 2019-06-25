@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2019 Pavel A. Sokolov
+ */
 package com.simplemvp.common;
 
 import android.arch.lifecycle.LifecycleObserver;

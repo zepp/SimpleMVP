@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2019 Pavel A. Sokolov
+ */
 package com.simplemvp.presenter;
 
 import android.util.Log;
