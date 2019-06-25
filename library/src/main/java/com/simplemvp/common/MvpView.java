@@ -24,6 +24,13 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     int getLayoutId();
 
     /**
+     * This method returns presenter which current view is attached to
+     *
+     * @return presenter
+     */
+    P getPresenter();
+
+    /**
      * This method is called when state is changed and view should update its state
      *
      * @param state new state

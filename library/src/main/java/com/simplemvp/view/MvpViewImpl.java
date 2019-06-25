@@ -20,6 +20,8 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewImplementation;
 
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -31,15 +33,15 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     private final static int DELAY = 200;
     private final static int QUEUE_SIZE = 8;
     private final String tag = getClass().getSimpleName();
-    private final MvpView<S, P> view;
+    private final WeakReference<MvpView<S, P>> reference;
     private final P presenter;
     private final Queue<S> queue = new ConcurrentLinkedQueue<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final AtomicBoolean isResumed = new AtomicBoolean();
 
-    MvpViewImpl(MvpView<S, P> view, P presenter) {
-        this.view = view;
+    MvpViewImpl(MvpView<S, P> view, P presenter, ReferenceQueue<MvpView<?, ?>> queue) {
+        this.reference = new WeakReference<>(view, queue);
         this.presenter = presenter;
     }
 
@@ -79,7 +81,10 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public void post(S state) {
         if (isResumed.get()) {
-            handler.post(() -> view.onStateChanged(state));
+            MvpView<S, P> view = reference.get();
+            if (view != null) {
+                handler.post(() -> view.onStateChanged(state));
+            }
         } else {
             queue.offer(state);
             while (queue.size() > QUEUE_SIZE) {
@@ -90,14 +95,20 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void finish() {
-        handler.post(view::finish);
+        MvpView<S, P> view = reference.get();
+        if (view != null) {
+            handler.post(view::finish);
+        }
     }
 
     private void flushQueue() {
+        MvpView<S, P> view = reference.get();
         Log.d(tag, "flushing event queue");
         while (!queue.isEmpty()) {
             S state = queue.poll();
-            handler.post(() -> view.onStateChanged(state));
+            if (view != null) {
+                handler.post(() -> view.onStateChanged(state));
+            }
         }
     }
 

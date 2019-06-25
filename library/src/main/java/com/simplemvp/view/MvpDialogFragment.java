@@ -27,7 +27,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
         super.onCreate(savedInstanceState);
         manager = MvpPresenterManager.getInstance(getContext());
         presenter = onInitPresenter(manager);
-        viewImpl = new MvpViewImpl<>(this, presenter);
+        viewImpl = new MvpViewImpl<>(this, presenter, manager.getReferenceQueue());
         getLifecycle().addObserver(viewImpl);
         presenter.attach(this);
     }
@@ -49,6 +49,11 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
     @Override
     public MvpViewImplementation<S, P> getViewImpl() {
         return viewImpl;
+    }
+
+    @Override
+    public P getPresenter() {
+        return presenter;
     }
 
     @Override
