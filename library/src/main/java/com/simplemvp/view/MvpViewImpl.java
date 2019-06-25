@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
         implements MvpViewImplementation<S, P> {
@@ -35,7 +36,7 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     private final Queue<S> queue = new ConcurrentLinkedQueue<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
-    private boolean isResumed;
+    private final AtomicBoolean isResumed = new AtomicBoolean();
 
     MvpViewImpl(MvpView<S, P> view, P presenter) {
         this.view = view;
@@ -44,13 +45,13 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
-        isResumed = true;
+        isResumed.set(true);
         flushQueue();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPaused() {
-        isResumed = false;
+        isResumed.set(false);
     }
 
     @Override
@@ -77,7 +78,7 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void post(S state) {
-        if (isResumed) {
+        if (isResumed.get()) {
             handler.post(() -> view.onStateChanged(state));
         } else {
             queue.offer(state);
