@@ -26,15 +26,21 @@ import com.simplemvp.presenter.MvpPresenterManager;
 /* Базовый класс для всех фрагментов, которые реализуют паттерн MVP */
 public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState> extends Fragment
         implements MvpView<S, P> {
+    private final static String PRESENTER_ID = "presenter-id";
     protected MvpViewImpl<S, P> viewImpl;
-    protected MvpPresenterManager manager;
     protected P presenter;
+    private MvpPresenterManager manager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int presenterId = savedInstanceState == null ? 0 : savedInstanceState.getInt(PRESENTER_ID);
         manager = MvpPresenterManager.getInstance(getContext());
-        presenter = onInitPresenter(manager);
+        if (presenterId == 0) {
+            presenter = onInitPresenter(manager);
+        } else {
+            presenter = manager.getPresenterInstance(presenterId);
+        }
         viewImpl = new MvpViewImpl<>(this, presenter, manager.getReferenceQueue());
         getLifecycle().addObserver(viewImpl);
         presenter.attach(this);
@@ -44,6 +50,12 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(getLayoutId(), container, false);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(PRESENTER_ID, presenter.getId());
     }
 
     @Override

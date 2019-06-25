@@ -69,6 +69,21 @@ public final class MvpPresenterManager {
     }
 
     /**
+     * This method returns already created presenter by ID
+     *
+     * @param presenterId presenter Id
+     * @param <S>         state type
+     * @param <P>         presenter type
+     * @return presenter of desired type
+     */
+    public <S extends MvpState, P extends MvpPresenter<S>> P getPresenterInstance(int presenterId) {
+        expungeStaleEntries();
+        synchronized (map) {
+            return (P) map.get(presenterId);
+        }
+    }
+
+    /**
      * This method releases presenter instance to be garbage collected
      *
      * @param presenter instance to be released if one has no attached views

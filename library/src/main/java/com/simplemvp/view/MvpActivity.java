@@ -23,19 +23,31 @@ import com.simplemvp.presenter.MvpPresenterManager;
 /* Базовый класс для всех Activity, которые реализуют паттерн MVP */
 public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState> extends AppCompatActivity
         implements MvpView<S, P> {
+    private final static String PRESENTER_ID = "presenter-id";
     protected MvpViewImpl<S, P> viewImpl;
-    protected MvpPresenterManager manager;
     protected P presenter;
+    private MvpPresenterManager manager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int presenterId = savedInstanceState == null ? 0 : savedInstanceState.getInt(PRESENTER_ID);
         setContentView(getLayoutId());
         manager = MvpPresenterManager.getInstance(this);
-        presenter = onInitPresenter(manager);
+        if (presenterId == 0) {
+            presenter = onInitPresenter(manager);
+        } else {
+            presenter = manager.getPresenterInstance(presenterId);
+        }
         viewImpl = new MvpViewImpl<>(this, presenter, manager.getReferenceQueue());
         getLifecycle().addObserver(viewImpl);
         presenter.attach(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(PRESENTER_ID, presenter.getId());
     }
 
     @Override
