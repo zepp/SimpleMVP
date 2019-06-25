@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <S> state type
  */
 public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleObserver, MvpPresenter<S> {
+    private final static AtomicInteger lastId = new AtomicInteger();
     protected final String tag = getClass().getSimpleName();
     protected final MvpPresenterManager manager;
     protected final Context context;
@@ -38,7 +39,6 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     protected final int id;
     private final List<MvpViewImplementation<S, ?>> implementations = new CopyOnWriteArrayList<>();
     private final ExecutorService executor;
-    private final AtomicInteger lastId = new AtomicInteger();
 
     public MvpBasePresenter(Context context, S state) {
         this.manager = MvpPresenterManager.getInstance(context);
@@ -84,6 +84,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
      * @return
      */
     @Override
+    @Handling(offload = false)
     public final boolean isDetached() {
         return implementations.isEmpty();
     }
@@ -167,5 +168,14 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         } catch (CloneNotSupportedException e) {
             return null;
         }
+    }
+
+    @Override
+    @Handling(offload = false)
+    public String toString() {
+        return "MvpBasePresenter{" +
+                "id=" + id +
+                ", state=" + state +
+                '}';
     }
 }

@@ -19,6 +19,7 @@ public interface MvpPresenter<S extends MvpState> {
 
     void detach(MvpView<S, ?> view);
 
+    @Handling(offload = false)
     boolean isDetached();
 
     @Handling(offload = false)
