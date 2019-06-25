@@ -6,6 +6,7 @@ package com.simplemvp.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -58,5 +59,10 @@ public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpSt
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         presenter.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        presenter.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

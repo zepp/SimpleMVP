@@ -16,6 +16,7 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewImplementation;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -115,6 +116,13 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(tag, "onActivityResult(" + requestCode + ", " + resultCode + ", " + data + ")");
+    }
+
+    @CallSuper
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(tag, "onRequestPermissionsResult(" + requestCode + ", " + Arrays.toString(permissions) + ", "
+                + Arrays.toString(grantResults));
     }
 
     @CallSuper
