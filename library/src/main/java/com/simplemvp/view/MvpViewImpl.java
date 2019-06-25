@@ -96,7 +96,8 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     private void flushQueue() {
         Log.d(tag, "flushing event queue");
         while (!queue.isEmpty()) {
-            handler.post(() -> view.onStateChanged(queue.poll()));
+            S state = queue.poll();
+            handler.post(() -> view.onStateChanged(state));
         }
     }
 

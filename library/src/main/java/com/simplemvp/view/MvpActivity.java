@@ -11,14 +11,14 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewImplementation;
-import com.simplemvp.presenter.MvpBasePresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 /* Базовый класс для всех Activity, которые реализуют паттерн MVP */
-public abstract class MvpActivity<P extends MvpBasePresenter<S>, S extends MvpState> extends AppCompatActivity
+public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState> extends AppCompatActivity
         implements MvpView<S, P> {
     protected MvpViewImpl<S, P> viewImpl;
     protected MvpPresenterManager manager;

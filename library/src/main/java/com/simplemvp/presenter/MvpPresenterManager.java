@@ -52,16 +52,12 @@ public final class MvpPresenterManager {
      * @param sClass class of state
      * @return new presenter
      */
-    public <P extends MvpPresenter<S>, S extends MvpState> P getPresenterInstance(Class<P> pClass,
-                                                                                  Class<S> sClass) {
+    public <S extends MvpState, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends I> pClass, Class<S> sClass) {
         synchronized (map) {
-            P presenter = (P) map.get(pClass);
-            if (presenter == null) {
-                S state = newState(sClass);
-                presenter = PresenterHandler.newProxy(executor, newPresenter(pClass, sClass, state));
-                map.put(presenter.getId(), presenter);
-                Log.d(tag, "new presenter: " + presenter);
-            }
+            S state = newState(sClass);
+            I presenter = PresenterHandler.newProxy(executor, newPresenter(pClass, sClass, state));
+            map.put(presenter.getId(), presenter);
+            Log.d(tag, "new presenter: " + presenter);
             return presenter;
         }
     }

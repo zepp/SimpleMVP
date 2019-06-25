@@ -5,6 +5,7 @@ package com.simplemvp.presenter;
 
 import android.util.Log;
 
+import com.simplemvp.annotations.Handling;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 
@@ -29,7 +30,7 @@ class PresenterHandler<S extends MvpState> implements InvocationHandler {
                 presenter.getClass().getInterfaces(), new PresenterHandler<>(executor, presenter));
     }
 
-    private static String formStackTrace(Exception e) {
+    private static String formStackTrace(Throwable e) {
         StringBuilder builder = new StringBuilder();
         builder.append(e.toString());
         builder.append('\n');
@@ -43,13 +44,27 @@ class PresenterHandler<S extends MvpState> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Handling handling = method.getAnnotation(Handling.class);
+        if (handling == null) {
+            offload(method, args);
+        } else {
+            if (handling.offload()) {
+                offload(method, args);
+            } else {
+                return method.invoke(presenter, args);
+            }
+        }
+        return null;
+    }
+
+    private void offload(Method method, Object[] args) {
         executor.execute(() -> {
             try {
                 method.invoke(presenter, args);
             } catch (Exception e) {
-                Log.e(tag, "error: " + formStackTrace(e));
+                Throwable cause = e.getCause();
+                Log.e(tag, "error: " + formStackTrace(cause == null ? e : cause));
             }
         });
-        return null;
     }
 }

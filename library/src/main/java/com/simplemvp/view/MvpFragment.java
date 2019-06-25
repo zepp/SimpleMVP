@@ -14,14 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewImplementation;
-import com.simplemvp.presenter.MvpBasePresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 /* Базовый класс для всех фрагментов, которые реализуют паттерн MVP */
-public abstract class MvpFragment<P extends MvpBasePresenter<S>, S extends MvpState> extends Fragment
+public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState> extends Fragment
         implements MvpView<S, P> {
     protected MvpViewImpl<S, P> viewImpl;
     protected MvpPresenterManager manager;

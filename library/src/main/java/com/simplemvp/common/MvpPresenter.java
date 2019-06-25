@@ -7,6 +7,8 @@ package com.simplemvp.common;
 import android.content.Intent;
 import android.support.annotation.IdRes;
 
+import com.simplemvp.annotations.Handling;
+
 /**
  * This interface describes generic MVP presenter
  *
@@ -19,6 +21,7 @@ public interface MvpPresenter<S extends MvpState> {
 
     boolean isDetached();
 
+    @Handling(offload = false)
     int getId();
 
     void commit();

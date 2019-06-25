@@ -11,6 +11,7 @@ import android.content.res.Resources;
 import android.support.annotation.CallSuper;
 import android.util.Log;
 
+import com.simplemvp.annotations.Handling;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
@@ -88,6 +89,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
     }
 
     @Override
+    @Handling(offload = false)
     public int getId() {
         return id;
     }
