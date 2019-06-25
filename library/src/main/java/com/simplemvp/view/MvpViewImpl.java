@@ -120,8 +120,8 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     private class TextWatcherImpl implements TextWatcher {
-        final @IdRes
-        int viewId;
+        @IdRes
+        final int viewId;
         String text = "";
         boolean isSendTextPosted;
         long millis;
