@@ -63,7 +63,7 @@ public final class MvpPresenterManager {
             S state = newState(sClass);
             I presenter = PresenterHandler.newProxy(executor, newPresenter(pClass, sClass, state));
             map.put(presenter.getId(), presenter);
-            Log.d(tag, "new presenter: " + presenter);
+            Log.d(tag, "new presenter: " + pClass.getSimpleName() + " { " + presenter.getId() + " }");
             return presenter;
         }
     }
@@ -90,7 +90,7 @@ public final class MvpPresenterManager {
      */
     public void releasePresenter(MvpPresenter<?> presenter) {
         if (presenter.isDetached()) {
-            Log.d(tag, "release presenter: " + presenter);
+            Log.d(tag, "release presenter: " + presenter.getId());
             synchronized (map) {
                 map.remove(presenter.getId());
             }

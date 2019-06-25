@@ -54,6 +54,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
      *
      * @param view to be attached
      */
+    @Handling(offload = false)
     public final void attach(MvpView<S, ?> view) {
         synchronized (implementations) {
             implementations.add(view.getViewImpl());
@@ -69,6 +70,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
      *
      * @param view to be detached
      */
+    @Handling(offload = false)
     public final void detach(MvpView<S, ?> view) {
         synchronized (implementations) {
             implementations.remove(view.getViewImpl());

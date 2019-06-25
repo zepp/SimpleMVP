@@ -15,8 +15,10 @@ import com.simplemvp.annotations.Handling;
  * @param <S> state type
  */
 public interface MvpPresenter<S extends MvpState> {
+    @Handling(offload = false)
     void attach(MvpView<S, ?> view);
 
+    @Handling(offload = false)
     void detach(MvpView<S, ?> view);
 
     @Handling(offload = false)
