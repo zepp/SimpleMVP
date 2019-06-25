@@ -14,19 +14,26 @@ import android.util.Log;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
+import com.simplemvp.common.MvpViewImplementation;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * This is a base class for any MVP presenter. It has basic implementation of interface methods that
+ * prints debug information. Also it keeps a list of attached views (implementations)
+ *
+ * @param <S> state type
+ */
 public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleObserver, MvpPresenter<S> {
     protected final String tag = getClass().getSimpleName();
     protected final MvpPresenterManager manager;
     protected final Context context;
-    protected final ExecutorService executor;
-    protected final List<MvpView<S, ?>> views = new CopyOnWriteArrayList<>();
     protected final Resources resources;
     protected final S state;
+    private final List<MvpViewImplementation<S, ?>> implementations = new CopyOnWriteArrayList<>();
+    private final ExecutorService executor;
 
     public MvpBasePresenter(Context context, S state) {
         this.manager = MvpPresenterManager.getInstance(context);
@@ -36,52 +43,62 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         this.resources = context.getResources();
     }
 
-    // добавляет представление в список клиентов текущего представителя
+    /**
+     * This method attaches view to the presenter
+     *
+     * @param view to be attached
+     */
     public final void attach(MvpView<S, ?> view) {
-        synchronized (views) {
-            views.add(view);
-            if (views.size() == 1) {
+        synchronized (implementations) {
+            implementations.add(view.getViewImpl());
+            if (implementations.size() == 1) {
                 executor.execute(this::onStart);
             }
         }
         view.getViewImpl().post(getStateSnapshot());
     }
 
-    // удаляет представление из списка клиентов текущего представления
+    /**
+     * This method detaches view from the presenter
+     *
+     * @param view to be detached
+     */
     public final void detach(MvpView<S, ?> view) {
-        synchronized (views) {
-            views.remove(view);
-            if (views.size() == 0) {
+        synchronized (implementations) {
+            implementations.remove(view.getViewImpl());
+            if (implementations.size() == 0) {
                 executor.execute(this::onStop);
             }
         }
     }
 
+    /**
+     * Predicate that indicates that presenter has no attached views
+     *
+     * @return
+     */
     @Override
-    public boolean isDetached() {
-        return views.isEmpty();
+    public final boolean isDetached() {
+        return implementations.isEmpty();
     }
 
-    public S getState() {
-        return (S) getStateSnapshot();
-    }
-
-    // делает копию состояния и отправляет её на отображение
-    // копия делается с целью избежания ситуации, когда состояние изменяется в процессе отображения
-    public void commit() {
+    /**
+     * This method sends current state to attached views to render changes
+     */
+    public synchronized void commit() {
         if (state.isChanged() || state.isInitial()) {
             S snapshot = getStateSnapshot();
             state.clearChanged();
-            for (MvpView<S, ?> view : views) {
-                view.getViewImpl().post(snapshot);
+            for (MvpViewImplementation<S, ?> impl : implementations) {
+                impl.post(snapshot);
             }
         }
     }
 
     @Override
     public void finish() {
-        for (MvpView<S, ?> view : views) {
-            view.getViewImpl().finish();
+        for (MvpViewImplementation<S, ?> impl : implementations) {
+            impl.finish();
         }
     }
 
