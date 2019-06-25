@@ -25,4 +25,6 @@ public interface MvpPresenter<S extends MvpState> {
     void onOptionsItemSelected(@IdRes int itemId);
 
     void onItemSelected(@IdRes int viewId, Object item);
+
+    void onTextChanged(@IdRes int viewId, String text);
 }

@@ -1,6 +1,7 @@
 package com.simplemvp.common;
 
 import android.arch.lifecycle.LifecycleObserver;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -25,4 +26,12 @@ public interface MvpViewImplementation<S extends MvpState, P extends MvpPresente
      * This method terminates parent view
      */
     void finish();
+
+    /**
+     * This method returns new TextWatcher to handle EditText events
+     *
+     * @param view view that has TextWatcher listener callback
+     * @return new TextWatcher listener
+     */
+    TextWatcher newTextWatcher(View view);
 }

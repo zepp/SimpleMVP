@@ -78,6 +78,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         }
     }
 
+    @Override
     public void finish() {
         for (MvpView<S, ?> view : views) {
             view.getViewImpl().finish();
@@ -102,9 +103,16 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         Log.d(tag, "onOptionsItemSelected(" + resources.getResourceName(itemId) + ")");
     }
 
+    @CallSuper
     @Override
     public void onItemSelected(int viewId, Object item) {
         Log.d(tag, "onItemSelected(" + resources.getResourceName(viewId) + ", " + item + ")");
+    }
+
+    @CallSuper
+    @Override
+    public void onTextChanged(int viewId, String text) {
+        Log.d(tag, "onTextChanged(" + resources.getResourceName(viewId) + ", " + text + ")");
     }
 
     @CallSuper
