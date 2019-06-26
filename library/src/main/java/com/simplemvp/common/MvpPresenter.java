@@ -43,5 +43,7 @@ public interface MvpPresenter<S extends MvpState> {
 
     void onCheckedChanged(@IdRes int viewId, boolean isChecked);
 
+    void onRadioCheckedChanged(@IdRes int radioViewId, @IdRes int viewId);
+
     void onTextChanged(@IdRes int viewId, String text);
 }

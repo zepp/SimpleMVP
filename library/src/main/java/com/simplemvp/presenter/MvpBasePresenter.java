@@ -158,6 +158,11 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
         Log.d(tag, "onCheckedChanged(" + resources.getResourceName(viewId) + ", " + isChecked + ")");
     }
 
+    @Override
+    public void onRadioCheckedChanged(int radioViewId, int viewId) {
+        Log.d(tag, "onRadioCheckedChanged(" + resources.getResourceName(radioViewId) + ", " + viewId + ")");
+    }
+
     @CallSuper
     protected void onStart() {
         Log.d(tag, "onStart");

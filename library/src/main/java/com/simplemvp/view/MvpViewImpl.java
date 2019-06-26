@@ -77,6 +77,7 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
+        presenter.onItemSelected(adapterView.getId(), null);
     }
 
     @Override
@@ -86,7 +87,7 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        presenter.onCheckedChanged(checkedId, true);
+        presenter.onRadioCheckedChanged(group.getId(), checkedId);
     }
 
     @Override
