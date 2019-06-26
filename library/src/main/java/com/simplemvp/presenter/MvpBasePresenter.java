@@ -4,7 +4,6 @@
 
 package com.simplemvp.presenter;
 
-import android.arch.lifecycle.LifecycleObserver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -29,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @param <S> state type
  */
-public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleObserver, MvpPresenter<S> {
+public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresenter<S> {
     private final static AtomicInteger lastId = new AtomicInteger();
     protected final String tag = getClass().getSimpleName();
     protected final MvpPresenterManager manager;
