@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019 Pavel A. Sokolov
+ */
+
 package com.simplemvp.annotations;
 
 import java.lang.annotation.ElementType;
