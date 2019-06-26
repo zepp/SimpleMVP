@@ -9,18 +9,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpActivity;
+import com.simplemvp.view.MvpEditText;
 
 public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState> {
     private Toolbar toolbar;
     private FloatingActionButton fab;
     private Button button;
-    private EditText editText;
+    private MvpEditText editText;
     private Spinner spinner;
     private RecyclerView events;
     private EventsAdapter eventsAdapter;
@@ -38,6 +38,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     @Override
     public void onStateChanged(MainState state) {
         eventsAdapter.setEvents(state.events);
+        editText.setTextNoWatchers(state.text);
     }
 
     @Override
