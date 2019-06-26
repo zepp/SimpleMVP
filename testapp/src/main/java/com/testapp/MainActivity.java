@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
@@ -21,6 +22,8 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     private Button button;
     private EditText editText;
     private Spinner spinner;
+    private RecyclerView events;
+    private EventsAdapter eventsAdapter;
 
     @Override
     public int getLayoutId() {
@@ -34,7 +37,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
 
     @Override
     public void onStateChanged(MainState state) {
-
+        eventsAdapter.setEvents(state.events);
     }
 
     @Override
@@ -45,6 +48,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        eventsAdapter = new EventsAdapter();
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         fab = findViewById(R.id.fab);
@@ -52,6 +56,8 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
         editText = findViewById(R.id.editText);
         spinner = findViewById(R.id.spinner);
         spinner.setAdapter(new SpinnerAdapter(this, new String[]{"One", "Two", "Three"}));
+        events = findViewById(R.id.events);
+        events.setAdapter(eventsAdapter);
     }
 
     @Override
@@ -75,7 +81,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     }
 
     private class SpinnerAdapter extends ArrayAdapter<String> {
-        public SpinnerAdapter(@NonNull Context context, @NonNull String[] objects) {
+        SpinnerAdapter(@NonNull Context context, @NonNull String[] objects) {
             super(context, android.R.layout.simple_spinner_item, objects);
         }
     }
