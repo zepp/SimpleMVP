@@ -10,6 +10,7 @@ import com.simplemvp.common.MvpState;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 
 class PresenterHandler<S extends MvpState> implements InvocationHandler {
@@ -23,9 +24,26 @@ class PresenterHandler<S extends MvpState> implements InvocationHandler {
         this.presenter = presenter;
     }
 
-    static <S extends MvpState, P extends MvpPresenter<S>> P newProxy(ExecutorService executor, MvpErrorHandler handler, P presenter) {
+    private static Class<?>[] concat(Class<?>[] first, Class<?>[] second) {
+        Class<?>[] both = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, both, first.length, second.length);
+        return both;
+    }
+
+    private static Class<?>[] getAllImplementedInterfaces(Class<?> clazz) {
+        Class<?>[] result = clazz.getInterfaces();
+        if (clazz.getSuperclass().equals(Object.class)) {
+            return result;
+        } else {
+            return concat(result, getAllImplementedInterfaces(clazz.getSuperclass()));
+        }
+    }
+
+    static <S extends MvpState, P extends MvpPresenter<S>> P newProxy(
+            ExecutorService executor, MvpErrorHandler handler, P presenter) {
         return (P) Proxy.newProxyInstance(presenter.getClass().getClassLoader(),
-                presenter.getClass().getInterfaces(), new PresenterHandler<>(executor, handler, presenter));
+                getAllImplementedInterfaces(presenter.getClass()),
+                new PresenterHandler<>(executor, handler, presenter));
     }
 
     @Override

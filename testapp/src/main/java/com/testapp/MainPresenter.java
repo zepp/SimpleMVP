@@ -2,12 +2,11 @@ package com.testapp;
 
 import android.content.Context;
 
-import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpBasePresenter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MainPresenter extends MvpBasePresenter<MainState> implements MvpPresenter<MainState> {
+public class MainPresenter extends MvpBasePresenter<MainState> {
     private final AtomicInteger lastEventId = new AtomicInteger();
 
     public MainPresenter(Context context, MainState state) {
