@@ -27,15 +27,17 @@ public final class MvpPresenterManager {
     private static volatile MvpPresenterManager instance;
     private final String tag = getClass().getSimpleName();
     private final Context context;
-    private final ExecutorService executor;
     private final Map<Integer, MvpPresenter<?>> map;
     private final ReferenceQueue<MvpView<?, ?>> referenceQueue;
+    private volatile ExecutorService executor;
+    private volatile MvpErrorHandler handler;
 
     private MvpPresenterManager(Context context) {
         this.context = context;
         this.executor = Executors.newSingleThreadExecutor();
         this.map = new HashMap<>();
         this.referenceQueue = new ReferenceQueue<>();
+        this.handler = e -> Log.e(tag, formStackTrace(e));
     }
 
     public static MvpPresenterManager getInstance(Context context) {
@@ -47,6 +49,23 @@ public final class MvpPresenterManager {
             }
         }
         return instance;
+    }
+
+    private static String formStackTrace(Throwable e) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(e.toString());
+        builder.append('\n');
+        for (StackTraceElement element : e.getStackTrace()) {
+            builder.append('\t');
+            builder.append(element.toString());
+            builder.append('\n');
+        }
+        return builder.toString();
+    }
+
+    public void initialize(ExecutorService executor, MvpErrorHandler handler) {
+        this.executor = executor;
+        this.handler = handler;
     }
 
     /**
@@ -61,7 +80,7 @@ public final class MvpPresenterManager {
         expungeStaleEntries();
         synchronized (map) {
             S state = newState(sClass);
-            I presenter = PresenterHandler.newProxy(executor, newPresenter(pClass, sClass, state));
+            I presenter = PresenterHandler.newProxy(executor, handler, newPresenter(pClass, sClass, state));
             map.put(presenter.getId(), presenter);
             Log.d(tag, "new presenter: " + pClass.getSimpleName() + " { " + presenter.getId() + " }");
             return presenter;
