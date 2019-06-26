@@ -41,5 +41,7 @@ public interface MvpPresenter<S extends MvpState> {
 
     void onItemSelected(@IdRes int viewId, Object item);
 
+    void onCheckedChanged(@IdRes int viewId, boolean isChecked);
+
     void onTextChanged(@IdRes int viewId, String text);
 }

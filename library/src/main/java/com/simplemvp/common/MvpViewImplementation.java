@@ -8,6 +8,8 @@ import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 
 /**
  * This interface describes MVP view implementation
@@ -17,6 +19,7 @@ import android.widget.AdapterView;
  */
 public interface MvpViewImplementation<S extends MvpState, P extends MvpPresenter<S>>
         extends LifecycleObserver, View.OnClickListener, MenuItem.OnMenuItemClickListener,
+        CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener,
         AdapterView.OnItemSelectedListener {
 
     /**

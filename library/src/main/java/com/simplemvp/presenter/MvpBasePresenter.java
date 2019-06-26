@@ -154,6 +154,11 @@ public abstract class MvpBasePresenter<S extends MvpState> implements LifecycleO
         Log.d(tag, "onTextChanged(" + resources.getResourceName(viewId) + ", " + text + ")");
     }
 
+    @Override
+    public void onCheckedChanged(int viewId, boolean isChecked) {
+        Log.d(tag, "onCheckedChanged(" + resources.getResourceName(viewId) + ", " + isChecked + ")");
+    }
+
     @CallSuper
     protected void onStart() {
         Log.d(tag, "onStart");

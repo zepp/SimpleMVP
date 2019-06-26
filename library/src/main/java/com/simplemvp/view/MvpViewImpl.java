@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
@@ -75,6 +77,16 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        presenter.onCheckedChanged(buttonView.getId(), isChecked);
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        presenter.onCheckedChanged(checkedId, true);
     }
 
     @Override
