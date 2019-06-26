@@ -3,25 +3,52 @@
  */
 package com.simplemvp.presenter;
 
-import com.simplemvp.annotations.Handling;
+import android.util.Log;
+
+import com.simplemvp.annotations.MvpEventHandler;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 class PresenterHandler<S extends MvpState> implements InvocationHandler {
     private final ExecutorService executor;
     private final MvpErrorHandler handler;
     private final MvpPresenter<S> presenter;
+    private final Map<String, MvpEventHandler> handlers;
 
     private PresenterHandler(ExecutorService executor, MvpErrorHandler handler, MvpPresenter<S> presenter) {
         this.executor = executor;
         this.handler = handler;
         this.presenter = presenter;
+        this.handlers = getPresenterAnnotations(presenter);
+    }
+
+    private static <S extends MvpState> Map<String, MvpEventHandler> getPresenterAnnotations(MvpPresenter<S> presenter) {
+        String tag = presenter.getClass().getSimpleName();
+        Map<String, MvpEventHandler> result = new HashMap<>();
+        for (Method method : presenter.getClass().getMethods()) {
+            MvpEventHandler handler = method.getAnnotation(MvpEventHandler.class);
+            if (handler != null) {
+                if (handler.executor()) {
+                    if (method.getReturnType().equals(void.class) || method.getReturnType().equals(Void.class)) {
+                        result.put(method.getName(), handler);
+                    } else {
+                        Log.w(tag, "@MvpEventHandler method " + method.getName() + " is ignored since return value is incorrect");
+                    }
+                } else {
+                    result.put(method.getName(), handler);
+                }
+            }
+        }
+        return result;
     }
 
     private static Class<?>[] concat(Class<?>[] first, Class<?>[] second) {
@@ -48,23 +75,33 @@ class PresenterHandler<S extends MvpState> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Handling handling = method.getAnnotation(Handling.class);
-        if (handling == null) {
-            return method.invoke(presenter, args);
+        MvpEventHandler handler = handlers.get(method.getName());
+        if (handler == null) {
+            return invoke(true, method, args);
         } else {
-            if (handling.offload()) {
-                offload(method, args);
+            if (handler.executor()) {
+                execute(handler.sync(), method, args);
             } else {
-                return method.invoke(presenter, args);
+                return invoke(handler.sync(), method, args);
             }
         }
         return null;
     }
 
-    private void offload(Method method, Object[] args) {
+    private Object invoke(boolean sync, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        if (sync) {
+            synchronized (presenter) {
+                return method.invoke(presenter, args);
+            }
+        } else {
+            return method.invoke(presenter, args);
+        }
+    }
+
+    private void execute(boolean sync, Method method, Object[] args) {
         executor.execute(() -> {
             try {
-                method.invoke(presenter, args);
+                invoke(sync, method, args);
             } catch (Exception e) {
                 Throwable cause = e.getCause();
                 handler.onError(cause == null ? e : cause);
