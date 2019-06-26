@@ -34,6 +34,10 @@ public abstract class MvpState implements Cloneable {
         return revision == 0;
     }
 
+    public int getRevision() {
+        return revision;
+    }
+
     @Override
     public synchronized MvpState clone() throws CloneNotSupportedException {
         MvpState state = (MvpState) super.clone();
@@ -41,5 +45,11 @@ public abstract class MvpState implements Cloneable {
         return state;
     }
 
-
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " {" +
+                "revision=" + revision +
+                ", isChanged=" + isChanged +
+                '}';
+    }
 }

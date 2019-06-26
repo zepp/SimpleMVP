@@ -11,7 +11,6 @@ import android.support.annotation.CallSuper;
 import android.util.Log;
 import android.view.DragEvent;
 
-import com.simplemvp.annotations.Handling;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
@@ -54,7 +53,6 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
      *
      * @param view to be attached
      */
-    @Handling(offload = false)
     public final void attach(MvpView<S, ?> view) {
         synchronized (implementations) {
             implementations.add(view.getViewImpl());
@@ -70,7 +68,6 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
      *
      * @param view to be detached
      */
-    @Handling(offload = false)
     public final void detach(MvpView<S, ?> view) {
         synchronized (implementations) {
             implementations.remove(view.getViewImpl());
@@ -83,16 +80,14 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
     /**
      * Predicate that indicates that presenter has no attached views
      *
-     * @return
+     * @return true if there is no attached views
      */
     @Override
-    @Handling(offload = false)
     public final boolean isDetached() {
         return implementations.isEmpty();
     }
 
     @Override
-    @Handling(offload = false)
     public int getId() {
         return id;
     }
@@ -188,9 +183,8 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
     }
 
     @Override
-    @Handling(offload = false)
     public String toString() {
-        return "MvpBasePresenter{" +
+        return getClass().getSimpleName() + " {" +
                 "id=" + id +
                 ", state=" + state +
                 '}';

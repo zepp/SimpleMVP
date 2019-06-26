@@ -37,6 +37,6 @@ class MainState extends MvpState {
         return "MainState{" +
                 "text='" + text + '\'' +
                 ", option=" + option +
-                "} " + super.toString();
+                "} ";
     }
 }

@@ -50,7 +50,7 @@ class PresenterHandler<S extends MvpState> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Handling handling = method.getAnnotation(Handling.class);
         if (handling == null) {
-            offload(method, args);
+            return method.invoke(presenter, args);
         } else {
             if (handling.offload()) {
                 offload(method, args);

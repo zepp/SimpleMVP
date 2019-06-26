@@ -8,24 +8,18 @@ import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.view.DragEvent;
 
-import com.simplemvp.annotations.Handling;
-
 /**
  * This interface describes generic MVP presenter
  *
  * @param <S> state type
  */
 public interface MvpPresenter<S extends MvpState> {
-    @Handling(offload = false)
     void attach(MvpView<S, ?> view);
 
-    @Handling(offload = false)
     void detach(MvpView<S, ?> view);
 
-    @Handling(offload = false)
     boolean isDetached();
 
-    @Handling(offload = false)
     int getId();
 
     void commit();
