@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +22,17 @@ import com.simplemvp.presenter.MvpPresenterManager;
 public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends MvpState>
         extends DialogFragment implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
+    protected final String tag = getClass().getSimpleName();
     protected MvpViewImpl<S, P> viewImpl;
     protected P presenter;
     private MvpPresenterManager manager;
+
+    protected Bundle initArguments(int presenterId) {
+        Bundle args = new Bundle();
+        args.putInt(PRESENTER_ID, presenterId);
+        setArguments(args);
+        return args;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,5 +87,15 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
     @Override
     public int getMenuId() {
         return 0;
+    }
+
+    @Override
+    public P onInitPresenter(MvpPresenterManager manager) {
+        if (getArguments() == null) {
+            Log.w(tag, "presenter ID is not supplied");
+            return null;
+        } else {
+            return manager.getPresenterInstance(getArguments().getInt(PRESENTER_ID));
+        }
     }
 }

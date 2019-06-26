@@ -24,6 +24,7 @@ import com.simplemvp.presenter.MvpPresenterManager;
 public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState> extends AppCompatActivity
         implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
+    protected final String tag = getClass().getSimpleName();
     protected MvpViewImpl<S, P> viewImpl;
     protected P presenter;
     private MvpPresenterManager manager;

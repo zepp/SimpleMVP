@@ -27,9 +27,17 @@ import com.simplemvp.presenter.MvpPresenterManager;
 public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState> extends Fragment
         implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
+    protected final String tag = getClass().getSimpleName();
     protected MvpViewImpl<S, P> viewImpl;
     protected P presenter;
     private MvpPresenterManager manager;
+
+    protected Bundle initArguments(int presenterId) {
+        Bundle args = new Bundle();
+        args.putInt(PRESENTER_ID, presenterId);
+        setArguments(args);
+        return args;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
