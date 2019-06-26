@@ -20,7 +20,7 @@ import android.widget.RadioGroup;
 public interface MvpViewImplementation<S extends MvpState, P extends MvpPresenter<S>>
         extends LifecycleObserver, View.OnClickListener, MenuItem.OnMenuItemClickListener,
         CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener,
-        AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener, View.OnDragListener {
 
     /**
      * This method posts new state to parent view

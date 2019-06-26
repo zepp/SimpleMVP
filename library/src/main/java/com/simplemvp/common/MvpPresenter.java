@@ -6,6 +6,7 @@ package com.simplemvp.common;
 
 import android.content.Intent;
 import android.support.annotation.IdRes;
+import android.view.DragEvent;
 
 import com.simplemvp.annotations.Handling;
 
@@ -46,4 +47,6 @@ public interface MvpPresenter<S extends MvpState> {
     void onRadioCheckedChanged(@IdRes int radioViewId, @IdRes int viewId);
 
     void onTextChanged(@IdRes int viewId, String text);
+
+    void onDrag(@IdRes int viewId, DragEvent event);
 }

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.CallSuper;
 import android.util.Log;
+import android.view.DragEvent;
 
 import com.simplemvp.annotations.Handling;
 import com.simplemvp.common.MvpPresenter;
@@ -161,6 +162,11 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
     @Override
     public void onRadioCheckedChanged(int radioViewId, int viewId) {
         Log.d(tag, "onRadioCheckedChanged(" + resources.getResourceName(radioViewId) + ", " + viewId + ")");
+    }
+
+    @Override
+    public void onDrag(int viewId, DragEvent event) {
+        Log.d(tag, "onDrag(" + resources.getResourceName(viewId) + ", " + event + ")");
     }
 
     @CallSuper

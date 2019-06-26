@@ -12,6 +12,7 @@ import android.support.annotation.IdRes;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -88,6 +89,12 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         presenter.onRadioCheckedChanged(group.getId(), checkedId);
+    }
+
+    @Override
+    public boolean onDrag(View v, DragEvent event) {
+        presenter.onDrag(v.getId(), event);
+        return true;
     }
 
     @Override
