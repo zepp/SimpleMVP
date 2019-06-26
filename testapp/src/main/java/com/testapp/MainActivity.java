@@ -66,7 +66,11 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.findItem(R.id.action_settings).setOnMenuItemClickListener(getViewImpl());
+        menu.findItem(R.id.action_settings).setOnMenuItemClickListener(view -> {
+            SettingsDialog dialog = SettingsDialog.newInstance(presenter.getId());
+            dialog.show(getSupportFragmentManager(), dialog.getClass().getSimpleName());
+            return true;
+        });
         return true;
     }
 
