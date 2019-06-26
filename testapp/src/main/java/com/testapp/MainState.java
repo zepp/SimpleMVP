@@ -8,6 +8,7 @@ import java.util.List;
 class MainState extends MvpState {
     String text = "";
     List<Event> events = new ArrayList<>();
+    int option;
 
     void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -19,10 +20,23 @@ class MainState extends MvpState {
         events.add(event);
     }
 
+    void setOption(int option) {
+        setChanged(this.option != option);
+        this.option = option;
+    }
+
     @Override
     public synchronized MainState clone() throws CloneNotSupportedException {
         MainState state = (MainState) super.clone();
         state.events = new ArrayList<>(events);
         return state;
+    }
+
+    @Override
+    public String toString() {
+        return "MainState{" +
+                "text='" + text + '\'' +
+                ", option=" + option +
+                "} " + super.toString();
     }
 }

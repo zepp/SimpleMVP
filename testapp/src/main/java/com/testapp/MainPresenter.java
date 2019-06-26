@@ -42,4 +42,10 @@ public class MainPresenter extends MvpBasePresenter<MainState> implements MvpPre
         state.addEvent(new Event(lastEventId.incrementAndGet(), "onCheckedChanged (" + resources.getResourceName(viewId) + ")"));
         commit();
     }
+
+    @Override
+    public void onRadioCheckedChanged(int radioViewId, int viewId) {
+        super.onRadioCheckedChanged(radioViewId, viewId);
+        state.setOption(viewId);
+    }
 }
