@@ -15,6 +15,7 @@ import com.simplemvp.common.MvpView;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -35,7 +36,7 @@ public final class MvpPresenterManager {
     private MvpPresenterManager(Context context) {
         this.context = context;
         this.executor = Executors.newSingleThreadExecutor();
-        this.map = new HashMap<>();
+        this.map = Collections.synchronizedMap(new HashMap<>());
         this.referenceQueue = new ReferenceQueue<>();
         this.handler = e -> Log.e(tag, formStackTrace(e));
     }
@@ -78,13 +79,11 @@ public final class MvpPresenterManager {
      */
     public <S extends MvpState, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends I> pClass, Class<S> sClass) {
         expungeStaleEntries();
-        synchronized (map) {
-            S state = newState(sClass);
-            I presenter = PresenterHandler.newProxy(executor, handler, newPresenter(pClass, sClass, state));
-            map.put(presenter.getId(), presenter);
-            Log.d(tag, "new presenter: " + pClass.getSimpleName() + " { " + presenter.getId() + " }");
-            return presenter;
-        }
+        S state = newState(sClass);
+        I presenter = PresenterHandler.newProxy(executor, handler, newPresenter(pClass, sClass, state));
+        map.put(presenter.getId(), presenter);
+        Log.d(tag, "new presenter: " + pClass.getSimpleName() + " { " + presenter.getId() + " }");
+        return presenter;
     }
 
     /**
@@ -97,9 +96,7 @@ public final class MvpPresenterManager {
      */
     public <S extends MvpState, P extends MvpPresenter<S>> P getPresenterInstance(int presenterId) {
         expungeStaleEntries();
-        synchronized (map) {
-            return (P) map.get(presenterId);
-        }
+        return (P) map.get(presenterId);
     }
 
     /**
@@ -110,9 +107,7 @@ public final class MvpPresenterManager {
     public void releasePresenter(MvpPresenter<?> presenter) {
         if (presenter.isDetached()) {
             Log.d(tag, "release presenter: " + presenter.getId());
-            synchronized (map) {
-                map.remove(presenter.getId());
-            }
+            map.remove(presenter.getId());
         }
     }
 
