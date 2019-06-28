@@ -62,7 +62,8 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+        // do not call super.onSaveInstanceState to avoid saving views state
+        outState.clear();
         outState.putInt(PRESENTER_ID, presenter.getId());
     }
 
