@@ -60,12 +60,15 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
                 executor.execute(() -> {
                     try {
                         onStart();
-                        // send state snapshot after onStart finished (state is initialized)
+                        // post state after onStart finished (state is initialized)
                         view.getViewHandle().post(getStateSnapshot());
                     } catch (Exception e) {
                         Log.d(tag, "error: ", e);
                     }
                 });
+            } else {
+                // post state in case of new view is connected
+                view.getViewHandle().post(getStateSnapshot());
             }
         }
     }
