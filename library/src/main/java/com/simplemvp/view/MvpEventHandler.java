@@ -54,6 +54,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
         isResumed.set(true);
+        Log.d(tag, "flushing event queue");
         flushQueue();
     }
 
@@ -108,16 +109,12 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void post(S state) {
+        queue.offer(state);
+        while (queue.size() > QUEUE_SIZE) {
+            queue.poll();
+        }
         if (isResumed.get()) {
-            MvpView<S, P> view = reference.get();
-            if (view != null) {
-                handler.post(() -> view.onStateChanged(state));
-            }
-        } else {
-            queue.offer(state);
-            while (queue.size() > QUEUE_SIZE) {
-                queue.poll();
-            }
+            handler.post(this::flushQueue);
         }
     }
 
@@ -131,11 +128,10 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     private void flushQueue() {
         MvpView<S, P> view = reference.get();
-        Log.d(tag, "flushing event queue");
         while (!queue.isEmpty()) {
             S state = queue.poll();
             if (view != null) {
-                handler.post(() -> view.onStateChanged(state));
+                view.onStateChanged(state);
             }
         }
     }
