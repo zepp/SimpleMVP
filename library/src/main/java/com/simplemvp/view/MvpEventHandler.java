@@ -45,6 +45,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final AtomicBoolean isResumed = new AtomicBoolean();
+    private volatile S lastState;
 
     MvpEventHandler(MvpView<S, P> view, P presenter, ReferenceQueue<MvpView<?, ?>> queue) {
         this.reference = new WeakReference<>(view, queue);
@@ -53,9 +54,14 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
+        MvpView<S, P> view = reference.get();
         isResumed.set(true);
-        Log.d(tag, "flushing event queue");
-        flushQueue();
+        if (queue.isEmpty() && lastState != null) {
+            view.onStateChanged(lastState);
+        } else {
+            Log.d(tag, "flushing event queue");
+            flushQueue();
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -110,9 +116,6 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public void post(S state) {
         queue.offer(state);
-        while (queue.size() > QUEUE_SIZE) {
-            queue.poll();
-        }
         if (isResumed.get()) {
             handler.post(this::flushQueue);
         }
@@ -130,7 +133,8 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         MvpView<S, P> view = reference.get();
         while (!queue.isEmpty()) {
             S state = queue.poll();
-            if (view != null) {
+            if (view != null && queue.size() <= QUEUE_SIZE) {
+                lastState = state;
                 view.onStateChanged(state);
             }
         }
