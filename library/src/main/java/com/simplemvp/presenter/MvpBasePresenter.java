@@ -57,10 +57,17 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
         synchronized (handles) {
             handles.add(view.getViewHandle());
             if (handles.size() == 1) {
-                executor.submit(this::onStart);
+                executor.execute(() -> {
+                    try {
+                        onStart();
+                        // send state snapshot after onStart finished (state is initialized)
+                        view.getViewHandle().post(getStateSnapshot());
+                    } catch (Exception e) {
+                        Log.d(tag, "error: ", e);
+                    }
+                });
             }
         }
-        view.getViewHandle().post(getStateSnapshot());
     }
 
     /**
@@ -72,7 +79,13 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
         synchronized (handles) {
             handles.remove(view.getViewHandle());
             if (handles.size() == 0) {
-                executor.submit(this::onStop);
+                executor.execute(() -> {
+                    try {
+                        onStop();
+                    } catch (Exception e) {
+                        Log.d(tag, "error: ", e);
+                    }
+                });
             }
         }
     }
