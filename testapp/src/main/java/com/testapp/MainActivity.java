@@ -16,6 +16,8 @@ import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpActivity;
 import com.simplemvp.view.MvpEditText;
 
+import java.util.Collections;
+
 public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState> {
     private Toolbar toolbar;
     private FloatingActionButton fab;
@@ -37,6 +39,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
 
     @Override
     public void onStateChanged(MainState state) {
+        Collections.sort(state.events, ((e1, e2) -> e2.id - e1.id));
         eventsAdapter.setEvents(state.events);
         editText.setTextNoWatchers(state.text);
     }
