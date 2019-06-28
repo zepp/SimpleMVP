@@ -57,7 +57,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
         synchronized (implementations) {
             implementations.add(view.getViewImpl());
             if (implementations.size() == 1) {
-                executor.execute(this::onStart);
+                executor.submit(this::onStart);
             }
         }
         view.getViewImpl().post(getStateSnapshot());
@@ -72,7 +72,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
         synchronized (implementations) {
             implementations.remove(view.getViewImpl());
             if (implementations.size() == 0) {
-                executor.execute(this::onStop);
+                executor.submit(this::onStop);
             }
         }
     }
