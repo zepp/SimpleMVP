@@ -10,14 +10,17 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
-import com.simplemvp.common.MvpViewImplementation;
+import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 /* Базовый класс для всех Activity, которые реализуют паттерн MVP */
@@ -25,7 +28,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
     protected final String tag = getClass().getSimpleName();
-    protected MvpViewImpl<S, P> viewImpl;
+    protected MvpEventHandler<S, P> eventHandler;
     protected P presenter;
     private MvpPresenterManager manager;
 
@@ -40,8 +43,8 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         } else {
             presenter = manager.getPresenterInstance(presenterId);
         }
-        viewImpl = new MvpViewImpl<>(this, presenter, manager.getReferenceQueue());
-        getLifecycle().addObserver(viewImpl);
+        eventHandler = new MvpEventHandler<>(this, presenter, manager.getReferenceQueue());
+        getLifecycle().addObserver(eventHandler);
         presenter.attach(this);
     }
 
@@ -58,7 +61,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         if (isFinishing()) {
             manager.releasePresenter(presenter);
         }
-        getLifecycle().removeObserver(viewImpl);
+        getLifecycle().removeObserver(eventHandler);
     }
 
     @CallSuper
@@ -73,8 +76,18 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
-    public MvpViewImplementation<S, P> getViewImpl() {
-        return viewImpl;
+    public MvpViewHandle<S> getViewHandle() {
+        return eventHandler;
+    }
+
+    @Override
+    public MvpListener getMvpListener() {
+        return eventHandler;
+    }
+
+    @Override
+    public TextWatcher newTextWatcher(View view) {
+        return eventHandler.newTextWatcher(view);
     }
 
     @Override

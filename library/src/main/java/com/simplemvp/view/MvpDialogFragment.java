@@ -8,22 +8,24 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
-import com.simplemvp.common.MvpViewImplementation;
+import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends MvpState>
         extends DialogFragment implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
     protected final String tag = getClass().getSimpleName();
-    protected MvpViewImpl<S, P> viewImpl;
+    protected MvpEventHandler<S, P> eventHandler;
     protected P presenter;
     private MvpPresenterManager manager;
 
@@ -44,8 +46,8 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
         } else {
             presenter = manager.getPresenterInstance(presenterId);
         }
-        viewImpl = new MvpViewImpl<>(this, presenter, manager.getReferenceQueue());
-        getLifecycle().addObserver(viewImpl);
+        eventHandler = new MvpEventHandler<>(this, presenter, manager.getReferenceQueue());
+        getLifecycle().addObserver(eventHandler);
         presenter.attach(this);
     }
 
@@ -67,12 +69,22 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
         super.onDestroy();
         presenter.detach(this);
         manager.releasePresenter(presenter);
-        getLifecycle().removeObserver(viewImpl);
+        getLifecycle().removeObserver(eventHandler);
     }
 
     @Override
-    public MvpViewImplementation<S, P> getViewImpl() {
-        return viewImpl;
+    public MvpViewHandle<S> getViewHandle() {
+        return eventHandler;
+    }
+
+    @Override
+    public MvpListener getMvpListener() {
+        return eventHandler;
+    }
+
+    @Override
+    public TextWatcher newTextWatcher(View view) {
+        return eventHandler.newTextWatcher(view);
     }
 
     @Override

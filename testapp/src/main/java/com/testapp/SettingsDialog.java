@@ -40,8 +40,8 @@ public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, M
     public void onStart() {
         super.onStart();
         ok.setOnClickListener(view -> finish());
-        options.setOnCheckedChangeListener(getViewImpl());
-        switch_.setOnCheckedChangeListener(getViewImpl());
+        options.setOnCheckedChangeListener(getMvpListener());
+        switch_.setOnCheckedChangeListener(getMvpListener());
     }
 
     @Override

@@ -64,10 +64,10 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     @Override
     protected void onStart() {
         super.onStart();
-        fab.setOnClickListener(getViewImpl());
-        button.setOnClickListener(getViewImpl());
-        editText.addTextChangedListener(getViewImpl().newTextWatcher(editText));
-        spinner.setOnItemSelectedListener(getViewImpl());
+        fab.setOnClickListener(getMvpListener());
+        button.setOnClickListener(getMvpListener());
+        editText.addTextChangedListener(newTextWatcher(editText));
+        spinner.setOnItemSelectedListener(getMvpListener());
     }
 
     @Override

@@ -14,7 +14,7 @@ import android.view.DragEvent;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
-import com.simplemvp.common.MvpViewImplementation;
+import com.simplemvp.common.MvpViewHandle;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is a base class for any MVP presenter. It has basic implementation of interface methods that
- * prints debug information. Also it keeps a list of attached views (implementations)
+ * prints debug information. Also it keeps a list of attached views (handles)
  *
  * @param <S> state type
  */
@@ -36,7 +36,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
     protected final Resources resources;
     protected final S state;
     protected final int id;
-    private final List<MvpViewImplementation<S, ?>> implementations = new CopyOnWriteArrayList<>();
+    private final List<MvpViewHandle<S>> handles = new CopyOnWriteArrayList<>();
     private final ExecutorService executor;
 
     public MvpBasePresenter(Context context, S state) {
@@ -54,13 +54,13 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
      * @param view to be attached
      */
     public final void attach(MvpView<S, ?> view) {
-        synchronized (implementations) {
-            implementations.add(view.getViewImpl());
-            if (implementations.size() == 1) {
+        synchronized (handles) {
+            handles.add(view.getViewHandle());
+            if (handles.size() == 1) {
                 executor.submit(this::onStart);
             }
         }
-        view.getViewImpl().post(getStateSnapshot());
+        view.getViewHandle().post(getStateSnapshot());
     }
 
     /**
@@ -69,9 +69,9 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
      * @param view to be detached
      */
     public final void detach(MvpView<S, ?> view) {
-        synchronized (implementations) {
-            implementations.remove(view.getViewImpl());
-            if (implementations.size() == 0) {
+        synchronized (handles) {
+            handles.remove(view.getViewHandle());
+            if (handles.size() == 0) {
                 executor.submit(this::onStop);
             }
         }
@@ -84,7 +84,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
      */
     @Override
     public final boolean isDetached() {
-        return implementations.isEmpty();
+        return handles.isEmpty();
     }
 
     @Override
@@ -99,7 +99,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
         if (state.isChanged() || state.isInitial()) {
             S snapshot = getStateSnapshot();
             state.clearChanged();
-            for (MvpViewImplementation<S, ?> impl : implementations) {
+            for (MvpViewHandle<S> impl : handles) {
                 impl.post(snapshot);
             }
         }
@@ -107,7 +107,7 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
 
     @Override
     public void finish() {
-        for (MvpViewImplementation<S, ?> impl : implementations) {
+        for (MvpViewHandle<S> impl : handles) {
             impl.finish();
         }
     }

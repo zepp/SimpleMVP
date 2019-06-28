@@ -6,6 +6,8 @@ package com.simplemvp.common;
 
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
+import android.text.TextWatcher;
+import android.view.View;
 
 import com.simplemvp.presenter.MvpPresenterManager;
 
@@ -47,11 +49,18 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     void onStateChanged(S state);
 
     /**
-     * This method returns implementation of current MVP view
+     * This method returns handle of current MVP view
      *
      * @return view implementation
      */
-    MvpViewImplementation<S, P> getViewImpl();
+    MvpViewHandle<S> getViewHandle();
+
+    /**
+     * This methods returns listener that combines a lot of View listeners to handle events
+     *
+     * @return
+     */
+    MvpListener getMvpListener();
 
     /**
      * This method is called when view is just created and new presenter instance should be created
@@ -65,4 +74,12 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
      * This method terminates current view
      */
     void finish();
+
+    /**
+     * This method returns new TextWatcher to handle EditText events
+     *
+     * @param view view that has TextWatcher listener callback
+     * @return new TextWatcher listener
+     */
+    TextWatcher newTextWatcher(View view);
 }

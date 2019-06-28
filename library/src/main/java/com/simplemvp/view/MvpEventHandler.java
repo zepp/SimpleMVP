@@ -5,6 +5,7 @@
 package com.simplemvp.view;
 
 import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,10 +20,11 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
+import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
-import com.simplemvp.common.MvpViewImplementation;
+import com.simplemvp.common.MvpViewHandle;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -32,8 +34,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
-        implements MvpViewImplementation<S, P> {
+class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
+        implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
     private final static int DELAY = 200;
     private final static int QUEUE_SIZE = 8;
     private final String tag = getClass().getSimpleName();
@@ -44,7 +46,7 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final AtomicBoolean isResumed = new AtomicBoolean();
 
-    MvpViewImpl(MvpView<S, P> view, P presenter, ReferenceQueue<MvpView<?, ?>> queue) {
+    MvpEventHandler(MvpView<S, P> view, P presenter, ReferenceQueue<MvpView<?, ?>> queue) {
         this.reference = new WeakReference<>(view, queue);
         this.presenter = presenter;
     }
@@ -97,8 +99,7 @@ class MvpViewImpl<S extends MvpState, P extends MvpPresenter<S>>
         return true;
     }
 
-    @Override
-    public TextWatcher newTextWatcher(View view) {
+    TextWatcher newTextWatcher(View view) {
         Log.d(tag, "new text watcher for view: " + view);
         TextWatcher watcher = new TextWatcherImpl(view.getId());
         textWatchers.add(watcher);
