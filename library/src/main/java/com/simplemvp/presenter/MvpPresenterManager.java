@@ -80,7 +80,7 @@ public final class MvpPresenterManager {
     public <S extends MvpState, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends I> pClass, Class<S> sClass) {
         expungeStaleEntries();
         S state = newState(sClass);
-        I presenter = PresenterHandler.newProxy(executor, handler, newPresenter(pClass, sClass, state));
+        I presenter = ProxyHandler.newProxy(executor, handler, newPresenter(pClass, sClass, state));
         map.put(presenter.getId(), presenter);
         Log.d(tag, "new presenter: " + presenter);
         return presenter;

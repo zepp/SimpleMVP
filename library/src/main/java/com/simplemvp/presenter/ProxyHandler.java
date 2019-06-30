@@ -18,13 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-class PresenterHandler<S extends MvpState> implements InvocationHandler {
+class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final ExecutorService executor;
     private final MvpErrorHandler handler;
     private final MvpPresenter<S> presenter;
     private final Map<String, MvpEventHandler> handlers;
 
-    private PresenterHandler(ExecutorService executor, MvpErrorHandler handler, MvpPresenter<S> presenter) {
+    private ProxyHandler(ExecutorService executor, MvpErrorHandler handler, MvpPresenter<S> presenter) {
         this.executor = executor;
         this.handler = handler;
         this.presenter = presenter;
@@ -70,7 +70,7 @@ class PresenterHandler<S extends MvpState> implements InvocationHandler {
             ExecutorService executor, MvpErrorHandler handler, P presenter) {
         return (P) Proxy.newProxyInstance(presenter.getClass().getClassLoader(),
                 getAllImplementedInterfaces(presenter.getClass()),
-                new PresenterHandler<>(executor, handler, presenter));
+                new ProxyHandler<>(executor, handler, presenter));
     }
 
     @Override
