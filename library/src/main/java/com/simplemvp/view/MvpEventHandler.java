@@ -9,6 +9,7 @@ import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.DragEvent;
@@ -41,6 +42,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final Queue<S> queue = new ConcurrentLinkedQueue<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
+    private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
     private final AtomicBoolean isResumed = new AtomicBoolean();
     private final AtomicBoolean isQueueFlush = new AtomicBoolean();
     private volatile S lastState;
@@ -109,6 +111,13 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         TextWatcher watcher = new MvpTextWatcher<>(handler, presenter, view.getId());
         textWatchers.add(watcher);
         return watcher;
+    }
+
+    SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
+        Log.d(tag, "new query text listener for view: " + view);
+        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(handler, presenter, view.getId());
+        queryTextListeners.add(listener);
+        return listener;
     }
 
     @Override

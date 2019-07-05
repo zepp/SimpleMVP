@@ -4,8 +4,10 @@
 
 package com.simplemvp.common;
 
+import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
+import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.view.View;
 
@@ -63,10 +65,12 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     MvpListener getMvpListener();
 
     /**
-     * This method is called when view is just created and new presenter instance should be created
+     * This method is called during view initialization (typically in {@link android.app.Activity#onCreate(Bundle) onCreate}
+     * or in {@link android.support.v4.app.Fragment#onCreate(Bundle) onCreate}) to created a new presenter
+     * instance
      *
-     * @param manager
-     * @return
+     * @param manager {@link MvpPresenterManager MvpPresenterManager} instance
+     * @return new presenter instance
      */
     P onInitPresenter(MvpPresenterManager manager);
 
@@ -76,10 +80,20 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     void finish();
 
     /**
-     * This method returns new TextWatcher to handle EditText events
+     * This method returns new {@link android.text.TextWatcher TextWatcher} for provided view to
+     * handle text change.
      *
-     * @param view view that has TextWatcher listener callback
-     * @return new TextWatcher listener
+     * @param view view that supports {@link android.text.TextWatcher TextWatcher} callback
+     * @return new listener instance
      */
     TextWatcher newTextWatcher(View view);
+
+    /**
+     * This method return new {@link android.support.v7.widget.SearchView.OnQueryTextListener OnQueryTextListener}
+     * to handle text change.
+     *
+     * @param view {@link android.support.v7.widget.SearchView SearchView} instance
+     * @return new listener instance
+     */
+    SearchView.OnQueryTextListener newQueryTextListener(SearchView view);
 }

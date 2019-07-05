@@ -10,6 +10,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -98,6 +99,11 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public TextWatcher newTextWatcher(View view) {
         return eventHandler.newTextWatcher(view);
+    }
+
+    @Override
+    public SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
+        return eventHandler.newQueryTextListener(view);
     }
 
     @Override

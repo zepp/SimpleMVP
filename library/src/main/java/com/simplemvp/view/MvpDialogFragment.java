@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -85,6 +86,11 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends Mvp
     @Override
     public TextWatcher newTextWatcher(View view) {
         return eventHandler.newTextWatcher(view);
+    }
+
+    @Override
+    public SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
+        return eventHandler.newQueryTextListener(view);
     }
 
     @Override
