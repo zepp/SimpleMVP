@@ -45,6 +45,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final AtomicBoolean isResumed = new AtomicBoolean();
+    private final AtomicBoolean isQueueFlush = new AtomicBoolean();
     private volatile S lastState;
 
     MvpEventHandler(MvpView<S, P> view, P presenter, ReferenceQueue<MvpView<?, ?>> queue) {
@@ -116,7 +117,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public void post(S state) {
         queue.offer(state);
-        if (isResumed.get()) {
+        if (isResumed.get() && isQueueFlush.compareAndSet(false, true)) {
             handler.post(this::flushQueue);
         }
     }
@@ -130,12 +131,23 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     private void flushQueue() {
-        MvpView<S, P> view = reference.get();
+        int size = queue.size();
+        int n = size / QUEUE_SIZE;
         while (!queue.isEmpty()) {
             S state = queue.poll();
-            if (view != null && queue.size() <= QUEUE_SIZE) {
+            // process every n'th state in case of queue overflow
+            if (n == 0 || size % n == 0) {
                 lastState = state;
-                view.onStateChanged(state);
+                MvpView<S, P> view = reference.get();
+                if (view != null) {
+                    view.onStateChanged(state);
+                }
+                size = queue.size();
+                n = size / QUEUE_SIZE;
+            }
+            // set flag and then check queue size again to avoid cases when item is left unprocessed
+            if (queue.isEmpty()) {
+                isQueueFlush.set(false);
             }
         }
     }
