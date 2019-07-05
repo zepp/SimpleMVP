@@ -9,8 +9,6 @@ import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.IdRes;
-import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.DragEvent;
@@ -36,7 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
-    private final static int DELAY = 200;
     private final static int QUEUE_SIZE = 8;
     private final String tag = getClass().getSimpleName();
     private final WeakReference<MvpView<S, P>> reference;
@@ -109,7 +106,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     TextWatcher newTextWatcher(View view) {
         Log.d(tag, "new text watcher for view: " + view);
-        TextWatcher watcher = new TextWatcherImpl(view.getId());
+        TextWatcher watcher = new MvpTextWatcher<>(handler, presenter, view.getId());
         textWatchers.add(watcher);
         return watcher;
     }
@@ -148,48 +145,6 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
             // set flag and then check queue size again to avoid cases when item is left unprocessed
             if (queue.isEmpty()) {
                 isQueueFlush.set(false);
-            }
-        }
-    }
-
-    private class TextWatcherImpl implements TextWatcher {
-        @IdRes
-        final int viewId;
-        String text = "";
-        boolean isSendTextPosted;
-        long millis;
-
-        TextWatcherImpl(int viewId) {
-            this.viewId = viewId;
-        }
-
-        void sendText() {
-            long delta = System.currentTimeMillis() - millis;
-            if (delta > DELAY) {
-                presenter.onTextChanged(viewId, text);
-                isSendTextPosted = false;
-            } else {
-                handler.postDelayed(this::sendText, DELAY - delta);
-            }
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            millis = System.currentTimeMillis();
-            text = s.toString();
-            if (!isSendTextPosted) {
-                isSendTextPosted = true;
-                handler.postDelayed(this::sendText, DELAY);
             }
         }
     }
