@@ -14,16 +14,16 @@ import android.view.View;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 /**
- * This interface describes a generic MVP view
+ * This interface specifies a generic MVP view
  *
  * @param <S> state type
  * @param <P> presenter type
  */
 public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     /**
-     * This method returns layout Id to be inflated by view
+     * This method returns layout Id to be inflated by a view
      *
-     * @return
+     * @return layout ID
      */
     @LayoutRes
     int getLayoutId();
@@ -31,7 +31,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     /**
      * This methods returns menu ID to be inflated by Activity
      *
-     * @return
+     * @return menu ID
      */
     @MenuRes
     int getMenuId();
@@ -58,7 +58,8 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     MvpViewHandle<S> getViewHandle();
 
     /**
-     * This methods returns listener that combines a lot of View listeners to handle events
+     * This methods returns universal listener that combines a lot of {@link View View} listeners to
+     * handle various events
      *
      * @return
      */
@@ -75,7 +76,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     P onInitPresenter(MvpPresenterManager manager);
 
     /**
-     * This method terminates current view
+     * Method to be called when {@link MvpView MvpView} is no longer needed and should be closed
      */
     void finish();
 

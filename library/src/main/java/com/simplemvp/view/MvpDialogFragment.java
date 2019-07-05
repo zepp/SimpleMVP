@@ -22,8 +22,17 @@ import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpPresenterManager;
 
-public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S extends MvpState>
-        extends DialogFragment implements MvpView<S, P> {
+/**
+ * Dialog base class that implements {@link MvpView MvpView} interface.
+ * {@link MvpDialogFragment MvpDialogFragment} refers to presenter implementation using interface
+ * that is specified by generic parameter. In most cases {@link MvpPresenter MvpPresenter} may be
+ * specified if no custom methods (handlers) to be used.
+ *
+ * @param <P> presenter type, must be an interface that is implemented by presenter.
+ * @param <S> state type, any class inherited from {@link MvpState MvpState}
+ */
+public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
+        extends MvpState> extends DialogFragment implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
     protected final String tag = getClass().getSimpleName();
     protected MvpEventHandler<S, P> eventHandler;

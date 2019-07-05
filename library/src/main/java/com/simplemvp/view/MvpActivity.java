@@ -24,9 +24,18 @@ import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpPresenterManager;
 
-/* Базовый класс для всех Activity, которые реализуют паттерн MVP */
-public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState> extends AppCompatActivity
-        implements MvpView<S, P> {
+/**
+ * Activity base class that implements {@link MvpView MvpView} interface. Basic build block of any
+ * application based on SimpleMVP library.
+ * {@link MvpActivity MvpActivity} refers to presenter implementation using interface that is specified
+ * by generic parameter. In most cases {@link MvpPresenter MvpPresenter} may be specified if no
+ * custom methods (handlers) to be used.
+ *
+ * @param <P> presenter type, must be an interface that is implemented by presenter.
+ * @param <S> state type, any class inherited from {@link MvpState MvpState}
+ */
+public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
+        extends AppCompatActivity implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
     protected final String tag = getClass().getSimpleName();
     protected MvpEventHandler<S, P> eventHandler;

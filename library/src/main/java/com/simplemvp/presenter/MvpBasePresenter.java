@@ -123,8 +123,8 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
 
     @Override
     public void finish() {
-        for (MvpViewHandle<S> impl : handles) {
-            impl.finish();
+        for (MvpViewHandle<S> handle : handles) {
+            handle.finish();
         }
     }
 
