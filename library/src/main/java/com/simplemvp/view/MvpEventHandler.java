@@ -171,14 +171,20 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private void flushQueue() {
         int size = queue.size();
         int n = size / QUEUE_SIZE;
-        while (!queue.isEmpty()) {
+        // flushQueue may be called when View has been paused or it is about to be destroyed
+        // so it is better to check this flag before start state processing
+        while (!queue.isEmpty() && isResumed.get()) {
             S state = queue.poll();
             // process every n'th state in case of queue overflow
             if (n == 0 || size % n == 0) {
                 lastState = state;
-                MvpView<S, P> view = reference.get();
-                if (view != null) {
-                    view.onStateChanged(state);
+                try {
+                    MvpView<S, P> view = reference.get();
+                    if (view != null) {
+                        view.onStateChanged(state);
+                    }
+                } catch (Exception e) {
+                    Log.e(tag, "state handling error: ", e);
                 }
                 size = queue.size();
                 n = size / QUEUE_SIZE;
