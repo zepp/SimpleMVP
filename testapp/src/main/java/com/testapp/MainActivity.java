@@ -43,6 +43,11 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     }
 
     @Override
+    public Bundle getArguments() {
+        return getIntent().getExtras();
+    }
+
+    @Override
     public void onStateChanged(MainState state) {
         Collections.sort(state.events, ((e1, e2) -> e2.id - e1.id));
         eventsAdapter.setEvents(state.events);

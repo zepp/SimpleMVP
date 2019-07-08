@@ -45,6 +45,13 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     Context getContext();
 
     /**
+     * This method return view's arguments that were supplied in constructor or factory method.
+     *
+     * @return {@link Bundle Bundle} reference
+     */
+    Bundle getArguments();
+
+    /**
      * This method returns presenter which current view is attached to
      *
      * @return presenter

@@ -96,6 +96,11 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
+    public Bundle getArguments() {
+        return getIntent().getExtras();
+    }
+
+    @Override
     public TextWatcher newTextWatcher(View view) {
         return eventHandler.newTextWatcher(view);
     }

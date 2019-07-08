@@ -7,6 +7,7 @@ package com.simplemvp.view;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.SearchView;
@@ -127,6 +128,12 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public MvpView<S, ?> getMvpView() {
         return reference.get();
+    }
+
+    @Override
+    public Bundle getArguments() {
+        MvpView<S, P> view = reference.get();
+        return view == null ? new Bundle() : view.getArguments();
     }
 
     @Override

@@ -3,6 +3,7 @@
  */
 package com.simplemvp.common;
 
+import android.os.Bundle;
 import android.support.annotation.StringRes;
 
 /**
@@ -13,11 +14,18 @@ import android.support.annotation.StringRes;
 public interface MvpViewHandle<S extends MvpState> {
 
     /**
-     * Getter to access {@link MvpView} reference.
+     * Method to access {@link MvpView} reference.
      *
      * @return null or reference to real view
      */
     MvpView<S, ?> getMvpView();
+
+    /**
+     * Method to access arguments reference
+     *
+     * @return {@link MvpView} arguments
+     */
+    Bundle getArguments();
 
     /**
      * This method posts new state to parent view
@@ -25,7 +33,6 @@ public interface MvpViewHandle<S extends MvpState> {
      * @param state
      */
     void post(S state);
-
 
     /**
      * This method terminates parent view
