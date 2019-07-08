@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
@@ -133,6 +134,22 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         MvpView<S, P> view = reference.get();
         if (view != null) {
             handler.post(view::finish);
+        }
+    }
+
+    @Override
+    public void showToast(String text, int duration) {
+        MvpView<S, P> view = reference.get();
+        if (view != null) {
+            Toast.makeText(view.getContext(), text, duration).show();
+        }
+    }
+
+    @Override
+    public void showToast(int resId, int duration) {
+        MvpView<S, P> view = reference.get();
+        if (view != null) {
+            Toast.makeText(view.getContext(), resId, duration).show();
         }
     }
 

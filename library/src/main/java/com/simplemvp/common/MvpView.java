@@ -4,6 +4,7 @@
 
 package com.simplemvp.common;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
@@ -35,6 +36,13 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
      */
     @MenuRes
     int getMenuId();
+
+    /**
+     * This method returns view's {@link Context}
+     *
+     * @return {@link Context}
+     */
+    Context getContext();
 
     /**
      * This method returns presenter which current view is attached to
