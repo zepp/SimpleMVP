@@ -49,48 +49,54 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
     }
 
     /**
-     * This method attaches view to the presenter
+     * This method is called by a view to attached oneself to presenter that is instantiated by
+     * {@link MvpPresenterManager}
      *
      * @param view to be attached
      */
-    public final void attach(MvpView<S, ?> view) {
-        synchronized (handles) {
-            handles.add(view.getViewHandle());
-            if (handles.size() == 1) {
-                executor.execute(() -> {
-                    try {
-                        onStart();
-                        // post state after onStart finished (state is initialized)
-                        view.getViewHandle().post(getStateSnapshot());
-                    } catch (Exception e) {
-                        Log.d(tag, "error: ", e);
+    public final synchronized void attach(MvpView<S, ?> view) {
+        MvpViewHandle<S> handle = view.getViewHandle();
+        boolean isFirst = handles.isEmpty();
+        handles.add(handle);
+        executor.execute(() -> {
+            try {
+                synchronized (this) {
+                    if (isFirst) {
+                        onFirstViewAttached(handle);
                     }
-                });
-            } else {
-                // post state in case of new view is connected
-                view.getViewHandle().post(getStateSnapshot());
+                    onViewAttached(handle);
+                }
+                // post state after onViewAttached finished (state is initialized)
+                handle.post(getStateSnapshot());
+            } catch (Exception e) {
+                Log.d(tag, "error: ", e);
             }
-        }
+        });
     }
 
     /**
-     * This method detaches view from the presenter
+     * This method is called by a view to detach oneself from presenter when view is about to be
+     * destroyed. This method call is mandatory otherwise presenter will not be stopped and acquired
+     * resources will not be released.
      *
      * @param view to be detached
      */
-    public final void detach(MvpView<S, ?> view) {
-        synchronized (handles) {
-            handles.remove(view.getViewHandle());
-            if (handles.size() == 0) {
-                executor.execute(() -> {
-                    try {
-                        onStop();
-                    } catch (Exception e) {
-                        Log.d(tag, "error: ", e);
+    public final synchronized void detach(MvpView<S, ?> view) {
+        MvpViewHandle<S> handle = view.getViewHandle();
+        handles.remove(handle);
+        boolean isLast = handles.isEmpty();
+        executor.execute(() -> {
+            try {
+                synchronized (this) {
+                    onViewDetached(handle);
+                    if (isLast) {
+                        onLastViewDetached();
                     }
-                });
+                }
+            } catch (Exception e) {
+                Log.d(tag, "error: ", e);
             }
-        }
+        });
     }
 
     /**
@@ -183,14 +189,45 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
         Log.d(tag, "onDrag(" + resources.getResourceName(viewId) + ", " + event + ")");
     }
 
+    /**
+     * This method is called when master view is attached to current presenter. This method is to be
+     * overridden to place initialization code that fills {@link MvpBasePresenter#state} with initial
+     * values and subscribes to necessary events.
+     *
+     * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
+     */
     @CallSuper
-    protected void onStart() {
-        Log.d(tag, "onStart");
+    protected void onFirstViewAttached(MvpViewHandle<S> handle) {
+        Log.d(tag, "onFirstViewAttached(" + handle.getMvpView() + ")");
     }
 
+    /**
+     * This method is called when fresh view is attached to presenter.
+     *
+     * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
+     */
     @CallSuper
-    protected void onStop() {
-        Log.d(tag, "onStop");
+    protected void onViewAttached(MvpViewHandle<S> handle) {
+        Log.d(tag, "onViewAttached(" + handle.getMvpView() + ")");
+    }
+
+    /**
+     * This method is called when view is detached from presenter.
+     *
+     * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
+     */
+    @CallSuper
+    protected void onViewDetached(MvpViewHandle<S> handle) {
+        Log.d(tag, "onViewDetached(" + handle.getMvpView() + ")");
+    }
+
+    /**
+     * This method is called when presenter has no attached views and it is about to be released
+     * by {@link MvpPresenterManager}.
+     */
+    @CallSuper
+    protected void onLastViewDetached() {
+        Log.d(tag, "onLastViewDetached()");
     }
 
     protected S getStateSnapshot() {
