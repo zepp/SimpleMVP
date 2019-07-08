@@ -6,6 +6,7 @@ import android.support.v7.widget.SearchView;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
+import com.simplemvp.common.MvpViewHandle;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTextListener {
     private final static int DELAY = 200;
     private final Handler handler;
+    private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
     @IdRes
     private final int viewId;
@@ -28,8 +30,9 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
     private String text = "";
     private long millis;
 
-    MvpOnQueryTextListener(Handler handler, MvpPresenter<S> presenter, int viewId) {
+    MvpOnQueryTextListener(Handler handler, MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
         this.handler = handler;
+        this.handle = handle;
         this.presenter = presenter;
         this.viewId = viewId;
     }
@@ -37,7 +40,7 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
     private void sendText() {
         long delta = System.currentTimeMillis() - millis;
         if (delta > DELAY) {
-            presenter.onTextChanged(viewId, text);
+            presenter.onTextChanged(handle, viewId, text);
             isSendTextPosted.set(false);
         } else {
             handler.postDelayed(this::sendText, DELAY - delta);

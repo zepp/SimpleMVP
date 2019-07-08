@@ -72,51 +72,51 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void onClick(View v) {
-        presenter.onViewClicked(v.getId());
+        presenter.onViewClicked(this, v.getId());
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        presenter.onOptionsItemSelected(item.getItemId());
+        presenter.onOptionsItemSelected(this, item.getItemId());
         return true;
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        presenter.onItemSelected(adapterView.getId(), adapterView.getItemAtPosition(i));
+        presenter.onItemSelected(this, adapterView.getId(), adapterView.getItemAtPosition(i));
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-        presenter.onItemSelected(adapterView.getId(), null);
+        presenter.onItemSelected(this, adapterView.getId(), null);
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        presenter.onCheckedChanged(buttonView.getId(), isChecked);
+        presenter.onCheckedChanged(this, buttonView.getId(), isChecked);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        presenter.onRadioCheckedChanged(group.getId(), checkedId);
+        presenter.onRadioCheckedChanged(this, group.getId(), checkedId);
     }
 
     @Override
     public boolean onDrag(View v, DragEvent event) {
-        presenter.onDrag(v.getId(), event);
+        presenter.onDrag(this, v.getId(), event);
         return true;
     }
 
     TextWatcher newTextWatcher(View view) {
         Log.d(tag, "new text watcher for view: " + view);
-        TextWatcher watcher = new MvpTextWatcher<>(handler, presenter, view.getId());
+        TextWatcher watcher = new MvpTextWatcher<>(handler, this, presenter, view.getId());
         textWatchers.add(watcher);
         return watcher;
     }
 
     SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
         Log.d(tag, "new query text listener for view: " + view);
-        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(handler, presenter, view.getId());
+        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(handler, this, presenter, view.getId());
         queryTextListeners.add(listener);
         return listener;
     }

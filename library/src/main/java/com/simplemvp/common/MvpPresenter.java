@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.view.DragEvent;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.CompoundButton;
 
 /**
  * This interface describes generic MVP presenter
@@ -47,8 +50,6 @@ public interface MvpPresenter<S extends MvpState> {
      */
     int getId();
 
-    void commit();
-
     /**
      * This method terminates presenter and all one's attached views
      */
@@ -57,36 +58,89 @@ public interface MvpPresenter<S extends MvpState> {
     /**
      * This method has the same purpose as the {@link android.app.Activity#onActivityResult(int, int, Intent)}
      *
+     * @param handle {@link MvpViewHandle} interface that hides real view
      * @param requestCode The integer request code originally supplied to startActivityForResult(),
      *                    allowing you to identify who this result came from.
      * @param resultCode  The integer result code returned by the child activity through its setResult().
      * @param data        An Intent, which can return result data to the caller (various data can be attached
-     *                    to Intent "extras").
      */
-    void onActivityResult(int requestCode, int resultCode, Intent data);
+    void onActivityResult(MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data);
 
     /**
      * This method has the same purpose as the {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])}
      *
+     * @param handle {@link MvpViewHandle} interface that hides real view
      * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
      * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
      *                     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
      *                     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
      */
-    void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
+    void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
 
-    void onViewClicked(@IdRes int viewId);
+    /**
+     * This method handles {@link android.view.View.OnClickListener#onClick(View)} callback.
+     *
+     * @param handle {@link MvpViewHandle} interface that hides real view
+     * @param viewId view's ID
+     */
+    void onViewClicked(MvpViewHandle<S> handle, @IdRes int viewId);
 
-    void onOptionsItemSelected(@IdRes int itemId);
+    /**
+     * This method has the same purpose as {@link android.app.Activity#onOptionsItemSelected(MenuItem)}
+     *
+     * @param handle {@link MvpViewHandle} interface that hides real view
+     * @param itemId menu item ID
+     */
+    void onOptionsItemSelected(MvpViewHandle<S> handle, @IdRes int itemId);
 
-    void onItemSelected(@IdRes int viewId, Object item);
+    /**
+     * This method handles {@link android.widget.AdapterView.OnItemSelectedListener} callbacks and also
+     * can be used to process similar events from other views such as
+     * {@link androidx.recyclerview.widget.RecyclerView RecyclerView}
+     *
+     * @param handle {@link MvpViewHandle} interface that hides real view
+     * @param viewId view's ID
+     * @param item   object
+     */
+    void onItemSelected(MvpViewHandle<S> handle, @IdRes int viewId, Object item);
 
-    void onCheckedChanged(@IdRes int viewId, boolean isChecked);
+    /**
+     * This method handles {@link android.widget.CompoundButton.OnCheckedChangeListener#onCheckedChanged(CompoundButton, boolean)}
+     * callback
+     *
+     * @param handle    {@link MvpViewHandle} interface that hides real view
+     * @param viewId    view's ID
+     * @param isChecked compound button state
+     */
+    void onCheckedChanged(MvpViewHandle<S> handle, @IdRes int viewId, boolean isChecked);
 
-    void onRadioCheckedChanged(@IdRes int radioViewId, @IdRes int viewId);
+    /**
+     * This method handles {@link android.widget.RadioGroup.OnCheckedChangeListener#check(int)}
+     * callback
+     *
+     * @param handle      {@link MvpViewHandle} interface that hides real view
+     * @param radioViewId {@link android.widget.RadioGroup} view instance ID
+     * @param viewId      checked button ID
+     */
+    void onRadioCheckedChanged(MvpViewHandle<S> handle, @IdRes int radioViewId, @IdRes int viewId);
 
-    void onTextChanged(@IdRes int viewId, String text);
+    /**
+     * This method handles text change callbacks from {@link android.widget.EditText} or
+     * {@link android.widget.SearchView} views
+     *
+     * @param handle {@link MvpViewHandle} interface that hides real view
+     * @param viewId view's ID
+     * @param text   new text
+     */
+    void onTextChanged(MvpViewHandle<S> handle, @IdRes int viewId, String text);
 
-    void onDrag(@IdRes int viewId, DragEvent event);
+    /**
+     * This method handles {@link View.OnDragListener#onDrag(View, DragEvent)} callback
+     *
+     * @param handle {@link MvpViewHandle} interface that hides real view
+     * @param viewId view's ID
+     * @param event  {@link DragEvent} event
+     */
+    void onDrag(MvpViewHandle<S> handle, @IdRes int viewId, DragEvent event);
 }

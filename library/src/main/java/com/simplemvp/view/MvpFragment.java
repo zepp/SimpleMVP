@@ -126,18 +126,18 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        presenter.onOptionsItemSelected(item.getItemId());
+        presenter.onOptionsItemSelected(getViewHandle(), item.getItemId());
         return true;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        presenter.onActivityResult(requestCode, resultCode, data);
+        presenter.onActivityResult(getViewHandle(), requestCode, resultCode, data);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        presenter.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        presenter.onRequestPermissionsResult(getViewHandle(), requestCode, permissions, grantResults);
     }
 
     @Override

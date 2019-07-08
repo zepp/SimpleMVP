@@ -109,14 +109,17 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
     }
 
     /**
-     * This method sends current state to attached views to render changes
+     * This method sends current state to attached views to render changes.
+     * Method is synchronized to keep state order otherwise state with less revision number may
+     * be delivered to {@link MvpView#onStateChanged(MvpState)} before the another state snapshot with
+     * bigger revision number.
      */
-    public synchronized void commit() {
+    protected synchronized void commit() {
         if (state.isChanged() || state.isInitial()) {
             S snapshot = getStateSnapshot();
             state.clearChanged();
-            for (MvpViewHandle<S> impl : handles) {
-                impl.post(snapshot);
+            for (MvpViewHandle<S> handle : handles) {
+                handle.post(snapshot);
             }
         }
     }
@@ -130,53 +133,53 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
 
     @CallSuper
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data) {
         Log.d(tag, "onActivityResult(" + requestCode + ", " + resultCode + ", " + data + ")");
     }
 
     @CallSuper
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, String[] permissions, int[] grantResults) {
         Log.d(tag, "onRequestPermissionsResult(" + requestCode + ", " + Arrays.toString(permissions) + ", "
                 + Arrays.toString(grantResults));
     }
 
     @CallSuper
     @Override
-    public void onViewClicked(int viewId) {
+    public void onViewClicked(MvpViewHandle<S> handle, int viewId) {
         Log.d(tag, "onViewClicked(" + resources.getResourceName(viewId) + ")");
     }
 
     @CallSuper
     @Override
-    public void onOptionsItemSelected(int itemId) {
+    public void onOptionsItemSelected(MvpViewHandle<S> handle, int itemId) {
         Log.d(tag, "onOptionsItemSelected(" + resources.getResourceName(itemId) + ")");
     }
 
     @CallSuper
     @Override
-    public void onItemSelected(int viewId, Object item) {
+    public void onItemSelected(MvpViewHandle<S> handle, int viewId, Object item) {
         Log.d(tag, "onItemSelected(" + resources.getResourceName(viewId) + ", " + item + ")");
     }
 
     @CallSuper
     @Override
-    public void onTextChanged(int viewId, String text) {
+    public void onTextChanged(MvpViewHandle<S> handle, int viewId, String text) {
         Log.d(tag, "onTextChanged(" + resources.getResourceName(viewId) + ", " + text + ")");
     }
 
     @Override
-    public void onCheckedChanged(int viewId, boolean isChecked) {
+    public void onCheckedChanged(MvpViewHandle<S> handle, int viewId, boolean isChecked) {
         Log.d(tag, "onCheckedChanged(" + resources.getResourceName(viewId) + ", " + isChecked + ")");
     }
 
     @Override
-    public void onRadioCheckedChanged(int radioViewId, int viewId) {
+    public void onRadioCheckedChanged(MvpViewHandle<S> handle, int radioViewId, int viewId) {
         Log.d(tag, "onRadioCheckedChanged(" + resources.getResourceName(radioViewId) + ", " + viewId + ")");
     }
 
     @Override
-    public void onDrag(int viewId, DragEvent event) {
+    public void onDrag(MvpViewHandle<S> handle, int viewId, DragEvent event) {
         Log.d(tag, "onDrag(" + resources.getResourceName(viewId) + ", " + event + ")");
     }
 

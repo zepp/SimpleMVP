@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
+import com.simplemvp.common.MvpViewHandle;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class MvpTextWatcher<S extends MvpState> implements TextWatcher {
     private final static int DELAY = 200;
     private final Handler handler;
+    private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
     @IdRes
     private final int viewId;
@@ -29,8 +31,9 @@ class MvpTextWatcher<S extends MvpState> implements TextWatcher {
     private String text = "";
     private long millis;
 
-    MvpTextWatcher(Handler handler, MvpPresenter<S> presenter, int viewId) {
+    MvpTextWatcher(Handler handler, MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
         this.handler = handler;
+        this.handle = handle;
         this.presenter = presenter;
         this.viewId = viewId;
     }
@@ -38,7 +41,7 @@ class MvpTextWatcher<S extends MvpState> implements TextWatcher {
     private void sendText() {
         long delta = System.currentTimeMillis() - millis;
         if (delta > DELAY) {
-            presenter.onTextChanged(viewId, text);
+            presenter.onTextChanged(handle, viewId, text);
             isSendTextPosted.set(false);
         } else {
             handler.postDelayed(this::sendText, DELAY - delta);
