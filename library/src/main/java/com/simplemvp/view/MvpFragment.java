@@ -50,10 +50,14 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         return args;
     }
 
+    protected int getPresenterId(Bundle bundle) {
+        return bundle.getInt(PRESENTER_ID);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int presenterId = savedInstanceState == null ? 0 : savedInstanceState.getInt(PRESENTER_ID);
+        int presenterId = savedInstanceState == null ? 0 : getPresenterId(savedInstanceState);
         manager = MvpPresenterManager.getInstance(getContext());
         if (presenterId == 0) {
             presenter = onInitPresenter(manager);

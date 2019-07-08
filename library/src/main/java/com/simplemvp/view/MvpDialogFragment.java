@@ -46,10 +46,14 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
         return args;
     }
 
+    protected int getPresenterId(Bundle bundle) {
+        return bundle.getInt(PRESENTER_ID);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int presenterId = savedInstanceState == null ? 0 : savedInstanceState.getInt(PRESENTER_ID);
+        int presenterId = savedInstanceState == null ? 0 : getPresenterId(savedInstanceState);
         manager = MvpPresenterManager.getInstance(getContext());
         if (presenterId == 0) {
             presenter = onInitPresenter(manager);
@@ -123,7 +127,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
             Log.w(tag, "presenter ID is not supplied");
             return null;
         } else {
-            return manager.getPresenterInstance(getArguments().getInt(PRESENTER_ID));
+            return manager.getPresenterInstance(getPresenterId(getArguments()));
         }
     }
 }
