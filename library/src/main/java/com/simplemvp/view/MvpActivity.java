@@ -53,7 +53,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         } else {
             presenter = manager.getPresenterInstance(presenterId);
         }
-        eventHandler = new MvpEventHandler<>(this, presenter, manager.getReferenceQueue());
+        eventHandler = new MvpEventHandler<>(this, presenter);
         getLifecycle().addObserver(eventHandler);
         presenter.attach(this);
     }

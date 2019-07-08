@@ -26,6 +26,7 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final static int QUEUE_SIZE = 8;
     private final String tag = getClass().getSimpleName();
     private final WeakReference<MvpView<S, P>> reference;
+    private final ReferenceQueue<MvpView<S, P>> referenceQueue;
     private final P presenter;
     private final Queue<S> queue = new ConcurrentLinkedQueue<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -48,8 +50,9 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final AtomicBoolean isQueueFlush = new AtomicBoolean();
     private volatile S lastState;
 
-    MvpEventHandler(MvpView<S, P> view, P presenter, ReferenceQueue<MvpView<?, ?>> queue) {
-        this.reference = new WeakReference<>(view, queue);
+    MvpEventHandler(MvpView<S, P> view, P presenter) {
+        this.referenceQueue = new ReferenceQueue<>();
+        this.reference = new WeakReference<>(view, referenceQueue);
         this.presenter = presenter;
     }
 
@@ -176,6 +179,20 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
             // set flag and then check queue size again to avoid cases when item is left unprocessed
             if (queue.isEmpty()) {
                 isQueueFlush.set(false);
+            }
+        }
+        expungeStaleEntries();
+    }
+
+    private void expungeStaleEntries() {
+        synchronized (referenceQueue) {
+            Reference<? extends MvpView> reference = referenceQueue.poll();
+            while (reference != null) {
+                MvpView view = reference.get();
+                MvpPresenter presenter = view.getPresenter();
+                presenter.detach(view);
+                reference.clear();
+                reference = referenceQueue.poll();
             }
         }
     }

@@ -10,10 +10,7 @@ import android.util.Log;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
-import com.simplemvp.common.MvpView;
 
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +26,6 @@ public final class MvpPresenterManager {
     private final String tag = getClass().getSimpleName();
     private final Context context;
     private final Map<Integer, MvpPresenter<?>> map;
-    private final ReferenceQueue<MvpView<?, ?>> referenceQueue;
     private volatile ExecutorService executor;
     private volatile MvpErrorHandler handler;
 
@@ -37,7 +33,6 @@ public final class MvpPresenterManager {
         this.context = context;
         this.executor = Executors.newSingleThreadExecutor();
         this.map = Collections.synchronizedMap(new HashMap<>());
-        this.referenceQueue = new ReferenceQueue<>();
         this.handler = e -> Log.e(tag, formStackTrace(e));
     }
 
@@ -78,7 +73,6 @@ public final class MvpPresenterManager {
      * @return new presenter
      */
     public <S extends MvpState, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends I> pClass, Class<S> sClass) {
-        expungeStaleEntries();
         S state = newState(sClass);
         I presenter = ProxyHandler.newProxy(executor, handler, newPresenter(pClass, sClass, state));
         map.put(presenter.getId(), presenter);
@@ -95,7 +89,6 @@ public final class MvpPresenterManager {
      * @return presenter of desired type
      */
     public <S extends MvpState, P extends MvpPresenter<S>> P getPresenterInstance(int presenterId) {
-        expungeStaleEntries();
         return (P) map.get(presenterId);
     }
 
@@ -111,26 +104,8 @@ public final class MvpPresenterManager {
         }
     }
 
-    public ReferenceQueue<MvpView<?, ?>> getReferenceQueue() {
-        return referenceQueue;
-    }
-
     ExecutorService getExecutor() {
         return executor;
-    }
-
-    private void expungeStaleEntries() {
-        synchronized (referenceQueue) {
-            Reference<? extends MvpView> reference = referenceQueue.poll();
-            while (reference != null) {
-                MvpView view = reference.get();
-                MvpPresenter presenter = view.getPresenter();
-                presenter.detach(view);
-                releasePresenter(presenter);
-                reference.clear();
-                reference = referenceQueue.poll();
-            }
-        }
     }
 
     private <P extends MvpPresenter<S>, S extends MvpState> P newPresenter(Class<P> pClass, Class<S> sClass, S state) {

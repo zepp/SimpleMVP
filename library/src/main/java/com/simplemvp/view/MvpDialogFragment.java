@@ -56,7 +56,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
         } else {
             presenter = manager.getPresenterInstance(presenterId);
         }
-        eventHandler = new MvpEventHandler<>(this, presenter, manager.getReferenceQueue());
+        eventHandler = new MvpEventHandler<>(this, presenter);
         getLifecycle().addObserver(eventHandler);
         presenter.attach(this);
     }
