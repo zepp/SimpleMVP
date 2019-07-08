@@ -13,6 +13,13 @@ import android.support.annotation.StringRes;
 public interface MvpViewHandle<S extends MvpState> {
 
     /**
+     * Getter to access {@link MvpView} reference.
+     *
+     * @return null or reference to real view
+     */
+    MvpView<S, ?> getMvpView();
+
+    /**
      * This method posts new state to parent view
      *
      * @param state

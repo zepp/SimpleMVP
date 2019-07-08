@@ -122,6 +122,11 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     @Override
+    public MvpView<S, ?> getMvpView() {
+        return reference.get();
+    }
+
+    @Override
     public void post(S state) {
         queue.offer(state);
         if (isResumed.get() && isQueueFlush.compareAndSet(false, true)) {
