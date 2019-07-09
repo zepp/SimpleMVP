@@ -47,6 +47,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
+    private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
     private final AtomicBoolean isQueueFlush = new AtomicBoolean();
     private volatile S lastState;
@@ -61,11 +62,13 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     public void onResumed() {
         MvpView<S, P> view = reference.get();
         isResumed.set(true);
-        if (queue.isEmpty() && lastState != null) {
-            view.onStateChanged(lastState);
-        } else {
-            Log.d(tag, "flushing event queue");
-            flushQueue();
+        if (isResumed()) {
+            if (queue.isEmpty() && lastState != null) {
+                view.onStateChanged(lastState);
+            } else {
+                Log.d(tag, "flushing event queue");
+                flushQueue();
+            }
         }
     }
 
@@ -139,7 +142,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public void post(S state) {
         queue.offer(state);
-        if (isResumed.get() && isQueueFlush.compareAndSet(false, true)) {
+        if (isResumed() && isQueueFlush.compareAndSet(false, true)) {
             handler.post(this::flushQueue);
         }
     }
@@ -168,12 +171,28 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         }
     }
 
+    /**
+     * This method enables or disables queue drain. State queue must not be drained in some cases
+     * since view is not ready to handle a state. If menu is not inflated for example.
+     *
+     * @param value true to enable queue drain, false to stop it
+     */
+    void setEnabled(boolean value) {
+        if (isEnabled.compareAndSet(!value, value) && isResumed()) {
+            flushQueue();
+        }
+    }
+
+    private boolean isResumed() {
+        return isEnabled.get() && isResumed.get();
+    }
+
     private void flushQueue() {
         int size = queue.size();
         int n = size / QUEUE_SIZE;
         // flushQueue may be called when View has been paused or it is about to be destroyed
         // so it is better to check this flag before start state processing
-        while (!queue.isEmpty() && isResumed.get()) {
+        while (!queue.isEmpty() && isResumed()) {
             S state = queue.poll();
             // process every n'th state in case of queue overflow
             if (n == 0 || size % n == 0) {

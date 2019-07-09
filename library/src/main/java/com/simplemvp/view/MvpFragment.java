@@ -65,6 +65,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
             presenter = manager.getPresenterInstance(presenterId);
         }
         eventHandler = new MvpEventHandler<>(this, presenter);
+        eventHandler.setEnabled(getMenuId() == 0);
         getLifecycle().addObserver(eventHandler);
         presenter.connect(this);
     }
@@ -95,6 +96,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (getMenuId() != 0) {
             inflater.inflate(getMenuId(), menu);
+            eventHandler.setEnabled(true);
         }
     }
 
