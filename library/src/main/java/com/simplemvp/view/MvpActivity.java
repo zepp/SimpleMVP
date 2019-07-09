@@ -56,7 +56,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         eventHandler = new MvpEventHandler<>(this, presenter);
         eventHandler.setEnabled(getMenuId() == 0);
         getLifecycle().addObserver(eventHandler);
-        presenter.connect(this);
+        presenter.connect(getViewHandle());
     }
 
     @Override
@@ -68,7 +68,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.disconnect(this);
+        presenter.disconnect(getViewHandle());
         if (isFinishing()) {
             manager.releasePresenter(presenter);
         }

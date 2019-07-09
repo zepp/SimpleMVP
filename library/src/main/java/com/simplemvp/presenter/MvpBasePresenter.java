@@ -52,10 +52,9 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
      * This method is called by a view to attached oneself to presenter that is instantiated by
      * {@link MvpPresenterManager}
      *
-     * @param view to be attached
+     * @param handle {@link MvpViewHandle MvpViewHandle} to connect to
      */
-    public final synchronized void connect(MvpView<S, ?> view) {
-        MvpViewHandle<S> handle = view.getViewHandle();
+    public final synchronized void connect(MvpViewHandle<S> handle) {
         boolean isFirst = handles.isEmpty();
         handles.add(handle);
         executor.execute(() -> {
@@ -79,10 +78,9 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
      * destroyed. This method call is mandatory otherwise presenter will not be stopped and acquired
      * resources will not be released.
      *
-     * @param view to be detached
+     * @param handle {@link MvpViewHandle MvpViewHandle} to disconnect from
      */
-    public final synchronized void disconnect(MvpView<S, ?> view) {
-        MvpViewHandle<S> handle = view.getViewHandle();
+    public final synchronized void disconnect(MvpViewHandle<S> handle) {
         handles.remove(handle);
         boolean isLast = handles.isEmpty();
         executor.execute(() -> {

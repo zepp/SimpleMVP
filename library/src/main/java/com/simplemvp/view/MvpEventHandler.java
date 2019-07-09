@@ -27,7 +27,6 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -145,6 +144,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         if (isResumed() && isQueueFlush.compareAndSet(false, true)) {
             handler.post(this::flushQueue);
         }
+        expungeStaleEntries();
     }
 
     @Override
@@ -213,18 +213,12 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
                 isQueueFlush.set(false);
             }
         }
-        expungeStaleEntries();
     }
 
     private void expungeStaleEntries() {
         synchronized (referenceQueue) {
-            Reference<? extends MvpView> reference = referenceQueue.poll();
-            while (reference != null) {
-                MvpView view = reference.get();
-                MvpPresenter presenter = view.getPresenter();
-                presenter.disconnect(view);
-                reference.clear();
-                reference = referenceQueue.poll();
+            if (referenceQueue.poll() != null) {
+                presenter.disconnect(this);
             }
         }
     }
