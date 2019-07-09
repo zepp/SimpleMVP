@@ -20,19 +20,20 @@ import android.widget.CompoundButton;
 public interface MvpPresenter<S extends MvpState> {
     /**
      * This method is called by any {@link MvpView MvpView} implementation to connect with presenter
-     * instance. Typically this method is called internally.
+     * instance. Typically this method is called internally by {@link com.simplemvp.view.MvpFragment},
+     * {@link com.simplemvp.view.MvpDialogFragment} or {@link com.simplemvp.view.MvpActivity}
      *
      * @param view view
      */
-    void attach(MvpView<S, ?> view);
+    void connect(MvpView<S, ?> view);
 
     /**
-     * This method is called when {@link MvpView MvpView} is closed e.g. presenter is no more needed.
-     * Typically it is called internally.
+     * This method is called when {@link MvpView MvpView} is about to be closed. Presenter is no more
+     * needed in other words. Typically it is called internally by view instance.
      *
-     * @param view
+     * @param view view
      */
-    void detach(MvpView<S, ?> view);
+    void disconnect(MvpView<S, ?> view);
 
     /**
      * Method to be used by {@link com.simplemvp.presenter.MvpPresenterManager MvpPresenterManager}

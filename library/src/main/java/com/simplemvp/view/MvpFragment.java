@@ -66,7 +66,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         }
         eventHandler = new MvpEventHandler<>(this, presenter);
         getLifecycle().addObserver(eventHandler);
-        presenter.attach(this);
+        presenter.connect(this);
     }
 
     @Nullable
@@ -85,7 +85,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.detach(this);
+        presenter.disconnect(this);
         manager.releasePresenter(presenter);
         getLifecycle().removeObserver(eventHandler);
     }

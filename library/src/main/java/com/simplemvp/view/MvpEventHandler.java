@@ -203,7 +203,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
             while (reference != null) {
                 MvpView view = reference.get();
                 MvpPresenter presenter = view.getPresenter();
-                presenter.detach(view);
+                presenter.disconnect(view);
                 reference.clear();
                 reference = referenceQueue.poll();
             }
