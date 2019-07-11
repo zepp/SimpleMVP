@@ -31,6 +31,9 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         if (viewId == R.id.clear_all) {
             state.clearEvents();
         } else {
+            if (viewId == R.id.show_toast) {
+                handle.showToast(state.text, state.duration.duration);
+            }
             state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onViewClicked"));
         }
         commit();
@@ -43,6 +46,9 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         if (viewId == R.id.events) {
             state.removeEvent((Event) item);
         } else {
+            if (viewId == R.id.duration_spinner) {
+                state.setDuration((ToastDuration) item);
+            }
             state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onItemSelected"));
         }
         commit();

@@ -17,9 +17,9 @@ import com.simplemvp.view.MvpFragment;
 
 
 public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {
-    private Button button;
-    private MvpEditText editText;
-    private Spinner spinner;
+    private Button showToast;
+    private MvpEditText toastText;
+    private Spinner durationSpinner;
 
     public MainFragment() {
         // Required empty public constructor
@@ -39,24 +39,24 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        editText = view.findViewById(R.id.edit_text);
-        button = view.findViewById(R.id.button);
-        editText = view.findViewById(R.id.edit_text);
-        spinner = view.findViewById(R.id.spinner);
-        spinner.setAdapter(new SpinnerAdapter(getContext(), new String[]{"One", "Two", "Three"}));
+        toastText = view.findViewById(R.id.toast_text);
+        showToast = view.findViewById(R.id.show_toast);
+        durationSpinner = view.findViewById(R.id.duration_spinner);
+        durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ToastDuration[]{
+                ToastDuration.LongDuration, ToastDuration.ShortDuration}));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        button.setOnClickListener(getMvpListener());
-        editText.addTextChangedListener(newTextWatcher(editText));
-        spinner.setOnItemSelectedListener(getMvpListener());
+        showToast.setOnClickListener(getMvpListener());
+        toastText.addTextChangedListener(newTextWatcher(toastText));
+        durationSpinner.setOnItemSelectedListener(getMvpListener());
     }
 
     @Override
     public void onStateChanged(MainState state) {
-        editText.setTextNoWatchers(state.text);
+        toastText.setTextNoWatchers(state.text);
     }
 
     @Override
@@ -64,8 +64,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 
-    private class SpinnerAdapter extends ArrayAdapter<String> {
-        SpinnerAdapter(@NonNull Context context, @NonNull String[] objects) {
+    private class SpinnerAdapter extends ArrayAdapter<ToastDuration> {
+        SpinnerAdapter(@NonNull Context context, @NonNull ToastDuration[] objects) {
             super(context, android.R.layout.simple_spinner_item, objects);
         }
     }
