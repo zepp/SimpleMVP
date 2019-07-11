@@ -1,5 +1,6 @@
 package com.testapp;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,8 +13,10 @@ import java.util.List;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
     private List<Event> events = Collections.emptyList();
+    private final Resources resources;
 
-    public EventsAdapter() {
+    public EventsAdapter(Resources resources) {
+        this.resources = resources;
         setHasStableIds(true);
     }
 
@@ -44,19 +47,22 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolde
         return events.get(position).id;
     }
 
-    public final static class EventHolder extends RecyclerView.ViewHolder {
+    public final class EventHolder extends RecyclerView.ViewHolder {
         private final TextView id;
-        private final TextView text;
+        private final TextView type;
+        private final TextView view;
 
         EventHolder(@NonNull View itemView) {
             super(itemView);
             id = itemView.findViewById(R.id.event_id);
-            text = itemView.findViewById(R.id.event_text);
+            type = itemView.findViewById(R.id.event_type);
+            view = itemView.findViewById(R.id.event_view);
         }
 
         void bind(Event event) {
             id.setText(String.valueOf(event.id));
-            text.setText(event.type);
+            type.setText(event.type);
+            view.setText(resources.getResourceEntryName(event.view));
         }
     }
 }
