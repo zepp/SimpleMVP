@@ -56,7 +56,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolde
 
         void bind(Event event) {
             id.setText(String.valueOf(event.id));
-            text.setText(event.text);
+            text.setText(event.type);
         }
     }
 }

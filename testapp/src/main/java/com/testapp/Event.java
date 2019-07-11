@@ -2,10 +2,12 @@ package com.testapp;
 
 class Event {
     final int id;
-    final String text;
+    final int view;
+    final String type;
 
-    Event(int id, String text) {
+    Event(int id, int view, String type) {
         this.id = id;
-        this.text = text;
+        this.view = view;
+        this.type = type;
     }
 }
