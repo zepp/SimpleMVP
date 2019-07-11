@@ -2,7 +2,9 @@ package com.testapp;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -16,6 +18,7 @@ import com.simplemvp.view.MvpActivity;
 
 public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState> {
     private Toolbar toolbar;
+    private TabLayout tabLayout;
     private ViewPager viewPager;
     private FloatingActionButton fab;
 
@@ -50,6 +53,8 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
         setSupportActionBar(toolbar);
         viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
         fab = findViewById(R.id.fab);
     }
 
@@ -81,6 +86,16 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
                 return MainFragment.newInstance(getPresenter().getId());
             } else {
                 return EventsFragment.newInstance(getPresenter().getId());
+            }
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 0) {
+                return "main";
+            } else {
+                return "events";
             }
         }
 
