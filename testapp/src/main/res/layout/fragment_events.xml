@@ -5,7 +5,6 @@
     android:id="@+id/events"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
