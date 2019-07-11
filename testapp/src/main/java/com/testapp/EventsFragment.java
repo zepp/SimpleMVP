@@ -45,6 +45,13 @@ public class EventsFragment extends MvpFragment<MvpPresenter<MainState>, MainSta
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        eventsAdapter.setListener(event ->
+                presenter.onItemSelected(getViewHandle(), events.getId(), event));
+    }
+
+    @Override
     public MvpPresenter<MainState> onInitPresenter(MvpPresenterManager manager) {
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
