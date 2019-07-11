@@ -49,6 +49,9 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
         state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onCheckedChanged"));
+        if (viewId == R.id.settings_switch) {
+            state.setSwitchChecked(isChecked);
+        }
         commit();
     }
 
