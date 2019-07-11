@@ -50,7 +50,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         return args;
     }
 
-    protected int getPresenterId(Bundle bundle) {
+    protected static int getPresenterId(Bundle bundle) {
         return bundle.getInt(PRESENTER_ID);
     }
 
@@ -127,7 +127,9 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void finish() {
-        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+        if (!isDetached()) {
+            getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+        }
     }
 
     @Override

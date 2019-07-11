@@ -46,7 +46,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
         return args;
     }
 
-    protected int getPresenterId(Bundle bundle) {
+    protected static int getPresenterId(Bundle bundle) {
         return bundle.getInt(PRESENTER_ID);
     }
 
@@ -114,7 +114,9 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
 
     @Override
     public void finish() {
-        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+        if (!isDetached()) {
+            getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+        }
     }
 
     @Override
