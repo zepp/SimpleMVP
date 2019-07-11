@@ -4,6 +4,7 @@
 
 package com.simplemvp.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -95,6 +96,11 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public MvpListener getMvpListener() {
         return eventHandler;
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 
     @Override

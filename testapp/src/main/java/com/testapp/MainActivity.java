@@ -1,6 +1,5 @@
 package com.testapp;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -32,11 +31,6 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
         return R.menu.menu_main;
     }
 
-    @Override
-    public Context getContext() {
-        return this;
-    }
-    
     @Override
     public void onStateChanged(MainState state) {
     }
