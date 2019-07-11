@@ -58,4 +58,11 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onRadioCheckedChanged(handle, radioViewId, viewId);
         state.setOption(viewId);
     }
+
+    @Override
+    public void onOptionsItemSelected(MvpViewHandle<MainState> handle, int itemId) {
+        super.onOptionsItemSelected(handle, itemId);
+        state.addEvent(new Event(lastEventId.incrementAndGet(), itemId, "onOptionsItemSelected"));
+        commit();
+    }
 }
