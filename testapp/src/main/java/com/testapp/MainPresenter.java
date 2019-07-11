@@ -20,7 +20,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     public void onTextChanged(MvpViewHandle<MainState> handle, int viewId, String text) {
         super.onTextChanged(handle, viewId, text);
         state.setText(text);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onTextChanged (" + resources.getResourceName(viewId) + ")"));
+        state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onTextChanged"));
         commit();
     }
 
@@ -28,7 +28,11 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpEventHandler
     public void onViewClicked(MvpViewHandle<MainState> handle, int viewId) {
         super.onViewClicked(handle, viewId);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onViewClicked (" + resources.getResourceName(viewId) + ")"));
+        if (viewId == R.id.clear_all) {
+            state.clearEvents();
+        } else {
+            state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onViewClicked"));
+        }
         commit();
     }
 
@@ -36,7 +40,11 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpEventHandler
     public void onItemSelected(MvpViewHandle<MainState> handle, int viewId, Object item) {
         super.onItemSelected(handle, viewId, item);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onItemSelected (" + resources.getResourceName(viewId) + ")"));
+        if (viewId == R.id.events) {
+            state.removeEvent((Event) item);
+        } else {
+            state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onItemSelected"));
+        }
         commit();
     }
 
@@ -44,7 +52,10 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpEventHandler
     public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onCheckedChanged (" + resources.getResourceName(viewId) + ")"));
+        state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onCheckedChanged"));
+        if (viewId == R.id.settings_switch) {
+            state.setSwitchChecked(isChecked);
+        }
         commit();
     }
 
@@ -53,5 +64,12 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     public void onRadioCheckedChanged(MvpViewHandle<MainState> handle, int radioViewId, int viewId) {
         super.onRadioCheckedChanged(handle, radioViewId, viewId);
         state.setOption(viewId);
+    }
+
+    @Override
+    public void onOptionsItemSelected(MvpViewHandle<MainState> handle, int itemId) {
+        super.onOptionsItemSelected(handle, itemId);
+        state.addEvent(new Event(lastEventId.incrementAndGet(), itemId, "onOptionsItemSelected"));
+        commit();
     }
 }

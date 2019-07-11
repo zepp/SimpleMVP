@@ -1,14 +1,15 @@
 package com.testapp;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.view.MenuItem;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
@@ -16,8 +17,9 @@ import com.simplemvp.view.MvpActivity;
 
 public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState> {
     private Toolbar toolbar;
+    private TabLayout tabLayout;
     private ViewPager viewPager;
-    private FloatingActionButton fab;
+    private FloatingActionButton clearAll;
 
     @Override
     public int getLayoutId() {
@@ -29,11 +31,6 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
         return R.menu.menu_main;
     }
 
-    @Override
-    public Context getContext() {
-        return this;
-    }
-    
     @Override
     public void onStateChanged(MainState state) {
     }
@@ -50,24 +47,24 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
         setSupportActionBar(toolbar);
         viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
-        fab = findViewById(R.id.fab);
+        tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
+        clearAll = findViewById(R.id.clear_all);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        fab.setOnClickListener(getMvpListener());
+        clearAll.setOnClickListener(getMvpListener());
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        menu.findItem(R.id.action_settings).setOnMenuItemClickListener(view -> {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_settings) {
             SettingsDialog dialog = SettingsDialog.newInstance(presenter.getId());
             dialog.show(getSupportFragmentManager(), dialog.getClass().getSimpleName());
-            return true;
-        });
-        return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -81,6 +78,16 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
                 return MainFragment.newInstance(getPresenter().getId());
             } else {
                 return EventsFragment.newInstance(getPresenter().getId());
+            }
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 0) {
+                return "main";
+            } else {
+                return "events";
             }
         }
 

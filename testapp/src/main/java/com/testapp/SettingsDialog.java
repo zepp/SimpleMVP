@@ -52,5 +52,6 @@ public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, M
         } else {
             options.check(state.option);
         }
+        switch_.setChecked(state.isSwitchChecked);
     }
 }
