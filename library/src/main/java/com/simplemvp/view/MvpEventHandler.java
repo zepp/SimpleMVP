@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
@@ -181,6 +183,20 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         }));
     }
 
+    @Override
+    public void showDialog(DialogFragment dialog) {
+        handler.post(new EventRunnable(view -> {
+            if (view instanceof AppCompatActivity) {
+                dialog.show(((AppCompatActivity) view).getSupportFragmentManager(),
+                        dialog.getClass().getSimpleName());
+            } else if (view instanceof Fragment) {
+                if (!((Fragment) view).isDetached()) {
+                    dialog.show(((Fragment) view).getFragmentManager(), dialog.getClass().getSimpleName());
+                }
+            }
+        }));
+    }
+
     /**
      * This method enables or disables queue drain. State queue must not be drained in some cases
      * since view is not ready to handle a state. If menu is not inflated for example.
@@ -245,7 +261,11 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
             handler.post(() -> {
                 MvpView<S, P> view = reference.get();
                 if (view != null) {
-                    consumer.accept(view);
+                    try {
+                        consumer.accept(view);
+                    } catch (Exception e) {
+                        Log.e(tag, "error:", e);
+                    }
                 }
             });
         }

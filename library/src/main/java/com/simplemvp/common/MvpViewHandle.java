@@ -6,6 +6,7 @@ package com.simplemvp.common;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.v4.app.DialogFragment;
 
 /**
  * This interface describes interface to be used by presenter to interact with MvpView
@@ -75,4 +76,11 @@ public interface MvpViewHandle<S extends MvpState> {
      *                    activity exits.
      */
     void startActivityForResult(Intent intent, int requestCode);
+
+    /**
+     * This method shows dialog using compat fragment manager.
+     *
+     * @param dialog {@link DialogFragment dialog} to be shown
+     */
+    void showDialog(DialogFragment dialog);
 }
