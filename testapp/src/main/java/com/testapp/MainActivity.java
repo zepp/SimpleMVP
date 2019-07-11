@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
@@ -56,15 +55,6 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     protected void onStart() {
         super.onStart();
         clearAll.setOnClickListener(getMvpListener());
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            SettingsDialog dialog = SettingsDialog.newInstance(presenter.getId());
-            dialog.show(getSupportFragmentManager(), dialog.getClass().getSimpleName());
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {

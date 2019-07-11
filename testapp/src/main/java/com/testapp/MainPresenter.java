@@ -69,6 +69,9 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @Override
     public void onOptionsItemSelected(MvpViewHandle<MainState> handle, int itemId) {
         super.onOptionsItemSelected(handle, itemId);
+        if (itemId == R.id.action_settings) {
+            handle.showDialog(SettingsDialog.newInstance(getId()));
+        }
         state.addEvent(new Event(lastEventId.incrementAndGet(), itemId, "onOptionsItemSelected"));
         commit();
     }
