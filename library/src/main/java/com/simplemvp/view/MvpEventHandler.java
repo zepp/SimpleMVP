@@ -7,9 +7,11 @@ package com.simplemvp.view;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,6 +28,7 @@ import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
+import com.simplemvp.functions.Consumer;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -149,26 +152,33 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void finish() {
-        MvpView<S, P> view = reference.get();
-        if (view != null) {
-            handler.post(view::finish);
-        }
+        handler.post(new EventRunnable(view -> view.finish()));
     }
 
     @Override
     public void showToast(String text, int duration) {
-        MvpView<S, P> view = reference.get();
-        if (view != null) {
-            Toast.makeText(view.getContext(), text, duration).show();
-        }
+        handler.post(new EventRunnable(view ->
+                Toast.makeText(view.getContext(), text, duration).show()));
     }
 
     @Override
     public void showToast(int resId, int duration) {
-        MvpView<S, P> view = reference.get();
-        if (view != null) {
-            Toast.makeText(view.getContext(), resId, duration).show();
-        }
+        handler.post(new EventRunnable(view ->
+                Toast.makeText(view.getContext(), resId, duration).show()));
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        handler.post(new EventRunnable(view -> view.getContext().startActivity(intent)));
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        handler.post(new EventRunnable(view -> {
+            if (view instanceof AppCompatActivity) {
+                ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
+            }
+        }));
     }
 
     /**
@@ -220,6 +230,24 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
             if (referenceQueue.poll() != null) {
                 presenter.disconnect(this);
             }
+        }
+    }
+
+    private class EventRunnable implements Runnable {
+        private final Consumer<MvpView<S, ?>> consumer;
+
+        EventRunnable(Consumer<MvpView<S, ?>> consumer) {
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void run() {
+            handler.post(() -> {
+                MvpView<S, P> view = reference.get();
+                if (view != null) {
+                    consumer.accept(view);
+                }
+            });
         }
     }
 }

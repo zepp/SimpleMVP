@@ -3,6 +3,7 @@
  */
 package com.simplemvp.common;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 
@@ -56,4 +57,22 @@ public interface MvpViewHandle<S extends MvpState> {
      *                 or {@link android.widget.Toast#LENGTH_LONG}
      */
     void showToast(@StringRes int resId, int duration);
+
+    /**
+     * This method starts new activity. It is a wrapper around {@link android.app.Activity#startActivity(Intent)}
+     * method that does real work.
+     *
+     * @param intent {@link Intent intent} instance
+     */
+    void startActivity(Intent intent);
+
+    /**
+     * Launch an activity for which you would like a result when it finished. This method invokes
+     * {@link android.app.Activity#startActivity(Intent, Bundle)} internally.
+     *
+     * @param intent      The intent to start.
+     * @param requestCode If >= 0, this code will be returned in onActivityResult() when the
+     *                    activity exits.
+     */
+    void startActivityForResult(Intent intent, int requestCode);
 }
