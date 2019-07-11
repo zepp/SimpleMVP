@@ -25,6 +25,11 @@ class MainState extends MvpState {
         setChanged(events.remove(event));
     }
 
+    void clearEvents() {
+        setChanged(true);
+        events.clear();
+    }
+
     void setOption(int option) {
         setChanged(this.option != option);
         this.option = option;

@@ -28,7 +28,11 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpEventHandler
     public void onViewClicked(MvpViewHandle<MainState> handle, int viewId) {
         super.onViewClicked(handle, viewId);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onViewClicked"));
+        if (viewId == R.id.clear_all) {
+            state.clearEvents();
+        } else {
+            state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onViewClicked"));
+        }
         commit();
     }
 

@@ -20,7 +20,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private FloatingActionButton fab;
+    private FloatingActionButton clearAll;
 
     @Override
     public int getLayoutId() {
@@ -55,13 +55,13 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
         viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
-        fab = findViewById(R.id.fab);
+        clearAll = findViewById(R.id.clear_all);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        fab.setOnClickListener(getMvpListener());
+        clearAll.setOnClickListener(getMvpListener());
     }
 
     @Override
