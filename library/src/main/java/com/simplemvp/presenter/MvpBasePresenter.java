@@ -5,6 +5,7 @@
 package com.simplemvp.presenter;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.CallSuper;
@@ -28,11 +29,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @param <S> state type
  */
-public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresenter<S> {
+public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrapper implements MvpPresenter<S> {
     private final static AtomicInteger lastId = new AtomicInteger();
     protected final String tag = getClass().getSimpleName();
     protected final MvpPresenterManager manager;
-    protected final Context context;
     protected final Resources resources;
     protected final S state;
     protected final int id;
@@ -40,8 +40,8 @@ public abstract class MvpBasePresenter<S extends MvpState> implements MvpPresent
     private final ExecutorService executor;
 
     public MvpBasePresenter(Context context, S state) {
+        super(context);
         this.manager = MvpPresenterManager.getInstance(context);
-        this.context = context;
         this.executor = manager.getExecutor();
         this.state = state;
         this.resources = context.getResources();
