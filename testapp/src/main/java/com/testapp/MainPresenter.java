@@ -3,6 +3,7 @@ package com.testapp;
 import android.content.Context;
 
 import com.simplemvp.annotations.MvpEventHandler;
+import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpBasePresenter;
 
@@ -13,6 +14,24 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
 
     public MainPresenter(Context context, MainState state) {
         super(context, state);
+    }
+
+    @Override
+    protected void onViewConnected(MvpViewHandle<MainState> handle) {
+        super.onViewConnected(handle);
+        MvpView<MainState, ?> view = handle.getMvpView();
+        state.addEvent(new Event(lastEventId.incrementAndGet(), view == null ? 0 : view.getLayoutId(),
+                "onViewConnected"));
+        commit();
+    }
+
+    @Override
+    protected void onViewDisconnected(MvpViewHandle<MainState> handle) {
+        super.onViewDisconnected(handle);
+        MvpView<MainState, ?> view = handle.getMvpView();
+        state.addEvent(new Event(lastEventId.incrementAndGet(), view == null ? 0: view.getLayoutId(),
+                "onViewDisconnected"));
+        commit();
     }
 
     @Override
