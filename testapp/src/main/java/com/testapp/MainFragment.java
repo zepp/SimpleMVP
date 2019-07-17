@@ -64,9 +64,9 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 
-    private class SpinnerAdapter extends ArrayAdapter<ToastDuration> {
+    private static class SpinnerAdapter extends ArrayAdapter<ToastDuration> {
         SpinnerAdapter(@NonNull Context context, @NonNull ToastDuration[] objects) {
-            super(context, android.R.layout.simple_spinner_item, objects);
+            super(context, R.layout.holder_duration, R.id.duration, objects);
         }
     }
 }
