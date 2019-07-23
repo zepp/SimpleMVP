@@ -79,8 +79,8 @@ public interface MvpViewHandle<S extends MvpState> {
 
     /**
      * This method shows dialog using compat fragment manager.
+     *  @param dialog {@link DialogFragment dialog} to be shown
      *
-     * @param dialog {@link DialogFragment dialog} to be shown
      */
     void showDialog(DialogFragment dialog);
 }

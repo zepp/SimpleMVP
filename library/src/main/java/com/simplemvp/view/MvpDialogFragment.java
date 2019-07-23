@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -108,13 +109,24 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
+    public void showDialog(DialogFragment dialog) {
+        FragmentManager manager = getFragmentManager();
+        if (manager == null) {
+            Log.e(tag, "fragment manager is not ready");
+        } else {
+            dialog.show(manager, dialog.getClass().getSimpleName());
+        }
+    }
+
+    @Override
     public P getPresenter() {
         return presenter;
     }
 
-    @Override
     public void finish() {
-        if (!isDetached()) {
+        if (manager == null) {
+            Log.e(tag, "fragment manager is not ready");
+        } else {
             getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
         }
     }

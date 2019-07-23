@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
@@ -116,6 +117,11 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
         return eventHandler.newQueryTextListener(view);
+    }
+
+    @Override
+    public void showDialog(DialogFragment dialog) {
+        dialog.show(getSupportFragmentManager(), dialog.getClass().getSimpleName());
     }
 
     @Override

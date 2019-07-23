@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.view.View;
@@ -112,4 +113,11 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
      * @return new listener instance
      */
     SearchView.OnQueryTextListener newQueryTextListener(SearchView view);
+
+    /**
+     * This method shows a dialog using view {@link android.support.v4.app.FragmentManager} and {@link Context}
+     *
+     * @param dialog dialog fragment to be shown
+     */
+    void showDialog(DialogFragment dialog);
 }
