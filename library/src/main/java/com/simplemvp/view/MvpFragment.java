@@ -11,10 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -125,12 +123,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void showDialog(DialogFragment dialog) {
-        FragmentManager manager = getFragmentManager();
-        if (manager == null) {
-            Log.e(tag, "fragment manager is not ready");
-        } else {
-            dialog.show(manager, dialog.getClass().getSimpleName());
-        }
+        dialog.show(getFragmentManager(), dialog.getClass().getSimpleName());
     }
 
     @Override
@@ -140,11 +133,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void finish() {
-        if (manager == null) {
-            Log.e(tag, "fragment manager is not ready");
-        } else {
-            getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
-        }
+        getFragmentManager().beginTransaction().remove(this).commit();
     }
 
     @Override

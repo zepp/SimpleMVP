@@ -46,14 +46,14 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final WeakReference<MvpView<S, P>> reference;
     private final ReferenceQueue<MvpView<S, P>> referenceQueue;
     private final P presenter;
-    private final Queue<S> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<EventRunnable> queue = new ConcurrentLinkedQueue<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
     private final AtomicBoolean isQueueFlush = new AtomicBoolean();
-    private volatile S lastState;
+    private volatile EventRunnable lastStateRunnable;
 
     MvpEventHandler(MvpView<S, P> view, P presenter) {
         this.referenceQueue = new ReferenceQueue<>();
@@ -66,8 +66,8 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         MvpView<S, P> view = reference.get();
         isResumed.set(true);
         if (isResumed()) {
-            if (queue.isEmpty() && lastState != null) {
-                view.onStateChanged(lastState);
+            if (queue.isEmpty() && lastStateRunnable != null) {
+                lastStateRunnable.run();
             } else {
                 Log.d(tag, "flushing event queue");
                 flushQueue();
@@ -144,16 +144,20 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void post(S state) {
-        queue.offer(state);
-        if (isResumed() && isQueueFlush.compareAndSet(false, true)) {
-            handler.post(this::flushQueue);
-        }
-        expungeStaleEntries();
+        queue.offer(new EventRunnable(true, view -> view.onStateChanged(state)));
+        initiateQueueFlush();
     }
 
     @Override
     public void finish() {
-        handler.post(new EventRunnable(view -> view.finish()));
+        queue.offer(new EventRunnable(view -> view.finish()));
+        initiateQueueFlush();
+    }
+
+    @Override
+    public void showDialog(DialogFragment dialog) {
+        queue.offer(new EventRunnable(view -> view.showDialog(dialog)));
+        initiateQueueFlush();
     }
 
     @Override
@@ -184,9 +188,14 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         }));
     }
 
-    @Override
-    public void showDialog(DialogFragment dialog) {
-        handler.post(new EventRunnable(view -> view.showDialog(dialog)));
+    /**
+     * This method initiate queue flush if it is not in process.
+     */
+    private void initiateQueueFlush() {
+        if (isResumed() && isQueueFlush.compareAndSet(false, true)) {
+            handler.post(this::flushQueue);
+        }
+        expungeStaleEntries();
     }
 
     /**
@@ -211,18 +220,13 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         // flushQueue may be called when View has been paused or it is about to be destroyed
         // so it is better to check this flag before start state processing
         while (!queue.isEmpty() && isResumed()) {
-            S state = queue.poll();
+            EventRunnable state = queue.poll();
             // process every n'th state in case of queue overflow
             if (n == 0 || size % n == 0) {
-                lastState = state;
-                try {
-                    MvpView<S, P> view = reference.get();
-                    if (view != null) {
-                        view.onStateChanged(state);
-                    }
-                } catch (Exception e) {
-                    Log.e(tag, "state handling error: ", e);
+                if (state.isStateRunnable) {
+                    lastStateRunnable = state;
                 }
+                state.run();
                 size = queue.size();
                 n = size / QUEUE_SIZE;
             }
@@ -242,9 +246,16 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     private class EventRunnable implements Runnable {
-        private final Consumer<MvpView<S, ?>> consumer;
+        final boolean isStateRunnable;
+        final Consumer<MvpView<S, ?>> consumer;
 
         EventRunnable(Consumer<MvpView<S, ?>> consumer) {
+            this.isStateRunnable = false;
+            this.consumer = consumer;
+        }
+
+        EventRunnable(boolean isStateRunnable, Consumer<MvpView<S, ?>> consumer) {
+            this.isStateRunnable = isStateRunnable;
             this.consumer = consumer;
         }
 
