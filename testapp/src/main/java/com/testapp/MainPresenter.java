@@ -51,7 +51,9 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             state.clearEvents();
         } else {
             if (viewId == R.id.show_toast) {
-                handle.showToast(state.text, state.duration.duration);
+                handle.showToast(state.text, state.duration.toastDuration);
+            } else if (viewId == R.id.show_snackbar) {
+                handle.showSnackBar(state.text, state.duration.snackBarDuration);
             }
             state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onViewClicked"));
         }
@@ -66,7 +68,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             state.removeEvent((Event) item);
         } else {
             if (viewId == R.id.duration_spinner) {
-                state.setDuration((ToastDuration) item);
+                state.setDuration((ActionDuration) item);
             }
             state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onItemSelected"));
         }

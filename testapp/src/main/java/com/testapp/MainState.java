@@ -10,7 +10,7 @@ class MainState extends MvpState {
     List<Event> events = new ArrayList<>();
     int option;
     boolean isSwitchChecked;
-    ToastDuration duration = ToastDuration.LongDuration;
+    ActionDuration duration = ActionDuration.LongDuration;
 
     void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -41,7 +41,7 @@ class MainState extends MvpState {
         isSwitchChecked = switchChecked;
     }
 
-    void setDuration(ToastDuration duration) {
+    void setDuration(ActionDuration duration) {
         setChanged(!this.duration.equals(duration));
         this.duration = duration;
     }

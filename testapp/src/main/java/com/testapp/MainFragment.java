@@ -18,6 +18,7 @@ import com.simplemvp.view.MvpFragment;
 
 public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {
     private Button showToast;
+    private Button showSnackBar;
     private MvpEditText toastText;
     private Spinner durationSpinner;
 
@@ -41,15 +42,17 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         super.onViewCreated(view, savedInstanceState);
         toastText = view.findViewById(R.id.toast_text);
         showToast = view.findViewById(R.id.show_toast);
+        showSnackBar = view.findViewById(R.id.show_snackbar);
         durationSpinner = view.findViewById(R.id.duration_spinner);
-        durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ToastDuration[]{
-                ToastDuration.LongDuration, ToastDuration.ShortDuration}));
+        durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ActionDuration[]{
+                ActionDuration.LongDuration, ActionDuration.ShortDuration}));
     }
 
     @Override
     public void onStart() {
         super.onStart();
         showToast.setOnClickListener(getMvpListener());
+        showSnackBar.setOnClickListener(getMvpListener());
         toastText.addTextChangedListener(newTextWatcher(toastText));
         durationSpinner.setOnItemSelectedListener(getMvpListener());
     }
@@ -64,8 +67,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 
-    private static class SpinnerAdapter extends ArrayAdapter<ToastDuration> {
-        SpinnerAdapter(@NonNull Context context, @NonNull ToastDuration[] objects) {
+    private static class SpinnerAdapter extends ArrayAdapter<ActionDuration> {
+        SpinnerAdapter(@NonNull Context context, @NonNull ActionDuration[] objects) {
             super(context, R.layout.holder_duration, R.id.duration, objects);
         }
     }
