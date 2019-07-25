@@ -100,8 +100,13 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
+    public View getView() {
+        return getWindow().getDecorView().getRootView();
+    }
+
+    @Override
     public Context getContext() {
-        return this;
+        return getBaseContext();
     }
 
     @Override

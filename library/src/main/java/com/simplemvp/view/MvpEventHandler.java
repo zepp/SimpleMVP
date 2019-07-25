@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -157,6 +158,18 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @Override
     public void showDialog(DialogFragment dialog) {
         queue.offer(new EventRunnable(view -> view.showDialog(dialog)));
+        initiateQueueFlush();
+    }
+
+    @Override
+    public void showSnackBar(String text, int duration) {
+        queue.offer(new EventRunnable(view -> Snackbar.make(view.getView(), text, duration).show()));
+        initiateQueueFlush();
+    }
+
+    @Override
+    public void showSnackBar(int res, int duration) {
+        queue.offer(new EventRunnable(view -> Snackbar.make(view.getView(), res, duration).show()));
         initiateQueueFlush();
     }
 

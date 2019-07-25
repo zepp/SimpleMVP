@@ -82,6 +82,13 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     MvpListener getMvpListener();
 
     /**
+     * This method returns root {@link View view} of the current {@link MvpView}
+     *
+     * @return
+     */
+    View getView();
+
+    /**
      * This method is called during view initialization (typically in {@link android.app.Activity#onCreate(Bundle) onCreate}
      * or in {@link android.support.v4.app.Fragment#onCreate(Bundle) onCreate}) to created a new presenter
      * instance
