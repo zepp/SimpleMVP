@@ -64,7 +64,6 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
-        MvpView<S, P> view = reference.get();
         isResumed.set(true);
         if (isResumed()) {
             if (queue.isEmpty() && lastStateRunnable != null) {
@@ -175,14 +174,16 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void showToast(String text, int duration) {
-        handler.post(new EventRunnable(view ->
+        queue.offer(new EventRunnable(view ->
                 Toast.makeText(view.getContext(), text, duration).show()));
+        initiateQueueFlush();
     }
 
     @Override
     public void showToast(int resId, int duration) {
-        handler.post(new EventRunnable(view ->
+        queue.offer(new EventRunnable(view ->
                 Toast.makeText(view.getContext(), resId, duration).show()));
+        initiateQueueFlush();
     }
 
     @Override
