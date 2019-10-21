@@ -85,6 +85,13 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        eventHandler.setEnabled(getMenuId() == 0);
+    }
+
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         presenter.disconnect(getViewHandle());
@@ -97,7 +104,14 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (getMenuId() != 0) {
             inflater.inflate(getMenuId(), menu);
-            eventHandler.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (!eventHandler.setEnabled(true)) {
+            eventHandler.handleLastState();
         }
     }
 

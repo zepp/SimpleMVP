@@ -68,6 +68,12 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        eventHandler.setEnabled(getMenuId() == 0);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         presenter.disconnect(getViewHandle());
@@ -83,10 +89,17 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         if (getMenuId() != 0) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(getMenuId(), menu);
-            eventHandler.setEnabled(true);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!eventHandler.setEnabled(true)) {
+            eventHandler.handleLastState();
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
