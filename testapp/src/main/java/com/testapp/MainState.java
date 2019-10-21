@@ -5,7 +5,7 @@ import com.simplemvp.common.MvpState;
 import java.util.ArrayList;
 import java.util.List;
 
-class MainState extends MvpState {
+public class MainState extends MvpState {
     String text = "";
     List<Event> events = new ArrayList<>();
     int option;

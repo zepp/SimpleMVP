@@ -64,11 +64,10 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
-        MvpView<S, P> view = reference.get();
         isResumed.set(true);
         if (isResumed()) {
-            if (queue.isEmpty() && lastStateRunnable != null) {
-                lastStateRunnable.run();
+            if (queue.isEmpty()) {
+                handleLastState();
             } else {
                 Log.d(tag, "flushing event queue");
                 flushQueue();
@@ -175,14 +174,16 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void showToast(String text, int duration) {
-        handler.post(new EventRunnable(view ->
+        queue.offer(new EventRunnable(view ->
                 Toast.makeText(view.getContext(), text, duration).show()));
+        initiateQueueFlush();
     }
 
     @Override
     public void showToast(int resId, int duration) {
-        handler.post(new EventRunnable(view ->
+        queue.offer(new EventRunnable(view ->
                 Toast.makeText(view.getContext(), resId, duration).show()));
+        initiateQueueFlush();
     }
 
     @Override
@@ -202,6 +203,16 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     /**
+     * This method handles last saved state runnable. It is called from inside and outside of
+     * current class.
+     */
+    void handleLastState() {
+        if (lastStateRunnable != null) {
+            lastStateRunnable.run();
+        }
+    }
+
+    /**
      * This method initiate queue flush if it is not in process.
      */
     private void initiateQueueFlush() {
@@ -215,12 +226,15 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
      * This method enables or disables queue drain. State queue must not be drained in some cases
      * since view is not ready to handle a state. If menu is not inflated for example.
      *
-     * @param value true to enable queue drain, false to stop it
+     * @param enabled true to enable queue drain, false to stop it
+     * @return true if state is changed
      */
-    void setEnabled(boolean value) {
-        if (isEnabled.compareAndSet(!value, value) && isResumed()) {
-            flushQueue();
+    boolean setEnabled(boolean enabled) {
+        boolean isChanged = isEnabled.compareAndSet(!enabled, enabled);
+        if (isChanged && isResumed()) {
+            onResumed();
         }
+        return isChanged;
     }
 
     private boolean isResumed() {
