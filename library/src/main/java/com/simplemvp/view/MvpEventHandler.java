@@ -53,7 +53,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
-    private final AtomicBoolean isQueueFlush = new AtomicBoolean();
+    private final AtomicBoolean isQueueDraining = new AtomicBoolean();
     private volatile EventRunnable lastStateRunnable;
 
     MvpEventHandler(MvpView<S, P> view, P presenter) {
@@ -70,7 +70,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
                 handleLastState();
             } else {
                 Log.d(tag, "flushing event queue");
-                flushQueue();
+                drainEventQueue();
             }
         }
     }
@@ -212,8 +212,8 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
      */
     private void postEvent(EventRunnable runnable) {
         queue.offer(runnable);
-        if (isResumed() && isQueueFlush.compareAndSet(false, true)) {
-            handler.post(this::flushQueue);
+        if (isResumed() && isQueueDraining.compareAndSet(false, true)) {
+            handler.post(this::drainEventQueue);
         }
         expungeStaleEntries();
     }
@@ -237,10 +237,10 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         return isEnabled.get() && isResumed.get();
     }
 
-    private void flushQueue() {
+    private void drainEventQueue() {
         int size = queue.size();
         int n = size / QUEUE_SIZE;
-        // flushQueue may be called when View has been paused or it is about to be destroyed
+        // drainEventQueue may be called when View has been paused or it is about to be destroyed
         // so it is better to check this flag before start state processing
         while (!queue.isEmpty() && isResumed()) {
             EventRunnable state = queue.poll();
@@ -255,7 +255,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
             }
             // set flag and then check queue size again to avoid cases when item is left unprocessed
             if (queue.isEmpty()) {
-                isQueueFlush.set(false);
+                isQueueDraining.set(false);
             }
         }
     }
@@ -284,16 +284,14 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
         @Override
         public void run() {
-            handler.post(() -> {
-                MvpView<S, P> view = reference.get();
-                if (view != null) {
-                    try {
-                        consumer.accept(view);
-                    } catch (Exception e) {
-                        Log.e(tag, "error:", e);
-                    }
+            MvpView<S, P> view = reference.get();
+            if (view != null) {
+                try {
+                    consumer.accept(view);
+                } catch (Exception e) {
+                    Log.e(tag, "error:", e);
                 }
-            });
+            }
         }
     }
 }
