@@ -144,49 +144,49 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void post(S state) {
-        postEvent(new EventRunnable(true, view -> view.onStateChanged(state)));
+        postEvent(new StateEvent(state));
     }
 
     @Override
     public void finish() {
-        postEvent(new EventRunnable(view -> view.finish()));
+        postEvent(new PresenterEvent(view -> view.finish()));
     }
 
     @Override
     public void showDialog(DialogFragment dialog) {
-        postEvent(new EventRunnable(view -> view.showDialog(dialog)));
+        postEvent(new PresenterEvent(view -> view.showDialog(dialog)));
     }
 
     @Override
     public void showSnackBar(String text, int duration) {
-        postEvent(new EventRunnable(view -> Snackbar.make(view.getView(), text, duration).show()));
+        postEvent(new PresenterEvent(view -> Snackbar.make(view.getView(), text, duration).show()));
     }
 
     @Override
     public void showSnackBar(int res, int duration) {
-        postEvent(new EventRunnable(view -> Snackbar.make(view.getView(), res, duration).show()));
+        postEvent(new PresenterEvent(view -> Snackbar.make(view.getView(), res, duration).show()));
     }
 
     @Override
     public void showToast(String text, int duration) {
-        postEvent(new EventRunnable(view ->
+        postEvent(new PresenterEvent(view ->
                 Toast.makeText(view.getContext(), text, duration).show()));
     }
 
     @Override
     public void showToast(int resId, int duration) {
-        postEvent(new EventRunnable(view ->
+        postEvent(new PresenterEvent(view ->
                 Toast.makeText(view.getContext(), resId, duration).show()));
     }
 
     @Override
     public void startActivity(Intent intent) {
-        postEvent(new EventRunnable(view -> view.getContext().startActivity(intent)));
+        postEvent(new PresenterEvent(view -> view.getContext().startActivity(intent)));
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        postEvent(new EventRunnable(view -> {
+        postEvent(new PresenterEvent(view -> {
             if (view instanceof AppCompatActivity) {
                 ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
             } else {
@@ -243,13 +243,13 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         // drainEventQueue may be called when View has been paused or it is about to be destroyed
         // so it is better to check this flag before start state processing
         while (!queue.isEmpty() && isResumed()) {
-            EventRunnable state = queue.poll();
+            EventRunnable runnable = queue.poll();
             // process every n'th state in case of queue overflow
             if (n == 0 || size % n == 0) {
-                if (state.isStateRunnable) {
-                    lastStateRunnable = state;
+                if (runnable.isState()) {
+                    lastStateRunnable = runnable;
                 }
-                state.run();
+                runnable.run();
                 size = queue.size();
                 n = size / QUEUE_SIZE;
             }
@@ -268,17 +268,37 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         }
     }
 
-    private class EventRunnable implements Runnable {
-        final boolean isStateRunnable;
-        final Consumer<MvpView<S, ?>> consumer;
+    private interface EventRunnable extends Runnable {
+        default boolean isState() {
+            return false;
+        }
+    }
 
-        EventRunnable(Consumer<MvpView<S, ?>> consumer) {
-            this.isStateRunnable = false;
-            this.consumer = consumer;
+    private class StateEvent implements EventRunnable {
+        final S state;
+
+        StateEvent(S state) {
+            this.state = state;
         }
 
-        EventRunnable(boolean isStateRunnable, Consumer<MvpView<S, ?>> consumer) {
-            this.isStateRunnable = isStateRunnable;
+        @Override
+        public boolean isState() {
+            return true;
+        }
+
+        @Override
+        public void run() {
+            MvpView<S, P> view = reference.get();
+            if (view != null) {
+                view.onStateChanged(state);
+            }
+        }
+    }
+
+    private class PresenterEvent implements EventRunnable {
+        final Consumer<MvpView<S, ?>> consumer;
+
+        PresenterEvent(Consumer<MvpView<S, ?>> consumer) {
             this.consumer = consumer;
         }
 
