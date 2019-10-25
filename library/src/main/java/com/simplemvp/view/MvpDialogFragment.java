@@ -88,6 +88,11 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
+    public void onFirstStateChange(S state) {
+        Log.d(tag, "onFirstStateChange(" + state + ")");
+    }
+    
+    @Override
     public MvpViewHandle<S> getViewHandle() {
         return eventHandler;
     }

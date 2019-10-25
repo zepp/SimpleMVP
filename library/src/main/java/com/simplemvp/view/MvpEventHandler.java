@@ -51,6 +51,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
+    private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
     private final AtomicBoolean isQueueDraining = new AtomicBoolean();
@@ -78,6 +79,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPaused() {
         isResumed.set(false);
+        isFirstStateChange.set(true);
     }
 
     @Override
@@ -268,6 +270,10 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         }
     }
 
+    private boolean isFirstStateChange() {
+        return isFirstStateChange.getAndSet(false);
+    }
+
     private interface EventRunnable extends Runnable {
         default boolean isState() {
             return false;
@@ -290,6 +296,9 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         public void run() {
             MvpView<S, P> view = reference.get();
             if (view != null) {
+                if (isFirstStateChange()) {
+                    view.onFirstStateChange(state);
+                }
                 view.onStateChanged(state);
             }
         }
