@@ -181,12 +181,12 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void startActivity(Intent intent) {
-        handler.post(new EventRunnable(view -> view.getContext().startActivity(intent)));
+        postEvent(new EventRunnable(view -> view.getContext().startActivity(intent)));
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        handler.post(new EventRunnable(view -> {
+        postEvent(new EventRunnable(view -> {
             if (view instanceof AppCompatActivity) {
                 ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
             } else {
