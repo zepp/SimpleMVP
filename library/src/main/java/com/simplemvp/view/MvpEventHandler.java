@@ -144,46 +144,39 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void post(S state) {
-        queue.offer(new EventRunnable(true, view -> view.onStateChanged(state)));
-        initiateQueueFlush();
+        postEvent(new EventRunnable(true, view -> view.onStateChanged(state)));
     }
 
     @Override
     public void finish() {
-        queue.offer(new EventRunnable(view -> view.finish()));
-        initiateQueueFlush();
+        postEvent(new EventRunnable(view -> view.finish()));
     }
 
     @Override
     public void showDialog(DialogFragment dialog) {
-        queue.offer(new EventRunnable(view -> view.showDialog(dialog)));
-        initiateQueueFlush();
+        postEvent(new EventRunnable(view -> view.showDialog(dialog)));
     }
 
     @Override
     public void showSnackBar(String text, int duration) {
-        queue.offer(new EventRunnable(view -> Snackbar.make(view.getView(), text, duration).show()));
-        initiateQueueFlush();
+        postEvent(new EventRunnable(view -> Snackbar.make(view.getView(), text, duration).show()));
     }
 
     @Override
     public void showSnackBar(int res, int duration) {
-        queue.offer(new EventRunnable(view -> Snackbar.make(view.getView(), res, duration).show()));
-        initiateQueueFlush();
+        postEvent(new EventRunnable(view -> Snackbar.make(view.getView(), res, duration).show()));
     }
 
     @Override
     public void showToast(String text, int duration) {
-        queue.offer(new EventRunnable(view ->
+        postEvent(new EventRunnable(view ->
                 Toast.makeText(view.getContext(), text, duration).show()));
-        initiateQueueFlush();
     }
 
     @Override
     public void showToast(int resId, int duration) {
-        queue.offer(new EventRunnable(view ->
+        postEvent(new EventRunnable(view ->
                 Toast.makeText(view.getContext(), resId, duration).show()));
-        initiateQueueFlush();
     }
 
     @Override
@@ -213,9 +206,12 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     /**
-     * This method initiate queue flush if it is not in process.
+     * This method post event to be processed on the main thread context
+     *
+     * @param runnable event to be sent
      */
-    private void initiateQueueFlush() {
+    private void postEvent(EventRunnable runnable) {
+        queue.offer(runnable);
         if (isResumed() && isQueueFlush.compareAndSet(false, true)) {
             handler.post(this::flushQueue);
         }
