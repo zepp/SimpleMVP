@@ -32,23 +32,23 @@ public class EventsFragment extends MvpFragment<MvpPresenter<MainState>, MainSta
     }
 
     @Override
-    public void onStateChanged(MainState state) {
-        eventsAdapter.setEvents(state.events);
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         eventsAdapter = new EventsAdapter(getContext().getResources());
         events = view.findViewById(R.id.events);
+    }
+
+    @Override
+    public void onFirstStateChange(MainState state) {
+        super.onFirstStateChange(state);
+        eventsAdapter.setListener(event ->
+                presenter.onItemSelected(getViewHandle(), events.getId(), event));
         events.setAdapter(eventsAdapter);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        eventsAdapter.setListener(event ->
-                presenter.onItemSelected(getViewHandle(), events.getId(), event));
+    public void onStateChanged(MainState state) {
+        eventsAdapter.setEvents(state.events);
     }
 
     @Override

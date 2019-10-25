@@ -31,10 +31,6 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     }
 
     @Override
-    public void onStateChanged(MainState state) {
-    }
-
-    @Override
     public MvpPresenter<MainState> onInitPresenter(MvpPresenterManager manager) {
         return manager.newPresenterInstance(MainPresenter.class, MainState.class);
     }
@@ -52,8 +48,12 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    public void onStateChanged(MainState state) {
+    }
+
+    @Override
+    public void onFirstStateChange(MainState state) {
+        super.onFirstStateChange(state);
         clearAll.setOnClickListener(getMvpListener());
     }
 
