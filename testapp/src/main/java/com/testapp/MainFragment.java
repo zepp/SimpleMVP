@@ -44,17 +44,17 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         showToast = view.findViewById(R.id.show_toast);
         showSnackBar = view.findViewById(R.id.show_snackbar);
         durationSpinner = view.findViewById(R.id.duration_spinner);
-        durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ActionDuration[]{
-                ActionDuration.LongDuration, ActionDuration.ShortDuration}));
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onFirstStateChange(MainState state) {
+        super.onFirstStateChange(state);
         showToast.setOnClickListener(getMvpListener());
         showSnackBar.setOnClickListener(getMvpListener());
         toastText.addTextChangedListener(newTextWatcher(toastText));
         durationSpinner.setOnItemSelectedListener(getMvpListener());
+        durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ActionDuration[]{
+                ActionDuration.LongDuration, ActionDuration.ShortDuration}));
     }
 
     @Override

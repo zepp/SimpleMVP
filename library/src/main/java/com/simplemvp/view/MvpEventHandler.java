@@ -51,9 +51,10 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
+    private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
-    private final AtomicBoolean isQueueFlush = new AtomicBoolean();
+    private final AtomicBoolean isQueueDraining = new AtomicBoolean();
     private volatile EventRunnable lastStateRunnable;
 
     MvpEventHandler(MvpView<S, P> view, P presenter) {
@@ -70,7 +71,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
                 handleLastState();
             } else {
                 Log.d(tag, "flushing event queue");
-                flushQueue();
+                drainEventQueue();
             }
         }
     }
@@ -78,6 +79,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPaused() {
         isResumed.set(false);
+        isFirstStateChange.set(true);
     }
 
     @Override
@@ -144,56 +146,49 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
 
     @Override
     public void post(S state) {
-        queue.offer(new EventRunnable(true, view -> view.onStateChanged(state)));
-        initiateQueueFlush();
+        postEvent(new StateEvent(state));
     }
 
     @Override
     public void finish() {
-        queue.offer(new EventRunnable(view -> view.finish()));
-        initiateQueueFlush();
+        postEvent(new PresenterEvent(view -> view.finish()));
     }
 
     @Override
     public void showDialog(DialogFragment dialog) {
-        queue.offer(new EventRunnable(view -> view.showDialog(dialog)));
-        initiateQueueFlush();
+        postEvent(new PresenterEvent(view -> view.showDialog(dialog)));
     }
 
     @Override
     public void showSnackBar(String text, int duration) {
-        queue.offer(new EventRunnable(view -> Snackbar.make(view.getView(), text, duration).show()));
-        initiateQueueFlush();
+        postEvent(new PresenterEvent(view -> Snackbar.make(view.getView(), text, duration).show()));
     }
 
     @Override
     public void showSnackBar(int res, int duration) {
-        queue.offer(new EventRunnable(view -> Snackbar.make(view.getView(), res, duration).show()));
-        initiateQueueFlush();
+        postEvent(new PresenterEvent(view -> Snackbar.make(view.getView(), res, duration).show()));
     }
 
     @Override
     public void showToast(String text, int duration) {
-        queue.offer(new EventRunnable(view ->
+        postEvent(new PresenterEvent(view ->
                 Toast.makeText(view.getContext(), text, duration).show()));
-        initiateQueueFlush();
     }
 
     @Override
     public void showToast(int resId, int duration) {
-        queue.offer(new EventRunnable(view ->
+        postEvent(new PresenterEvent(view ->
                 Toast.makeText(view.getContext(), resId, duration).show()));
-        initiateQueueFlush();
     }
 
     @Override
     public void startActivity(Intent intent) {
-        handler.post(new EventRunnable(view -> view.getContext().startActivity(intent)));
+        postEvent(new PresenterEvent(view -> view.getContext().startActivity(intent)));
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        handler.post(new EventRunnable(view -> {
+        postEvent(new PresenterEvent(view -> {
             if (view instanceof AppCompatActivity) {
                 ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
             } else {
@@ -213,11 +208,14 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     /**
-     * This method initiate queue flush if it is not in process.
+     * This method post event to be processed on the main thread context
+     *
+     * @param runnable event to be sent
      */
-    private void initiateQueueFlush() {
-        if (isResumed() && isQueueFlush.compareAndSet(false, true)) {
-            handler.post(this::flushQueue);
+    private void postEvent(EventRunnable runnable) {
+        queue.offer(runnable);
+        if (isResumed() && isQueueDraining.compareAndSet(false, true)) {
+            handler.post(this::drainEventQueue);
         }
         expungeStaleEntries();
     }
@@ -241,25 +239,25 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         return isEnabled.get() && isResumed.get();
     }
 
-    private void flushQueue() {
+    private void drainEventQueue() {
         int size = queue.size();
         int n = size / QUEUE_SIZE;
-        // flushQueue may be called when View has been paused or it is about to be destroyed
+        // drainEventQueue may be called when View has been paused or it is about to be destroyed
         // so it is better to check this flag before start state processing
         while (!queue.isEmpty() && isResumed()) {
-            EventRunnable state = queue.poll();
+            EventRunnable runnable = queue.poll();
             // process every n'th state in case of queue overflow
             if (n == 0 || size % n == 0) {
-                if (state.isStateRunnable) {
-                    lastStateRunnable = state;
+                if (runnable.isState()) {
+                    lastStateRunnable = runnable;
                 }
-                state.run();
+                runnable.run();
                 size = queue.size();
                 n = size / QUEUE_SIZE;
             }
             // set flag and then check queue size again to avoid cases when item is left unprocessed
             if (queue.isEmpty()) {
-                isQueueFlush.set(false);
+                isQueueDraining.set(false);
             }
         }
     }
@@ -272,32 +270,57 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
         }
     }
 
-    private class EventRunnable implements Runnable {
-        final boolean isStateRunnable;
-        final Consumer<MvpView<S, ?>> consumer;
+    private boolean isFirstStateChange() {
+        return isFirstStateChange.getAndSet(false);
+    }
 
-        EventRunnable(Consumer<MvpView<S, ?>> consumer) {
-            this.isStateRunnable = false;
-            this.consumer = consumer;
+    private interface EventRunnable extends Runnable {
+        default boolean isState() {
+            return false;
+        }
+    }
+
+    private class StateEvent implements EventRunnable {
+        final S state;
+
+        StateEvent(S state) {
+            this.state = state;
         }
 
-        EventRunnable(boolean isStateRunnable, Consumer<MvpView<S, ?>> consumer) {
-            this.isStateRunnable = isStateRunnable;
+        @Override
+        public boolean isState() {
+            return true;
+        }
+
+        @Override
+        public void run() {
+            MvpView<S, P> view = reference.get();
+            if (view != null) {
+                if (isFirstStateChange()) {
+                    view.onFirstStateChange(state);
+                }
+                view.onStateChanged(state);
+            }
+        }
+    }
+
+    private class PresenterEvent implements EventRunnable {
+        final Consumer<MvpView<S, ?>> consumer;
+
+        PresenterEvent(Consumer<MvpView<S, ?>> consumer) {
             this.consumer = consumer;
         }
 
         @Override
         public void run() {
-            handler.post(() -> {
-                MvpView<S, P> view = reference.get();
-                if (view != null) {
-                    try {
-                        consumer.accept(view);
-                    } catch (Exception e) {
-                        Log.e(tag, "error:", e);
-                    }
+            MvpView<S, P> view = reference.get();
+            if (view != null) {
+                try {
+                    consumer.accept(view);
+                } catch (Exception e) {
+                    Log.e(tag, "error:", e);
                 }
-            });
+            }
         }
     }
 }

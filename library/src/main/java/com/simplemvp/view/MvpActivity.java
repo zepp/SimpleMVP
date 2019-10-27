@@ -14,6 +14,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -100,6 +101,11 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
             eventHandler.handleLastState();
         }
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void onFirstStateChange(S state) {
+        Log.d(tag, "onFirstStateChange(" + state + ")");
     }
 
     @Override

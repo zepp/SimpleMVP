@@ -67,6 +67,13 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
     void onStateChanged(S state);
 
     /**
+     * This method is called once after activity/fragment startup
+     *
+     * @param state current presenter state
+     */
+    void onFirstStateChange(S state);
+
+    /**
      * This method returns handle of current MVP view
      *
      * @return view implementation
