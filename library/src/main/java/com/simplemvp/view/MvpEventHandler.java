@@ -47,7 +47,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final WeakReference<MvpView<S, P>> reference;
     private final ReferenceQueue<MvpView<S, P>> referenceQueue;
     private final P presenter;
-    private final Queue<EventRunnable> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<EventRunnable> events = new ConcurrentLinkedQueue<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
@@ -55,7 +55,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
     private final AtomicBoolean isQueueDraining = new AtomicBoolean();
-    private volatile EventRunnable lastStateRunnable;
+    private volatile EventRunnable lastStateEvent;
 
     MvpEventHandler(MvpView<S, P> view, P presenter) {
         this.referenceQueue = new ReferenceQueue<>();
@@ -67,7 +67,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     public void onResumed() {
         isResumed.set(true);
         if (isResumed()) {
-            if (queue.isEmpty()) {
+            if (events.isEmpty()) {
                 handleLastState();
             } else {
                 Log.d(tag, "flushing event queue");
@@ -202,8 +202,8 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
      * current class.
      */
     void handleLastState() {
-        if (lastStateRunnable != null) {
-            lastStateRunnable.run();
+        if (lastStateEvent != null) {
+            lastStateEvent.run();
         }
     }
 
@@ -212,12 +212,22 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
      *
      * @param runnable event to be sent
      */
-    private void postEvent(EventRunnable runnable) {
-        queue.offer(runnable);
+    synchronized private void postEvent(EventRunnable runnable) {
+        events.offer(runnable);
         if (isResumed() && isQueueDraining.compareAndSet(false, true)) {
             handler.post(this::drainEventQueue);
         }
         expungeStaleEntries();
+    }
+
+    /**
+     * This method polls event from the queue and updates flag
+     *
+     * @return event or null
+     */
+    synchronized private EventRunnable pollEvent() {
+        isQueueDraining.compareAndSet(true, !events.isEmpty());
+        return events.poll();
     }
 
     /**
@@ -240,24 +250,23 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     private void drainEventQueue() {
-        int size = queue.size();
+        int size = events.size();
         int n = size / QUEUE_SIZE;
         // drainEventQueue may be called when View has been paused or it is about to be destroyed
         // so it is better to check this flag before start state processing
-        while (!queue.isEmpty() && isResumed()) {
-            EventRunnable runnable = queue.poll();
+        while (isResumed()) {
+            EventRunnable event = pollEvent();
+            if (event == null) {
+                break;
+            }
             // process every n'th state in case of queue overflow
             if (n == 0 || size % n == 0) {
-                if (runnable.isState()) {
-                    lastStateRunnable = runnable;
+                if (event.isState()) {
+                    lastStateEvent = event;
                 }
-                runnable.run();
-                size = queue.size();
+                event.run();
+                size = events.size();
                 n = size / QUEUE_SIZE;
-            }
-            // set flag and then check queue size again to avoid cases when item is left unprocessed
-            if (queue.isEmpty()) {
-                isQueueDraining.set(false);
             }
         }
     }
