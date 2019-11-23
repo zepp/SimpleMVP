@@ -69,12 +69,6 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        eventHandler.setEnabled(getMenuId() == 0);
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         presenter.disconnect(getViewHandle());
