@@ -32,16 +32,29 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
+import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends ContextWrapper
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
-    private final String tag = getClass().getSimpleName();
+    private final static Thread mainThread = Looper.getMainLooper().getThread();
+    private final static String tag = MvpEventHandler.class.getSimpleName();
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private final MvpView<S, P> view;
     private final P presenter;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Queue<Callable<?>> events = new LinkedList<>();
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
     private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
@@ -216,4 +229,88 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
         return isFirstStateChange.getAndSet(false);
     }
 
+    private static boolean isMainThread(Thread thread) {
+        return mainThread.equals(thread);
+    }
+
+    private void postEvent(Callable<?> event) {
+        events.add(event);
+    }
+
+    private void drainEvents() {
+        try {
+            while (!events.isEmpty()) {
+                events.remove().call();
+            }
+        } catch (Exception e) {
+            events.clear();
+            Log.e(tag, "error: ", e);
+        }
+    }
+
+    private MvpViewHandle<S> newProxy() {
+        return (MvpViewHandle<S>) Proxy.newProxyInstance(getClass().getClassLoader(),
+                new Class<?>[]{MvpViewHandle.class}, new MvpProxyHandler(this, presenter));
+    }
+
+    private static class MvpProxyHandler<S extends MvpState, P extends MvpPresenter<S>> implements InvocationHandler {
+        private final WeakReference<MvpEventHandler<S, P>> eventHandler;
+        private final Set<Method> annotatedMethods;
+        private final MvpPresenter<S> presenter;
+        private final Handler handler;
+        private final int layoutId;
+
+        MvpProxyHandler(MvpEventHandler<S, P> eventHandler, MvpPresenter<S> presenter) {
+            this.eventHandler = new WeakReference<>(eventHandler);
+            this.presenter = presenter;
+            annotatedMethods = Collections.synchronizedSet(getAnnotatedMethods(eventHandler));
+            handler = new Handler(Looper.getMainLooper());
+            layoutId = eventHandler.getLayoutId();
+        }
+
+        private Set<Method> getAnnotatedMethods(MvpViewHandle<S> view) {
+            Set<Method> result = new TreeSet<>((o1, o2) -> o1.getName().compareTo(o2.getName()));
+            for (Method method : view.getClass().getMethods()) {
+                if (method.getAnnotation(com.simplemvp.annotations.MvpEventHandler.class) != null) {
+                    result.add(method);
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            MvpEventHandler<S, P> eventHandler = this.eventHandler.get();
+            if (eventHandler == null) {
+                presenter.disconnect(layoutId);
+                return null;
+            } else {
+                if (annotatedMethods.contains(method)) {
+                    if (isMainThread(Thread.currentThread())) {
+                        return invoke(eventHandler, method, args);
+                    } else {
+                        handler.post(() -> {
+                            try {
+                                invoke(eventHandler, method, args);
+                            } catch (Exception e) {
+                                Log.e(tag, "error: ", e);
+                            }
+                        });
+                        return null;
+                    }
+                } else {
+                    return method.invoke(eventHandler, args);
+                }
+            }
+        }
+
+        private Object invoke(MvpEventHandler<S, P> handler, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+            if (handler.isResumed()) {
+                return method.invoke(handler, args);
+            } else {
+                handler.postEvent(() -> method.invoke(handler, args));
+                return null;
+            }
+        }
+    }
 }
