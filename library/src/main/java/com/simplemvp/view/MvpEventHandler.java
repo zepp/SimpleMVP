@@ -48,12 +48,12 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends ContextWrapper
+class MvpEventHandler<S extends MvpState> extends ContextWrapper
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
     private final static Thread mainThread = Looper.getMainLooper().getThread();
     private final static String tag = MvpEventHandler.class.getSimpleName();
-    private final MvpView<S, P> view;
-    private final P presenter;
+    private final MvpView<S, ?> view;
+    private final MvpPresenter<S> presenter;
     private final Queue<Callable<?>> events = new LinkedList<>();
     private final List<TextWatcher> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
@@ -63,7 +63,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
     private MvpViewHandle<S> proxy;
     private S state;
 
-    MvpEventHandler(MvpView<S, P> view, P presenter) {
+    MvpEventHandler(MvpView<S, ?> view, MvpPresenter<S> presenter) {
         super(view.getContext());
         this.view = view;
         this.presenter = presenter;
@@ -174,7 +174,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
     }
 
     @Override
-    public MvpView<S, P> getMvpView() {
+    public MvpView<S, ?> getMvpView() {
         return view;
     }
 
@@ -282,14 +282,14 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
                 new Class<?>[]{MvpViewHandle.class}, new MvpProxyHandler(this, presenter));
     }
 
-    private static class MvpProxyHandler<S extends MvpState, P extends MvpPresenter<S>> implements InvocationHandler {
-        private final WeakReference<MvpEventHandler<S, P>> eventHandler;
+    private static class MvpProxyHandler<S extends MvpState> implements InvocationHandler {
+        private final WeakReference<MvpEventHandler<S>> eventHandler;
         private final Set<Method> annotatedMethods;
         private final MvpPresenter<S> presenter;
         private final Handler handler;
         private final int layoutId;
 
-        MvpProxyHandler(MvpEventHandler<S, P> eventHandler, MvpPresenter<S> presenter) {
+        MvpProxyHandler(MvpEventHandler<S> eventHandler, MvpPresenter<S> presenter) {
             this.eventHandler = new WeakReference<>(eventHandler);
             this.presenter = presenter;
             annotatedMethods = Collections.synchronizedSet(getAnnotatedMethods(eventHandler));
@@ -309,7 +309,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            MvpEventHandler<S, P> eventHandler = this.eventHandler.get();
+            MvpEventHandler<S> eventHandler = this.eventHandler.get();
             if (eventHandler == null) {
                 presenter.disconnect(layoutId);
                 return null;
@@ -333,7 +333,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
             }
         }
 
-        private Object invoke(MvpEventHandler<S, P> handler, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        private Object invoke(MvpEventHandler<S> handler, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
             if (handler.isResumed()) {
                 return method.invoke(handler, args);
             } else {

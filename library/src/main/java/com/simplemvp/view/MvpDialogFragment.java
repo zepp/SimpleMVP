@@ -35,7 +35,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
         extends MvpState> extends DialogFragment implements MvpView<S, P> {
     private final static String PRESENTER_ID = "presenter-id";
     protected final String tag = getClass().getSimpleName();
-    protected MvpEventHandler<S, P> eventHandler;
+    protected MvpEventHandler<S> eventHandler;
     protected P presenter;
     private MvpPresenterManager manager;
 
