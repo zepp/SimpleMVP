@@ -6,7 +6,7 @@ package com.simplemvp.presenter;
 import android.support.v4.util.Consumer;
 import android.util.Log;
 
-import com.simplemvp.annotations.MvpEventHandler;
+import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 
@@ -23,7 +23,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final ExecutorService executor;
     private final Consumer<Throwable> handler;
     private final MvpPresenter<S> presenter;
-    private final Map<String, MvpEventHandler> handlers;
+    private final Map<String, MvpHandler> handlers;
 
     private ProxyHandler(ExecutorService executor, Consumer<Throwable> handler, MvpPresenter<S> presenter) {
         this.executor = executor;
@@ -32,17 +32,17 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         this.handlers = getPresenterAnnotations(presenter);
     }
 
-    private static <S extends MvpState> Map<String, MvpEventHandler> getPresenterAnnotations(MvpPresenter<S> presenter) {
+    private static <S extends MvpState> Map<String, MvpHandler> getPresenterAnnotations(MvpPresenter<S> presenter) {
         String tag = presenter.getClass().getSimpleName();
-        Map<String, MvpEventHandler> result = new TreeMap<>();
+        Map<String, MvpHandler> result = new TreeMap<>();
         for (Method method : presenter.getClass().getMethods()) {
-            MvpEventHandler handler = method.getAnnotation(MvpEventHandler.class);
+            MvpHandler handler = method.getAnnotation(MvpHandler.class);
             if (handler != null) {
                 if (handler.executor()) {
                     if (method.getReturnType().equals(void.class) || method.getReturnType().equals(Void.class)) {
                         result.put(method.getName(), handler);
                     } else {
-                        Log.w(tag, "@MvpEventHandler method " + method.getName() + " is ignored since return value is incorrect");
+                        Log.w(tag, "@MvpHandler method " + method.getName() + " is ignored since return value is incorrect");
                     }
                 } else {
                     result.put(method.getName(), handler);
@@ -76,7 +76,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        MvpEventHandler handler = handlers.get(method.getName());
+        MvpHandler handler = handlers.get(method.getName());
         if (handler == null) {
             return invoke(true, method, args);
         } else {

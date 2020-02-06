@@ -92,7 +92,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (!eventHandler.setEnabled(true)) {
-            eventHandler.handleLastState();
+            eventHandler.postLastState();
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -104,7 +104,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public MvpViewHandle<S> getViewHandle() {
-        return eventHandler;
+        return eventHandler.getProxy();
     }
 
     @Override

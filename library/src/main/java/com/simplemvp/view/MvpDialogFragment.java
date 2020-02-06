@@ -94,7 +94,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     
     @Override
     public MvpViewHandle<S> getViewHandle() {
-        return eventHandler;
+        return eventHandler.getProxy();
     }
 
     @Override

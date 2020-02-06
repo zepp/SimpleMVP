@@ -2,7 +2,7 @@ package com.testapp;
 
 import android.content.Context;
 
-import com.simplemvp.annotations.MvpEventHandler;
+import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpBasePresenter;
@@ -26,7 +26,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    @MvpEventHandler
+    @MvpHandler
     public void onTextChanged(MvpViewHandle<MainState> handle, int viewId, String text) {
         super.onTextChanged(handle, viewId, text);
         state.setText(text);
@@ -35,7 +35,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    @MvpEventHandler
+    @MvpHandler
     public void onViewClicked(MvpViewHandle<MainState> handle, int viewId) {
         super.onViewClicked(handle, viewId);
         if (viewId == R.id.clear_all) {
@@ -52,7 +52,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    @MvpEventHandler
+    @MvpHandler
     public void onItemSelected(MvpViewHandle<MainState> handle, int viewId, Object item) {
         super.onItemSelected(handle, viewId, item);
         if (viewId == R.id.events) {
@@ -67,7 +67,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    @MvpEventHandler
+    @MvpHandler
     public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
         state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onCheckedChanged"));
@@ -78,7 +78,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    @MvpEventHandler
+    @MvpHandler
     public void onRadioCheckedChanged(MvpViewHandle<MainState> handle, int radioViewId, int viewId) {
         super.onRadioCheckedChanged(handle, radioViewId, viewId);
         state.setOption(viewId);

@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface MvpEventHandler {
+public @interface MvpHandler {
 
     /**
      * if true, runs handler using mode otherwise in the main thread

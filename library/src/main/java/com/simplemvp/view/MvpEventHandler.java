@@ -26,6 +26,7 @@ import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
@@ -60,6 +61,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
     private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
+    private MvpViewHandle<S> proxy;
     private S state;
 
     MvpEventHandler(MvpView<S, P> view, P presenter) {
@@ -71,6 +73,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
         isResumed.set(true);
+        onEnabledResumed();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -79,53 +82,94 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
         isFirstStateChange.set(true);
     }
 
+    private void onEnabledResumed() {
+        if (isResumed()) {
+            if (events.isEmpty()) {
+                postLastState();
+            } else {
+                drainEvents();
+            }
+        }
+    }
+
+    /**
+     * This method posts last saved state.
+     */
+    void postLastState() {
+        if (state != null) {
+            post(state);
+        }
+    }
+
+    /**
+     * This method enables or disables queue drain. State queue must not be drained in some cases
+     * since view is not ready to handle a state. If menu is not inflated for example.
+     *
+     * @param enabled true to enable queue drain, false to stop it
+     * @return true if state is changed
+     */
+    boolean setEnabled(boolean enabled) {
+        boolean isChanged = isEnabled.compareAndSet(!enabled, enabled);
+        if (isChanged) {
+            onEnabledResumed();
+        }
+        return isChanged;
+    }
+
+    MvpViewHandle<S> getProxy() {
+        if (proxy == null) {
+            proxy = newProxy();
+        }
+        return proxy;
+    }
+
     @Override
     public void onClick(View v) {
-        presenter.onViewClicked(this, v.getId());
+        presenter.onViewClicked(getProxy(), v.getId());
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        presenter.onOptionsItemSelected(this, item.getItemId());
+        presenter.onOptionsItemSelected(getProxy(), item.getItemId());
         return true;
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        presenter.onItemSelected(this, adapterView.getId(), adapterView.getItemAtPosition(i));
+        presenter.onItemSelected(getProxy(), adapterView.getId(), adapterView.getItemAtPosition(i));
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-        presenter.onItemSelected(this, adapterView.getId(), null);
+        presenter.onItemSelected(getProxy(), adapterView.getId(), null);
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        presenter.onCheckedChanged(this, buttonView.getId(), isChecked);
+        presenter.onCheckedChanged(getProxy(), buttonView.getId(), isChecked);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        presenter.onRadioCheckedChanged(this, group.getId(), checkedId);
+        presenter.onRadioCheckedChanged(getProxy(), group.getId(), checkedId);
     }
 
     @Override
     public boolean onDrag(View v, DragEvent event) {
-        presenter.onDrag(this, v.getId(), event);
+        presenter.onDrag(getProxy(), v.getId(), event);
         return true;
     }
 
     TextWatcher newTextWatcher(View view) {
         Log.d(tag, "new text watcher for view: " + view);
-        TextWatcher watcher = new MvpTextWatcher<>(handler, this, presenter, view.getId());
+        TextWatcher watcher = new MvpTextWatcher<>(handler, getProxy(), presenter, view.getId());
         textWatchers.add(watcher);
         return watcher;
     }
 
     SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
         Log.d(tag, "new query text listener for view: " + view);
-        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(handler, this, presenter, view.getId());
+        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(handler, getProxy(), presenter, view.getId());
         queryTextListeners.add(listener);
         return listener;
     }
@@ -146,79 +190,65 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
     }
 
     @Override
+    @MvpHandler
     public void post(S state) {
         if (isFirstStateChange()) {
             view.onFirstStateChange(state);
         }
         view.onStateChanged(state);
+        this.state = state;
     }
 
     @Override
+    @MvpHandler
     public void finish() {
         view.finish();
     }
 
     @Override
+    @MvpHandler
     public void showDialog(DialogFragment dialog) {
         view.showDialog(dialog);
     }
 
     @Override
+    @MvpHandler
     public void showSnackBar(String text, int duration) {
         Snackbar.make(view.getView(), text, duration).show();
     }
 
     @Override
+    @MvpHandler
     public void showSnackBar(int res, int duration) {
         Snackbar.make(view.getView(), res, duration).show();
     }
 
     @Override
+    @MvpHandler
     public void showToast(String text, int duration) {
         Toast.makeText(view.getContext(), text, duration).show();
     }
 
     @Override
+    @MvpHandler
     public void showToast(int resId, int duration) {
         Toast.makeText(view.getContext(), resId, duration).show();
     }
 
     @Override
+    @MvpHandler
     public void startActivity(Intent intent) {
         view.getContext().startActivity(intent);
     }
 
     @Override
+    @MvpHandler
     public void startActivityForResult(Intent intent, int requestCode) {
         if (view instanceof AppCompatActivity) {
             ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
         } else {
             Log.e(tag, "only activity can start activity for result");
         }
-    }
-
-    /**
-     * This method handles last saved state runnable. It is called from inside and outside of
-     * current class.
-     */
-    void handleLastState() {
-        if (state != null) {
-            post(state);
-        }
-    }
-
-    /**
-     * This method enables or disables queue drain. State queue must not be drained in some cases
-     * since view is not ready to handle a state. If menu is not inflated for example.
-     *
-     * @param enabled true to enable queue drain, false to stop it
-     * @return true if state is changed
-     */
-    boolean setEnabled(boolean enabled) {
-        boolean isChanged = isEnabled.compareAndSet(!enabled, enabled);
-        if (isChanged) {
-        }
-        return isChanged;
     }
 
     private boolean isResumed() {
@@ -271,7 +301,7 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
         private Set<Method> getAnnotatedMethods(MvpViewHandle<S> view) {
             Set<Method> result = new TreeSet<>((o1, o2) -> o1.getName().compareTo(o2.getName()));
             for (Method method : view.getClass().getMethods()) {
-                if (method.getAnnotation(com.simplemvp.annotations.MvpEventHandler.class) != null) {
+                if (method.getAnnotation(MvpHandler.class) != null) {
                     result.add(method);
                 }
             }

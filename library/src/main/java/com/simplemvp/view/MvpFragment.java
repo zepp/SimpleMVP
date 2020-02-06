@@ -105,7 +105,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (!eventHandler.setEnabled(true)) {
-            eventHandler.handleLastState();
+            eventHandler.postLastState();
         }
     }
 
@@ -116,7 +116,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public MvpViewHandle<S> getViewHandle() {
-        return eventHandler;
+        return eventHandler.getProxy();
     }
 
     @Override
