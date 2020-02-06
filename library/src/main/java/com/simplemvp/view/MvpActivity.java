@@ -71,9 +71,8 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.disconnect(getViewHandle());
         if (isFinishing()) {
-            manager.releasePresenter(presenter);
+            presenter.disconnect(getViewHandle());
         }
         getLifecycle().removeObserver(eventHandler);
     }

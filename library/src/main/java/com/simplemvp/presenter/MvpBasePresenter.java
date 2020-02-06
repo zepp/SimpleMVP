@@ -55,8 +55,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      */
     public final synchronized void connect(MvpViewHandle<S> handle) {
         boolean isFirst = handles.isEmpty();
-        if (!handles.containsKey(handle.getLayoutId())) {
-            handles.put(handle.getLayoutId(), handle);
+        if (handles.put(handle.getLayoutId(), handle) == null) {
             executor.execute(() -> {
                 try {
                     synchronized (this) {
@@ -71,6 +70,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                     Log.d(tag, "error: ", e);
                 }
             });
+        } else {
+            handle.post(getStateSnapshot());
         }
     }
 
@@ -230,9 +231,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @CallSuper
     protected void onLastViewDisconnected() {
         Log.d(tag, "onLastViewDisconnected()");
+        manager.releasePresenter(this);
     }
 
-    protected S getStateSnapshot() {
+    protected synchronized S getStateSnapshot() {
         try {
             return (S) state.clone();
         } catch (CloneNotSupportedException e) {

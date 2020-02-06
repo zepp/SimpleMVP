@@ -89,7 +89,6 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     public void onDestroy() {
         super.onDestroy();
         presenter.disconnect(getViewHandle());
-        manager.releasePresenter(presenter);
         getLifecycle().removeObserver(eventHandler);
     }
 

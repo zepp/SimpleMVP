@@ -83,7 +83,6 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     public void onDestroy() {
         super.onDestroy();
         presenter.disconnect(getViewHandle());
-        manager.releasePresenter(presenter);
         getLifecycle().removeObserver(eventHandler);
     }
 
