@@ -139,6 +139,11 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>>
     }
 
     @Override
+    public int getLayoutId() {
+        return getMvpView().getLayoutId();
+    }
+
+    @Override
     public Bundle getArguments() {
         MvpView<S, P> view = reference.get();
         return view == null ? new Bundle() : view.getArguments();

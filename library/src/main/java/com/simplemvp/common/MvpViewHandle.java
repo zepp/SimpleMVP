@@ -5,6 +5,7 @@ package com.simplemvp.common;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 
@@ -21,6 +22,14 @@ public interface MvpViewHandle<S extends MvpState> {
      * @return null or reference to real view
      */
     MvpView<S, ?> getMvpView();
+
+    /**
+     * This method returns layout Id of real view
+     *
+     * @return layout ID
+     */
+    @LayoutRes
+    int getLayoutId();
 
     /**
      * Method to access arguments reference
