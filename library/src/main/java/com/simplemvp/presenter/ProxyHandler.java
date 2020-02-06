@@ -3,6 +3,7 @@
  */
 package com.simplemvp.presenter;
 
+import android.support.v4.util.Consumer;
 import android.util.Log;
 
 import com.simplemvp.annotations.MvpEventHandler;
@@ -14,17 +15,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 
 class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final ExecutorService executor;
-    private final MvpErrorHandler handler;
+    private final Consumer<Throwable> handler;
     private final MvpPresenter<S> presenter;
     private final Map<String, MvpEventHandler> handlers;
 
-    private ProxyHandler(ExecutorService executor, MvpErrorHandler handler, MvpPresenter<S> presenter) {
+    private ProxyHandler(ExecutorService executor, Consumer<Throwable> handler, MvpPresenter<S> presenter) {
         this.executor = executor;
         this.handler = handler;
         this.presenter = presenter;
@@ -33,7 +34,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
 
     private static <S extends MvpState> Map<String, MvpEventHandler> getPresenterAnnotations(MvpPresenter<S> presenter) {
         String tag = presenter.getClass().getSimpleName();
-        Map<String, MvpEventHandler> result = new HashMap<>();
+        Map<String, MvpEventHandler> result = new TreeMap<>();
         for (Method method : presenter.getClass().getMethods()) {
             MvpEventHandler handler = method.getAnnotation(MvpEventHandler.class);
             if (handler != null) {
@@ -67,7 +68,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     }
 
     static <S extends MvpState, P extends MvpPresenter<S>> P newProxy(
-            ExecutorService executor, MvpErrorHandler handler, P presenter) {
+            ExecutorService executor, Consumer<Throwable> handler, P presenter) {
         return (P) Proxy.newProxyInstance(presenter.getClass().getClassLoader(),
                 getAllImplementedInterfaces(presenter.getClass()),
                 new ProxyHandler<>(executor, handler, presenter));
@@ -104,7 +105,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
                 invoke(sync, method, args);
             } catch (Exception e) {
                 Throwable cause = e.getCause();
-                handler.onError(cause == null ? e : cause);
+                handler.accept(cause == null ? e : cause);
             }
         });
     }

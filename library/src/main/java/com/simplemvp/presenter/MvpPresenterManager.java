@@ -6,6 +6,8 @@ package com.simplemvp.presenter;
 
 
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.support.v4.util.Consumer;
 import android.util.Log;
 
 import com.simplemvp.common.MvpPresenter;
@@ -13,26 +15,25 @@ import com.simplemvp.common.MvpState;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * This class keeps presenter instances and instantiate ones by request
  */
-public final class MvpPresenterManager {
+public final class MvpPresenterManager extends ContextWrapper {
     private static volatile MvpPresenterManager instance;
     private final String tag = getClass().getSimpleName();
-    private final Context context;
     private final Map<Integer, MvpPresenter<?>> map;
     private volatile ExecutorService executor;
-    private volatile MvpErrorHandler handler;
+    private volatile Consumer<Throwable> handler;
 
     private MvpPresenterManager(Context context) {
-        this.context = context;
+        super(context);
         this.executor = Executors.newSingleThreadExecutor();
-        this.map = Collections.synchronizedMap(new HashMap<>());
+        this.map = Collections.synchronizedMap(new TreeMap<>());
         this.handler = e -> Log.e(tag, formStackTrace(e));
     }
 
@@ -59,7 +60,7 @@ public final class MvpPresenterManager {
         return builder.toString();
     }
 
-    public void initialize(ExecutorService executor, MvpErrorHandler handler) {
+    public void initialize(ExecutorService executor, Consumer<Throwable> handler) {
         this.executor = executor;
         this.handler = handler;
     }
@@ -99,8 +100,9 @@ public final class MvpPresenterManager {
      */
     public void releasePresenter(MvpPresenter<?> presenter) {
         if (presenter.isDetached()) {
-            Log.d(tag, "release presenter: " + presenter);
-            map.remove(presenter.getId());
+            if (map.remove(presenter.getId()) != null) {
+                Log.d(tag, "release presenter: " + presenter);
+            }
         }
     }
 
@@ -110,10 +112,10 @@ public final class MvpPresenterManager {
 
     private <P extends MvpPresenter<S>, S extends MvpState> P newPresenter(Class<P> pClass, Class<S> sClass, S state) {
         try {
-            return pClass.getConstructor(Context.class, sClass).newInstance(context, state);
+            return pClass.getConstructor(Context.class, sClass).newInstance(getBaseContext(), state);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             Log.e(tag, e.getLocalizedMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -122,7 +124,7 @@ public final class MvpPresenterManager {
             return clazz.getConstructor().newInstance();
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             Log.e(tag, e.getLocalizedMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }
