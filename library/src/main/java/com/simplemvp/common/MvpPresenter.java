@@ -6,6 +6,7 @@ package com.simplemvp.common;
 
 import android.content.Intent;
 import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.DragEvent;
 import android.view.MenuItem;
@@ -34,6 +35,13 @@ public interface MvpPresenter<S extends MvpState> {
      * @param handle {@link MvpViewHandle} reference
      */
     void disconnect(MvpViewHandle<S> handle);
+
+    /**
+     * This method disconnects view from presenter by layout ID.
+     *
+     * @param layoutId layout id of the connected view
+     */
+    void disconnect(@LayoutRes int layoutId);
 
     /**
      * Method to be used by {@link com.simplemvp.presenter.MvpPresenterManager MvpPresenterManager}

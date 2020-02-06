@@ -26,15 +26,6 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    protected void onViewDisconnected(MvpViewHandle<MainState> handle) {
-        super.onViewDisconnected(handle);
-        MvpView<MainState, ?> view = handle.getMvpView();
-        state.addEvent(new Event(lastEventId.incrementAndGet(), view == null ? 0: view.getLayoutId(),
-                "onViewDisconnected"));
-        commit();
-    }
-
-    @Override
     @MvpEventHandler
     public void onTextChanged(MvpViewHandle<MainState> handle, int viewId, String text) {
         super.onTextChanged(handle, viewId, text);

@@ -7,7 +7,6 @@ package com.simplemvp.presenter;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.support.annotation.CallSuper;
 import android.util.Log;
 import android.view.DragEvent;
@@ -18,8 +17,9 @@ import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,10 +33,9 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private final static AtomicInteger lastId = new AtomicInteger();
     protected final String tag = getClass().getSimpleName();
     protected final MvpPresenterManager manager;
-    protected final Resources resources;
     protected final S state;
-    protected final int id;
-    private final List<MvpViewHandle<S>> handles = new CopyOnWriteArrayList<>();
+    private final int id;
+    private final Map<Integer, MvpViewHandle<S>> handles;
     private final ExecutorService executor;
 
     public MvpBasePresenter(Context context, S state) {
@@ -44,8 +43,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.manager = MvpPresenterManager.getInstance(context);
         this.executor = manager.getExecutor();
         this.state = state;
-        this.resources = context.getResources();
         this.id = lastId.incrementAndGet();
+        this.handles = Collections.synchronizedMap(new TreeMap<>());
     }
 
     /**
@@ -56,21 +55,32 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      */
     public final synchronized void connect(MvpViewHandle<S> handle) {
         boolean isFirst = handles.isEmpty();
-        handles.add(handle);
-        executor.execute(() -> {
-            try {
-                synchronized (this) {
-                    if (isFirst) {
-                        onFirstViewConnected(handle);
+        if (!handles.containsKey(handle.getLayoutId())) {
+            handles.put(handle.getLayoutId(), handle);
+            executor.execute(() -> {
+                try {
+                    synchronized (this) {
+                        if (isFirst) {
+                            onFirstViewConnected(handle);
+                        }
+                        onViewConnected(handle);
                     }
-                    onViewConnected(handle);
+                    // post state after onViewConnected finished (state is initialized)
+                    handle.post(getStateSnapshot());
+                } catch (Exception e) {
+                    Log.d(tag, "error: ", e);
                 }
-                // post state after onViewConnected finished (state is initialized)
-                handle.post(getStateSnapshot());
-            } catch (Exception e) {
-                Log.d(tag, "error: ", e);
-            }
-        });
+            });
+        }
+    }
+
+    public final void disconnect(MvpViewHandle<S> handle) {
+        disconnectById(handle.getLayoutId());
+    }
+
+    @Override
+    public final void disconnect(int layoutId) {
+        disconnectById(layoutId);
     }
 
     /**
@@ -78,23 +88,23 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * destroyed. This method call is mandatory otherwise presenter will not be stopped and acquired
      * resources will not be released.
      *
-     * @param handle {@link MvpViewHandle MvpViewHandle} to disconnect from
+     * @param layoutId layout ID of the connected view
      */
-    public final synchronized void disconnect(MvpViewHandle<S> handle) {
-        handles.remove(handle);
-        boolean isLast = handles.isEmpty();
-        executor.execute(() -> {
-            try {
-                synchronized (this) {
-                    onViewDisconnected(handle);
-                    if (isLast) {
-                        onLastViewDisconnected();
+    private synchronized void disconnectById(int layoutId) {
+        if (handles.remove(layoutId) != null) {
+            boolean isLast = handles.isEmpty();
+            executor.execute(() -> {
+                try {
+                    synchronized (this) {
+                        if (isLast) {
+                            onLastViewDisconnected();
+                        }
                     }
+                } catch (Exception e) {
+                    Log.d(tag, "error: ", e);
                 }
-            } catch (Exception e) {
-                Log.d(tag, "error: ", e);
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -122,16 +132,20 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         if (state.isChanged() || state.isInitial()) {
             S snapshot = getStateSnapshot();
             state.clearChanged();
-            for (MvpViewHandle<S> handle : handles) {
-                handle.post(snapshot);
+            synchronized (handles) {
+                for (MvpViewHandle<S> handle : handles.values()) {
+                    handle.post(snapshot);
+                }
             }
         }
     }
 
     @Override
     public void finish() {
-        for (MvpViewHandle<S> handle : handles) {
-            handle.finish();
+        synchronized (handles) {
+            for (MvpViewHandle<S> handle : handles.values()) {
+                handle.finish();
+            }
         }
     }
 
@@ -151,40 +165,40 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @CallSuper
     @Override
     public void onViewClicked(MvpViewHandle<S> handle, int viewId) {
-        Log.d(tag, "onViewClicked(" + resources.getResourceName(viewId) + ")");
+        Log.d(tag, "onViewClicked(" + getResources().getResourceName(viewId) + ")");
     }
 
     @CallSuper
     @Override
     public void onOptionsItemSelected(MvpViewHandle<S> handle, int itemId) {
-        Log.d(tag, "onOptionsItemSelected(" + resources.getResourceName(itemId) + ")");
+        Log.d(tag, "onOptionsItemSelected(" + getResources().getResourceName(itemId) + ")");
     }
 
     @CallSuper
     @Override
     public void onItemSelected(MvpViewHandle<S> handle, int viewId, Object item) {
-        Log.d(tag, "onItemSelected(" + resources.getResourceName(viewId) + ", " + item + ")");
+        Log.d(tag, "onItemSelected(" + getResources().getResourceName(viewId) + ", " + item + ")");
     }
 
     @CallSuper
     @Override
     public void onTextChanged(MvpViewHandle<S> handle, int viewId, String text) {
-        Log.d(tag, "onTextChanged(" + resources.getResourceName(viewId) + ", " + text + ")");
+        Log.d(tag, "onTextChanged(" + getResources().getResourceName(viewId) + ", " + text + ")");
     }
 
     @Override
     public void onCheckedChanged(MvpViewHandle<S> handle, int viewId, boolean isChecked) {
-        Log.d(tag, "onCheckedChanged(" + resources.getResourceName(viewId) + ", " + isChecked + ")");
+        Log.d(tag, "onCheckedChanged(" + getResources().getResourceName(viewId) + ", " + isChecked + ")");
     }
 
     @Override
     public void onRadioCheckedChanged(MvpViewHandle<S> handle, int radioViewId, int viewId) {
-        Log.d(tag, "onRadioCheckedChanged(" + resources.getResourceName(radioViewId) + ", " + viewId + ")");
+        Log.d(tag, "onRadioCheckedChanged(" + getResources().getResourceName(radioViewId) + ", " + viewId + ")");
     }
 
     @Override
     public void onDrag(MvpViewHandle<S> handle, int viewId, DragEvent event) {
-        Log.d(tag, "onDrag(" + resources.getResourceName(viewId) + ", " + event + ")");
+        Log.d(tag, "onDrag(" + getResources().getResourceName(viewId) + ", " + event + ")");
     }
 
     /**
@@ -207,16 +221,6 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @CallSuper
     protected void onViewConnected(MvpViewHandle<S> handle) {
         Log.d(tag, "onViewConnected(" + handle.getMvpView() + ")");
-    }
-
-    /**
-     * This method is called when view is disconnected from presenter.
-     *
-     * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
-     */
-    @CallSuper
-    protected void onViewDisconnected(MvpViewHandle<S> handle) {
-        Log.d(tag, "onViewDisconnected(" + handle.getMvpView() + ")");
     }
 
     /**
