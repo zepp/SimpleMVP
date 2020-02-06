@@ -52,7 +52,6 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
     private final static Thread mainThread = Looper.getMainLooper().getThread();
     private final static String tag = MvpEventHandler.class.getSimpleName();
-    private final Handler handler = new Handler(Looper.getMainLooper());
     private final MvpView<S, P> view;
     private final P presenter;
     private final Queue<Callable<?>> events = new LinkedList<>();
@@ -162,14 +161,14 @@ class MvpEventHandler<S extends MvpState, P extends MvpPresenter<S>> extends Con
 
     TextWatcher newTextWatcher(View view) {
         Log.d(tag, "new text watcher for view: " + view);
-        TextWatcher watcher = new MvpTextWatcher<>(handler, getProxy(), presenter, view.getId());
+        TextWatcher watcher = new MvpTextWatcher<>(getProxy(), presenter, view.getId());
         textWatchers.add(watcher);
         return watcher;
     }
 
     SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
         Log.d(tag, "new query text listener for view: " + view);
-        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(handler, getProxy(), presenter, view.getId());
+        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view.getId());
         queryTextListeners.add(listener);
         return listener;
     }

@@ -1,6 +1,5 @@
 package com.simplemvp.view;
 
-import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,8 +7,6 @@ import android.text.TextWatcher;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpViewHandle;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class implements {@link android.text.TextWatcher TextWatcher} interface to handle events from
@@ -20,32 +17,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @param <S> state type
  */
 class MvpTextWatcher<S extends MvpState> implements TextWatcher {
-    private final static int DELAY = 200;
-    private final Handler handler;
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
     @IdRes
     private final int viewId;
-    // provides ability to set flag in handy manner
-    private final AtomicBoolean isSendTextPosted = new AtomicBoolean();
-    private String text = "";
-    private long millis;
 
-    MvpTextWatcher(Handler handler, MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
-        this.handler = handler;
+    MvpTextWatcher(MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
         this.handle = handle;
         this.presenter = presenter;
         this.viewId = viewId;
-    }
-
-    private void sendText() {
-        long delta = System.currentTimeMillis() - millis;
-        if (delta > DELAY) {
-            presenter.onTextChanged(handle, viewId, text);
-            isSendTextPosted.set(false);
-        } else {
-            handler.postDelayed(this::sendText, DELAY - delta);
-        }
     }
 
     @Override
@@ -60,10 +40,6 @@ class MvpTextWatcher<S extends MvpState> implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable s) {
-        millis = System.currentTimeMillis();
-        text = s.toString();
-        if (isSendTextPosted.compareAndSet(false, true)) {
-            handler.postDelayed(this::sendText, DELAY);
-        }
+        presenter.onTextChanged(handle, viewId, s.toString());
     }
 }

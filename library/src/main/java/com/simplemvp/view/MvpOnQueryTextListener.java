@@ -1,14 +1,11 @@
 package com.simplemvp.view;
 
-import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.v7.widget.SearchView;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpViewHandle;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class implements {@link android.support.v7.widget.SearchView.OnQueryTextListener OnQueryTextListener}
@@ -19,32 +16,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @param <S> state type
  */
 class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTextListener {
-    private final static int DELAY = 200;
-    private final Handler handler;
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
     @IdRes
     private final int viewId;
-    // provides ability to set flag in handy manner
-    private final AtomicBoolean isSendTextPosted = new AtomicBoolean();
-    private String text = "";
-    private long millis;
 
-    MvpOnQueryTextListener(Handler handler, MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
-        this.handler = handler;
+    MvpOnQueryTextListener(MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
         this.handle = handle;
         this.presenter = presenter;
         this.viewId = viewId;
-    }
-
-    private void sendText() {
-        long delta = System.currentTimeMillis() - millis;
-        if (delta > DELAY) {
-            presenter.onTextChanged(handle, viewId, text);
-            isSendTextPosted.set(false);
-        } else {
-            handler.postDelayed(this::sendText, DELAY - delta);
-        }
     }
 
     @Override
@@ -54,12 +34,7 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextChange(String s) {
-        millis = System.currentTimeMillis();
-        text = s;
-        if (isSendTextPosted.compareAndSet(false, true)) {
-            handler.postDelayed(this::sendText, DELAY);
-        }
-        // false if the SearchView should perform the default action of showing any suggestions
+        presenter.onTextChanged(handle, viewId, s);
         return false;
     }
 }
