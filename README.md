@@ -26,7 +26,7 @@ Presenter handles various UI events such as:
 
 Presenter stays alive on configuration change if one has been connected to `MvpActivity`.
 
-Presenter handlers are annotated using `@MvpEventHandler` annotation to specify how to invoke handler. Annotation has following fields:
+Presenter handlers are annotated using `@MvpHandler` annotation to specify how to invoke handler. Annotation has following fields:
 
 * `executor` - if true then run handler on executor to offload main thread
 * `sync` - if true then presenter is synchronized before handler invocation. It is better to leave default value.
@@ -93,7 +93,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements My
         super(context, state);
     }
 
-    @MvpEventHandler
+    @MvpHandler
     void doSomething() {
     }
 }
