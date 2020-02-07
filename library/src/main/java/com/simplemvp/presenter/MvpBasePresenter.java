@@ -39,13 +39,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrapper implements MvpPresenter<S> {
     private final static AtomicInteger lastId = new AtomicInteger();
     protected final String tag = getClass().getSimpleName();
-    protected final MvpPresenterManager manager;
     protected final S state;
+    private final MvpPresenterManager manager;
     private final int id;
     private final Map<Integer, MvpViewHandle<S>> handles;
     private final ExecutorService executor;
     private final ScheduledExecutorService scheduledExecutor;
     private final List<AsyncBroadcastReceiver> receivers;
+    private MvpViewHandle<S> parentHandle;
     private ScheduledFuture<?> commit;
 
     public MvpBasePresenter(Context context, S state) {
@@ -56,7 +57,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.state = state;
         this.id = lastId.incrementAndGet();
         this.handles = Collections.synchronizedMap(new TreeMap<>());
-        this.receivers = Collections.synchronizedList(new ArrayList<>());
+        this.receivers = new ArrayList<>();
         this.commit = scheduledExecutor.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
     }
 
@@ -85,6 +86,9 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
             });
         } else {
             handle.post(getStateSnapshot());
+        }
+        if (handles.size() == 1) {
+            parentHandle = handle;
         }
     }
 
@@ -134,6 +138,24 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @Override
     public int getId() {
         return id;
+    }
+
+    /**
+     * This method returns parents view handle
+     *
+     * @return {@link MvpViewHandle} instance
+     */
+    protected MvpViewHandle<S> getParentHandle() {
+        return parentHandle;
+    }
+
+    /**
+     * This method returns executor that handles method calls of this presenter.
+     *
+     * @return {@link ExecutorService} instance
+     */
+    protected ExecutorService getExecutor() {
+        return executor;
     }
 
     /**
