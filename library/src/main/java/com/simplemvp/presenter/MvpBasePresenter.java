@@ -4,9 +4,11 @@
 
 package com.simplemvp.presenter;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.CallSuper;
 import android.util.Log;
 import android.view.DragEvent;
@@ -16,8 +18,10 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
@@ -37,6 +41,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private final int id;
     private final Map<Integer, MvpViewHandle<S>> handles;
     private final ExecutorService executor;
+    private final List<AsyncBroadcastReceiver> receivers;
 
     public MvpBasePresenter(Context context, S state) {
         super(context);
@@ -45,6 +50,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.state = state;
         this.id = lastId.incrementAndGet();
         this.handles = Collections.synchronizedMap(new TreeMap<>());
+        this.receivers = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
@@ -203,6 +209,28 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     /**
+     * This method subscribes current presenter to broadcast intents to be processed in
+     * {@link MvpBasePresenter#onBroadcastReceived(Intent)} method.
+     *
+     * @param filter {@link IntentFilter} instance
+     */
+    protected final void subscribeToBroadcast(IntentFilter filter) {
+        AsyncBroadcastReceiver receiver = new AsyncBroadcastReceiver();
+        receivers.add(receiver);
+        registerReceiver(receiver, filter);
+    }
+
+    /**
+     * This method is called when broadcast intent is received.
+     *
+     * @param intent {@link Intent} instance
+     */
+    @CallSuper
+    protected void onBroadcastReceived(Intent intent) {
+        Log.d(tag, "onBroadcastReceived(" + intent + ")");
+    }
+
+    /**
      * This method is called when master view is connected to current presenter. This method is to be
      * overridden to place initialization code that fills {@link MvpBasePresenter#state} with initial
      * values and subscribes to necessary events.
@@ -231,6 +259,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @CallSuper
     protected void onLastViewDisconnected() {
         Log.d(tag, "onLastViewDisconnected()");
+        for (AsyncBroadcastReceiver receiver : receivers) {
+            unregisterReceiver(receiver);
+        }
+        receivers.clear();
         manager.releasePresenter(this);
     }
 
@@ -248,5 +280,26 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                 "id=" + id +
                 ", state=" + state +
                 '}';
+    }
+
+    private class AsyncBroadcastReceiver extends BroadcastReceiver {
+        AsyncBroadcastReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PendingResult result = goAsync();
+            executor.submit(() -> {
+                try {
+                    synchronized (this) {
+                        onBroadcastReceived(intent);
+                    }
+                } catch (Exception e) {
+                    Log.d(tag, "error: ", e);
+                } finally {
+                    result.finish();
+                }
+            });
+        }
     }
 }
