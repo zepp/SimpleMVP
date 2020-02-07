@@ -161,7 +161,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        presenter.onRequestPermissionsResult(getViewHandle(), requestCode, permissions, grantResults);
+        eventHandler.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

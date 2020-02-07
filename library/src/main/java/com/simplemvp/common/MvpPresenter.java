@@ -7,11 +7,12 @@ package com.simplemvp.common;
 import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.view.DragEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+
+import java.util.Map;
 
 /**
  * This interface describes generic MVP presenter
@@ -78,14 +79,11 @@ public interface MvpPresenter<S extends MvpState> {
     /**
      * This method has the same purpose as the {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])}
      *
-     * @param handle {@link MvpViewHandle} interface that hides real view
-     * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
-     * @param permissions  The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *                     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
-     *                     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *  @param handle {@link MvpViewHandle} interface that hides real view
+     * @param requestCode  request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions  map that maps permission type to permission result
      */
-    void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
+    void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, Map<String, Integer> permissions);
 
     /**
      * This method handles {@link android.view.View.OnClickListener#onClick(View)} callback.

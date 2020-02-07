@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -42,8 +43,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -151,6 +154,14 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         presenter.onRadioCheckedChanged(getProxy(), group.getId(), checkedId);
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Map<String, Integer> perms = new TreeMap<>();
+        for (int i = 0; i < permissions.length; i++) {
+            perms.put(permissions[i], grantResults[i]);
+        }
+        presenter.onRequestPermissionsResult(getProxy(), requestCode, perms);
     }
 
     @Override

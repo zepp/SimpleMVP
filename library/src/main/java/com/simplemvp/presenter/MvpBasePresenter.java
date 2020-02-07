@@ -19,7 +19,6 @@ import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -77,9 +76,9 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                             onFirstViewConnected(handle);
                         }
                         onViewConnected(handle);
+                        // post state after onViewConnected finished (state is initialized)
+                        handle.post(getStateSnapshot());
                     }
-                    // post state after onViewConnected finished (state is initialized)
-                    handle.post(getStateSnapshot());
                 } catch (Exception e) {
                     Log.d(tag, "error: ", e);
                 }
@@ -199,9 +198,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @CallSuper
     @Override
-    public void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, String[] permissions, int[] grantResults) {
-        Log.d(tag, "onRequestPermissionsResult(" + requestCode + ", " + Arrays.toString(permissions) + ", "
-                + Arrays.toString(grantResults));
+    public void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, Map<String, Integer> permissions) {
+        Log.d(tag, "onRequestPermissionsResult(" + requestCode + ", " + permissions.keySet());
     }
 
     @CallSuper
