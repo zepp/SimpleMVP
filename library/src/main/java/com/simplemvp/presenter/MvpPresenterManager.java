@@ -30,14 +30,14 @@ public final class MvpPresenterManager extends ContextWrapper {
     private final Map<Integer, MvpPresenter<?>> map;
     private final ScheduledExecutorService scheduledExecutor;
     private volatile ExecutorService executor;
-    private volatile Consumer<Throwable> handler;
+    private volatile Consumer<Throwable> errorHandler;
 
     private MvpPresenterManager(Context context) {
         super(context);
         this.executor = Executors.newSingleThreadExecutor();
         this.map = Collections.synchronizedMap(new TreeMap<>());
         this.scheduledExecutor = Executors.newScheduledThreadPool(1);
-        this.handler = e -> Log.e(tag, "error: ", e);
+        this.errorHandler = e -> Log.e(tag, "error: ", e);
     }
 
     public static MvpPresenterManager getInstance(Context context) {
@@ -53,7 +53,7 @@ public final class MvpPresenterManager extends ContextWrapper {
 
     public void initialize(ExecutorService executor, Consumer<Throwable> handler) {
         this.executor = executor;
-        this.handler = handler;
+        this.errorHandler = handler;
     }
 
     ExecutorService getExecutor() {
@@ -62,6 +62,10 @@ public final class MvpPresenterManager extends ContextWrapper {
 
     ScheduledExecutorService getScheduledExecutor() {
         return scheduledExecutor;
+    }
+
+    Consumer<Throwable> getErrorHandler() {
+        return errorHandler;
     }
 
     /**
@@ -74,7 +78,7 @@ public final class MvpPresenterManager extends ContextWrapper {
      */
     public <S extends MvpState, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends I> pClass, Class<S> sClass) {
         S state = newState(sClass);
-        I presenter = ProxyHandler.newProxy(executor, handler, newPresenter(pClass, sClass, state));
+        I presenter = ProxyHandler.newProxy(executor, errorHandler, newPresenter(pClass, sClass, state));
         map.put(presenter.getId(), presenter);
         Log.d(tag, "new presenter: " + presenter);
         return presenter;

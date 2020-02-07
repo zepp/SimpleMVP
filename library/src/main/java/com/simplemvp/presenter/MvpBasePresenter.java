@@ -10,6 +10,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.CallSuper;
+import android.support.v4.util.Consumer;
 import android.util.Log;
 import android.view.DragEvent;
 
@@ -45,6 +46,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private final ExecutorService executor;
     private final ScheduledExecutorService scheduledExecutor;
     private final List<AsyncBroadcastReceiver> receivers;
+    private final Consumer<Throwable> errorHandler;
     private MvpViewHandle<S> parentHandle;
     private ScheduledFuture<?> commit;
 
@@ -53,6 +55,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.manager = MvpPresenterManager.getInstance(context);
         this.executor = manager.getExecutor();
         this.scheduledExecutor = manager.getScheduledExecutor();
+        this.errorHandler = manager.getErrorHandler();
         this.state = state;
         this.id = lastId.incrementAndGet();
         this.handles = Collections.synchronizedMap(new TreeMap<>());
@@ -80,7 +83,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                         handle.post(getStateSnapshot());
                     }
                 } catch (Exception e) {
-                    Log.d(tag, "error: ", e);
+                    errorHandler.accept(e);
                 }
             });
         } else {
@@ -118,7 +121,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                         }
                     }
                 } catch (Exception e) {
-                    Log.d(tag, "error: ", e);
+                    errorHandler.accept(e);
                 }
             });
         }
@@ -329,7 +332,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                         onBroadcastReceived(intent);
                     }
                 } catch (Exception e) {
-                    Log.d(tag, "error: ", e);
+                    errorHandler.accept(e);
                 } finally {
                     result.finish();
                 }
