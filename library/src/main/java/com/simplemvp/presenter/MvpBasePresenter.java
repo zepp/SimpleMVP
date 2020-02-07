@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -41,16 +44,20 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private final int id;
     private final Map<Integer, MvpViewHandle<S>> handles;
     private final ExecutorService executor;
+    private final ScheduledExecutorService scheduledExecutor;
     private final List<AsyncBroadcastReceiver> receivers;
+    private ScheduledFuture<?> commit;
 
     public MvpBasePresenter(Context context, S state) {
         super(context);
         this.manager = MvpPresenterManager.getInstance(context);
         this.executor = manager.getExecutor();
+        this.scheduledExecutor = manager.getScheduledExecutor();
         this.state = state;
         this.id = lastId.incrementAndGet();
         this.handles = Collections.synchronizedMap(new TreeMap<>());
         this.receivers = Collections.synchronizedList(new ArrayList<>());
+        this.commit = scheduledExecutor.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -136,6 +143,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * bigger revision number.
      */
     protected synchronized void commit() {
+        commit.cancel(false);
         if (state.isChanged() || state.isInitial()) {
             S snapshot = getStateSnapshot();
             state.clearChanged();
@@ -145,6 +153,11 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                 }
             }
         }
+    }
+
+    protected synchronized void commit(long millis) {
+        commit.cancel(false);
+        commit = scheduledExecutor.schedule(() -> commit(), millis, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -263,6 +276,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
             unregisterReceiver(receiver);
         }
         receivers.clear();
+        commit.cancel(false);
         manager.releasePresenter(this);
     }
 

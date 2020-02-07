@@ -45,7 +45,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onTextChanged(handle, viewId, text);
         state.setText(text);
         state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onTextChanged"));
-        commit();
+        commit(200);
     }
 
     @Override

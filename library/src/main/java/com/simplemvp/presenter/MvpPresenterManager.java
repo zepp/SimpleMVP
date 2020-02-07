@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * This class keeps presenter instances and instantiate ones by request
@@ -27,6 +28,7 @@ public final class MvpPresenterManager extends ContextWrapper {
     private static volatile MvpPresenterManager instance;
     private final String tag = getClass().getSimpleName();
     private final Map<Integer, MvpPresenter<?>> map;
+    private final ScheduledExecutorService scheduledExecutor;
     private volatile ExecutorService executor;
     private volatile Consumer<Throwable> handler;
 
@@ -34,7 +36,8 @@ public final class MvpPresenterManager extends ContextWrapper {
         super(context);
         this.executor = Executors.newSingleThreadExecutor();
         this.map = Collections.synchronizedMap(new TreeMap<>());
-        this.handler = e -> Log.e(tag, formStackTrace(e));
+        this.scheduledExecutor = Executors.newScheduledThreadPool(1);
+        this.handler = e -> Log.e(tag, "error: ", e);
     }
 
     public static MvpPresenterManager getInstance(Context context) {
@@ -48,21 +51,17 @@ public final class MvpPresenterManager extends ContextWrapper {
         return instance;
     }
 
-    private static String formStackTrace(Throwable e) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(e.toString());
-        builder.append('\n');
-        for (StackTraceElement element : e.getStackTrace()) {
-            builder.append('\t');
-            builder.append(element.toString());
-            builder.append('\n');
-        }
-        return builder.toString();
-    }
-
     public void initialize(ExecutorService executor, Consumer<Throwable> handler) {
         this.executor = executor;
         this.handler = handler;
+    }
+
+    ExecutorService getExecutor() {
+        return executor;
+    }
+
+    ScheduledExecutorService getScheduledExecutor() {
+        return scheduledExecutor;
     }
 
     /**
@@ -104,10 +103,6 @@ public final class MvpPresenterManager extends ContextWrapper {
                 Log.d(tag, "release presenter: " + presenter);
             }
         }
-    }
-
-    ExecutorService getExecutor() {
-        return executor;
     }
 
     private <P extends MvpPresenter<S>, S extends MvpState> P newPresenter(Class<P> pClass, Class<S> sClass, S state) {
