@@ -1,6 +1,11 @@
 package com.testapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.BatteryManager;
 
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpView;
@@ -11,9 +16,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainPresenter extends MvpBasePresenter<MainState> {
     private final AtomicInteger lastEventId = new AtomicInteger();
+    private final ConnectivityManager connectivityManager;
 
     public MainPresenter(Context context, MainState state) {
         super(context, state);
+        connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    @Override
+    protected void onFirstViewConnected(MvpViewHandle<MainState> handle) {
+        super.onFirstViewConnected(handle);
+        subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     @Override
@@ -92,5 +106,32 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         }
         state.addEvent(new Event(lastEventId.incrementAndGet(), itemId, "onOptionsItemSelected"));
         commit();
+    }
+
+    @Override
+    protected void onBroadcastReceived(Intent intent) {
+        super.onBroadcastReceived(intent);
+        if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+            NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+            if (info == null) {
+                state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "network is unavailable"));
+            } else {
+                state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "network: " + info.getTypeName()));
+            }
+            commit();
+        } else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
+            switch (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)) {
+                case BatteryManager.BATTERY_PLUGGED_USB:
+                    state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "USB is plugged"));
+                    break;
+                case BatteryManager.BATTERY_PLUGGED_AC:
+                    state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "AC power supply is plugged"));
+                    break;
+                case BatteryManager.BATTERY_PLUGGED_WIRELESS:
+                    state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "Wireless power supply is plugged"));
+                    break;
+            }
+            commit();
+        }
     }
 }

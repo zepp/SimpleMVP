@@ -77,7 +77,11 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
             this.event = event;
             id.setText(String.valueOf(event.id));
             type.setText(event.type);
-            view.setText(resources.getResourceEntryName(event.view));
+            if (event.view == 0) {
+                view.setText("-");
+            } else {
+                view.setText(resources.getResourceEntryName(event.view));
+            }
             delete.setOnClickListener(this);
         }
 
