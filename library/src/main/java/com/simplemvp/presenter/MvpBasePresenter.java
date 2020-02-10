@@ -180,8 +180,12 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     protected synchronized void commit(long millis) {
-        commit.cancel(false);
-        commit = scheduledExecutor.schedule(() -> commit(), millis, TimeUnit.MILLISECONDS);
+        if (millis > 0) {
+            commit.cancel(false);
+            commit = scheduledExecutor.schedule(() -> commit(), millis, TimeUnit.MILLISECONDS);
+        } else {
+            commit();
+        }
     }
 
     @Override
