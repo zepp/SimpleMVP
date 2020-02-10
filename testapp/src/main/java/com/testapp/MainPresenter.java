@@ -8,11 +8,12 @@ import android.net.NetworkInfo;
 import android.os.BatteryManager;
 
 import com.simplemvp.annotations.MvpHandler;
-import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpBasePresenter;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.testapp.EventType.UI;
 
 public class MainPresenter extends MvpBasePresenter<MainState> {
     private final AtomicInteger lastEventId = new AtomicInteger();
@@ -28,15 +29,13 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onFirstViewConnected(handle);
         subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        state.addEvent(new Event(UI, lastEventId.incrementAndGet(), "onFirstViewConnected", handle.getLayoutId()));
     }
 
     @Override
     protected void onViewConnected(MvpViewHandle<MainState> handle) {
         super.onViewConnected(handle);
-        MvpView<MainState, ?> view = handle.getMvpView();
-        state.addEvent(new Event(lastEventId.incrementAndGet(), view == null ? 0 : view.getLayoutId(),
-                "onViewConnected"));
-        commit();
+        state.addEvent(new Event(UI, lastEventId.incrementAndGet(), "onViewConnected", handle.getLayoutId()));
     }
 
     @Override
@@ -44,7 +43,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     public void onTextChanged(MvpViewHandle<MainState> handle, int viewId, String text) {
         super.onTextChanged(handle, viewId, text);
         state.setText(text);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onTextChanged"));
+        state.addEvent(new Event(lastEventId.incrementAndGet(), "onTextChanged", viewId));
         commit(200);
     }
 
@@ -60,7 +59,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             } else if (viewId == R.id.show_snackbar) {
                 handle.showSnackBar(state.text, state.duration.snackBarDuration);
             }
-            state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onViewClicked"));
+            state.addEvent(new Event(lastEventId.incrementAndGet(), "onViewClicked", viewId));
         }
         commit();
     }
@@ -75,7 +74,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
             }
-            state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onItemSelected"));
+            state.addEvent(new Event(lastEventId.incrementAndGet(), "onItemSelected", viewId));
         }
         commit();
     }
@@ -84,7 +83,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpHandler
     public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), viewId, "onCheckedChanged"));
+        state.addEvent(new Event(lastEventId.incrementAndGet(), "onCheckedChanged", viewId));
         if (viewId == R.id.settings_switch) {
             state.setSwitchChecked(isChecked);
         }
@@ -95,7 +94,9 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpHandler
     public void onRadioCheckedChanged(MvpViewHandle<MainState> handle, int radioViewId, int viewId) {
         super.onRadioCheckedChanged(handle, radioViewId, viewId);
+        state.addEvent(new Event(lastEventId.incrementAndGet(), "onRadioCheckedChanged", radioViewId));
         state.setOption(viewId);
+        commit();
     }
 
     @Override
@@ -104,7 +105,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         if (itemId == R.id.action_settings) {
             handle.showDialog(SettingsDialog.newInstance(getId()));
         }
-        state.addEvent(new Event(lastEventId.incrementAndGet(), itemId, "onOptionsItemSelected"));
+        state.addEvent(new Event(lastEventId.incrementAndGet(), "onOptionsItemSelected", itemId));
         commit();
     }
 
@@ -114,21 +115,26 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();
             if (info == null) {
-                state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "network is unavailable"));
+                state.addEvent(new Event(lastEventId.incrementAndGet(),
+                        intent.getAction(), "OFFLINE"));
             } else {
-                state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "network: " + info.getTypeName()));
+                state.addEvent(new Event(lastEventId.incrementAndGet(),
+                        intent.getAction(), info.getTypeName()));
             }
             commit();
         } else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
             switch (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)) {
                 case BatteryManager.BATTERY_PLUGGED_USB:
-                    state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "USB is plugged"));
+                    state.addEvent(new Event(lastEventId.incrementAndGet(),
+                            intent.getAction(), "USB power supply"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_AC:
-                    state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "AC power supply is plugged"));
+                    state.addEvent(new Event(lastEventId.incrementAndGet(),
+                            intent.getAction(), "AC power supply"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_WIRELESS:
-                    state.addEvent(new Event(lastEventId.incrementAndGet(), 0, "Wireless power supply is plugged"));
+                    state.addEvent(new Event(lastEventId.incrementAndGet(),
+                            intent.getAction(), "Wireless power supply"));
                     break;
             }
             commit();

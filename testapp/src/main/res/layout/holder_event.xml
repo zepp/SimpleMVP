@@ -38,9 +38,10 @@
             tools:text="OnTextChanged" />
 
         <TextView
-            android:id="@+id/event_view"
+            android:id="@+id/event_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:lines="1"
             app:layout_constraintBottom_toBottomOf="@id/event_id"
             app:layout_constraintEnd_toEndOf="@+id/event_type"
             app:layout_constraintStart_toStartOf="@id/event_type"

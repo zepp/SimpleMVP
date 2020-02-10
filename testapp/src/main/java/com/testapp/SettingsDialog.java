@@ -45,13 +45,18 @@ public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, M
     }
 
     @Override
-    public void onStateChanged(MainState state) {
-        Log.d(tag, state.toString());
+    public void onFirstStateChange(MainState state) {
+        super.onFirstStateChange(state);
         if (state.option == 0) {
             options.clearCheck();
         } else {
             options.check(state.option);
         }
+    }
+
+    @Override
+    public void onStateChanged(MainState state) {
+        Log.d(tag, state.toString());
         switch_.setChecked(state.isSwitchChecked);
     }
 }

@@ -61,7 +61,7 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
     public final class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView id;
         private final TextView type;
-        private final TextView view;
+        private final TextView info;
         private final ImageButton delete;
         private Event event;
 
@@ -69,18 +69,18 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
             super(itemView);
             id = itemView.findViewById(R.id.event_id);
             type = itemView.findViewById(R.id.event_type);
-            view = itemView.findViewById(R.id.event_view);
+            info = itemView.findViewById(R.id.event_info);
             delete = itemView.findViewById(R.id.event_delete);
         }
 
         void bind(Event event) {
             this.event = event;
             id.setText(String.valueOf(event.id));
-            type.setText(event.type);
-            if (event.view == 0) {
-                view.setText("-");
+            type.setText(event.handler);
+            if (event.type == EventType.LIFECYCLE || event.type == EventType.UI) {
+                info.setText(resources.getResourceEntryName(event.view));
             } else {
-                view.setText(resources.getResourceEntryName(event.view));
+                info.setText(event.broadcast);
             }
             delete.setOnClickListener(this);
         }
