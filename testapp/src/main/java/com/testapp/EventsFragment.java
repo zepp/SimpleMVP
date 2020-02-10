@@ -48,7 +48,7 @@ public class EventsFragment extends MvpFragment<MvpPresenter<MainState>, MainSta
 
     @Override
     public void onStateChanged(MainState state) {
-        eventsAdapter.setEvents(state.events);
+        eventsAdapter.setEvents(state.getFilteredEvents());
     }
 
     @Override

@@ -42,8 +42,12 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpHandler
     public void onTextChanged(MvpViewHandle<MainState> handle, int viewId, String text) {
         super.onTextChanged(handle, viewId, text);
-        state.setText(text);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onTextChanged", viewId));
+        if (viewId == R.id.main_search) {
+            state.setSearchPattern(text.toLowerCase());
+        } else if (viewId == R.id.toast_text) {
+            state.setText(text);
+            state.addEvent(new Event(lastEventId.incrementAndGet(), "onTextChanged", viewId));
+        }
         commit(state.delay);
     }
 

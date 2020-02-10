@@ -12,6 +12,7 @@ public class MainState extends MvpState {
     boolean isSwitchChecked;
     ActionDuration duration = ActionDuration.LongDuration;
     long delay;
+    String searchPattern = "";
 
     void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -32,6 +33,19 @@ public class MainState extends MvpState {
         events.clear();
     }
 
+    List<Event> getFilteredEvents() {
+        if (searchPattern.isEmpty()) {
+            return events;
+        }
+        List<Event> result = new ArrayList<>(events.size());
+        for (Event event : events) {
+            if (event.handler.toLowerCase().contains(searchPattern)) {
+                result.add(event);
+            }
+        }
+        return result;
+    }
+
     void setOption(int option) {
         setChanged(this.option != option);
         this.option = option;
@@ -47,16 +61,21 @@ public class MainState extends MvpState {
         this.duration = duration;
     }
 
+    void setDelay(long delay) {
+        setChanged(this.delay != delay);
+        this.delay = delay;
+    }
+
+    void setSearchPattern(String value) {
+        setChanged(!searchPattern.equals(value));
+        this.searchPattern = value;
+    }
+
     @Override
     public synchronized MainState clone() throws CloneNotSupportedException {
         MainState state = (MainState) super.clone();
         state.events = new ArrayList<>(events);
         return state;
-    }
-
-    void setDelay(long delay) {
-        setChanged(this.delay != delay);
-        this.delay = delay;
     }
 
     @Override

@@ -10,7 +10,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.util.Consumer;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.inputmethod.InputMethodManager;
 
 import com.simplemvp.common.MvpPresenter;
@@ -23,6 +25,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private FloatingActionButton clearAll;
+    private SearchView search;
 
     @Override
     public int getLayoutId() {
@@ -58,6 +61,12 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        search = (SearchView) menu.findItem(R.id.main_search).getActionView();
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public void onStateChanged(MainState state) {
     }
 
@@ -65,6 +74,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     public void onFirstStateChange(MainState state) {
         super.onFirstStateChange(state);
         clearAll.setOnClickListener(getMvpListener());
+        search.setOnQueryTextListener(newQueryTextListener(search));
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
