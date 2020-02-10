@@ -283,7 +283,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
      */
     @CallSuper
-    protected void onFirstViewConnected(MvpViewHandle<S> handle) {
+    protected void onFirstViewConnected(MvpViewHandle<S> handle) throws Exception {
         Log.d(tag, "onFirstViewConnected(" + handle.getMvpView() + ")");
     }
 
@@ -293,7 +293,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
      */
     @CallSuper
-    protected void onViewConnected(MvpViewHandle<S> handle) {
+    protected void onViewConnected(MvpViewHandle<S> handle) throws Exception {
         Log.d(tag, "onViewConnected(" + handle.getMvpView() + ")");
     }
 
@@ -302,7 +302,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * by {@link MvpPresenterManager}.
      */
     @CallSuper
-    protected void onLastViewDisconnected() {
+    protected void onLastViewDisconnected() throws Exception {
         Log.d(tag, "onLastViewDisconnected()");
         for (AsyncBroadcastReceiver receiver : receivers) {
             unregisterReceiver(receiver);

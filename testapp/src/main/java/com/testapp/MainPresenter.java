@@ -29,7 +29,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    protected void onFirstViewConnected(MvpViewHandle<MainState> handle) {
+    protected void onFirstViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onFirstViewConnected(handle);
         subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -39,7 +39,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     }
 
     @Override
-    protected void onViewConnected(MvpViewHandle<MainState> handle) {
+    protected void onViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onViewConnected(handle);
         state.addEvent(new Event(UI, lastEventId.incrementAndGet(), "onViewConnected", handle.getLayoutId()));
     }
