@@ -248,6 +248,11 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         Log.d(tag, "onDrag(" + getResources().getResourceName(viewId) + ", " + event + ")");
     }
 
+    @Override
+    public void onProgressChanged(MvpViewHandle<S> handle, int viewId, int progress) {
+        Log.d(tag, "onProgressChanged(" + getResources().getResourceName(viewId) + ", " + progress + ")");
+    }
+
     /**
      * This method subscribes current presenter to broadcast intents to be processed in
      * {@link MvpBasePresenter#onBroadcastReceived(Intent)} method.

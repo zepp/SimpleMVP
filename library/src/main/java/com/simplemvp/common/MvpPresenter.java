@@ -11,6 +11,7 @@ import android.view.DragEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 
 import java.util.Map;
 
@@ -150,4 +151,16 @@ public interface MvpPresenter<S extends MvpState> {
      * @param event  {@link DragEvent} event
      */
     void onDrag(MvpViewHandle<S> handle, @IdRes int viewId, DragEvent event);
+
+    /**
+     * This method handles events from SeekBar
+     *
+     * @param handle   {@link MvpViewHandle} interface that hides real view
+     * @param viewId   view's ID
+     * @param progress The current progress level. This will be in the range min..max where min
+     *                 and max were set by {@link ProgressBar#setMin(int)} and
+     *                 {@link ProgressBar#setMax(int)}, respectively. (The default values for
+     *                 min is 0 and max is 100.)
+     */
+    void onProgressChanged(MvpViewHandle<S> handle, @IdRes int viewId, int progress);
 }

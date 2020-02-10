@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.simplemvp.annotations.MvpHandler;
@@ -168,6 +169,20 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     public boolean onDrag(View v, DragEvent event) {
         presenter.onDrag(getProxy(), v.getId(), event);
         return true;
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        presenter.onProgressChanged(getProxy(), seekBar.getId(), progress);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 
     TextWatcher newTextWatcher(View view) {
