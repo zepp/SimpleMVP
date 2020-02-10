@@ -2,6 +2,7 @@ package com.testapp;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Consumer;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +16,13 @@ import java.util.List;
 class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
     private final Resources resources;
     private List<Event> events = Collections.emptyList();
-    private ItemClickListener listener;
+    private Consumer<Event> listener;
 
     EventsAdapter(Resources resources) {
         this.resources = resources;
         setHasStableIds(true);
+        listener = event -> {
+        };
     }
 
     void setEvents(List<Event> events) {
@@ -27,9 +30,8 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
         notifyDataSetChanged();
     }
 
-    void setListener(ItemClickListener listener) {
+    void setListener(Consumer<Event> listener) {
         this.listener = listener;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -52,10 +54,6 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
     @Override
     public long getItemId(int position) {
         return events.get(position).id;
-    }
-
-    interface ItemClickListener {
-        void onItemClicked(Event event);
     }
 
     public final class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -87,9 +85,7 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
 
         @Override
         public void onClick(View view) {
-            if (listener != null) {
-                listener.onItemClicked(event);
-            }
+            listener.accept(event);
         }
     }
 }
