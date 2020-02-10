@@ -44,7 +44,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onTextChanged(handle, viewId, text);
         state.setText(text);
         state.addEvent(new Event(lastEventId.incrementAndGet(), "onTextChanged", viewId));
-        commit(200);
+        commit(state.delay);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             }
             state.addEvent(new Event(lastEventId.incrementAndGet(), "onViewClicked", viewId));
         }
-        commit();
+        commit(state.delay);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             }
             state.addEvent(new Event(lastEventId.incrementAndGet(), "onItemSelected", viewId));
         }
-        commit();
+        commit(state.delay);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         if (viewId == R.id.settings_switch) {
             state.setSwitchChecked(isChecked);
         }
-        commit();
+        commit(state.delay);
     }
 
     @Override
@@ -98,17 +98,27 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onRadioCheckedChanged(handle, radioViewId, viewId);
         state.addEvent(new Event(lastEventId.incrementAndGet(), "onRadioCheckedChanged", radioViewId));
         state.setOption(viewId);
-        commit();
+        commit(state.delay);
     }
 
     @Override
+    @MvpHandler
     public void onOptionsItemSelected(MvpViewHandle<MainState> handle, int itemId) {
         super.onOptionsItemSelected(handle, itemId);
         if (itemId == R.id.action_settings) {
             handle.showDialog(SettingsDialog.newInstance(getId()));
         }
         state.addEvent(new Event(lastEventId.incrementAndGet(), "onOptionsItemSelected", itemId));
-        commit();
+        commit(state.delay);
+    }
+
+    @Override
+    @MvpHandler
+    public void onProgressChanged(MvpViewHandle<MainState> handle, int viewId, int progress) {
+        super.onProgressChanged(handle, viewId, progress);
+        state.addEvent(new Event(lastEventId.incrementAndGet(), "onProgressChanged", viewId));
+        state.setDelay(progress * 100);
+        commit(state.delay);
     }
 
     @Override
@@ -123,7 +133,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
                 state.addEvent(new Event(lastEventId.incrementAndGet(),
                         intent.getAction(), info.getTypeName()));
             }
-            commit();
+            commit(state.delay);
         } else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
             switch (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)) {
                 case BatteryManager.BATTERY_PLUGGED_USB:
@@ -139,7 +149,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
                             intent.getAction(), "Wireless power supply"));
                     break;
             }
-            commit();
+            commit(state.delay);
         }
     }
 }

@@ -11,6 +11,7 @@ public class MainState extends MvpState {
     int option;
     boolean isSwitchChecked;
     ActionDuration duration = ActionDuration.LongDuration;
+    long delay;
 
     void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -51,6 +52,11 @@ public class MainState extends MvpState {
         MainState state = (MainState) super.clone();
         state.events = new ArrayList<>(events);
         return state;
+    }
+
+    void setDelay(long delay) {
+        setChanged(this.delay != delay);
+        this.delay = delay;
     }
 
     @Override

@@ -16,16 +16,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/settings_delay_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/settings_delay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <SeekBar
+        android:id="@+id/settings_delay"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:max="10"
+        android:progress="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/settings_delay_title"
+        app:layout_constraintTop_toBottomOf="@id/settings_delay_title" />
+
+
     <RadioGroup
         android:id="@+id/options"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title">
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/settings_delay"
+        app:layout_constraintStart_toStartOf="@+id/settings_delay"
+        app:layout_constraintTop_toBottomOf="@id/settings_delay">
 
         <RadioButton
             android:id="@+id/settings_option_1"
@@ -54,12 +76,10 @@
         android:id="@+id/settings_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
         android:text="@string/settings_switch"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/options"
+        app:layout_constraintStart_toStartOf="@+id/options"
         app:layout_constraintTop_toBottomOf="@id/options" />
 
     <Button

@@ -5,7 +5,7 @@ import android.widget.Toast;
 
 enum ActionDuration {
     LongDuration(Toast.LENGTH_LONG, Snackbar.LENGTH_LONG, "Long"),
-    ShortDuration(Toast.LENGTH_SHORT, Toast.LENGTH_SHORT, "Short");
+    ShortDuration(Toast.LENGTH_SHORT, Snackbar.LENGTH_SHORT, "Short");
 
     int toastDuration;
     int snackBarDuration;

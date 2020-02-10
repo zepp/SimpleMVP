@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.view.MvpDialogFragment;
@@ -16,6 +17,7 @@ public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, M
     private Button ok;
     private SwitchCompat switch_;
     private RadioGroup options;
+    private SeekBar delay;
 
     public static SettingsDialog newInstance(int presenterId) {
         SettingsDialog dialog = new SettingsDialog();
@@ -34,6 +36,7 @@ public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, M
         ok = view.findViewById(R.id.settings_ok);
         options = view.findViewById(R.id.options);
         switch_ = view.findViewById(R.id.settings_switch);
+        delay = view.findViewById(R.id.settings_delay);
     }
 
     @Override
@@ -42,6 +45,7 @@ public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, M
         ok.setOnClickListener(view -> finish());
         options.setOnCheckedChangeListener(getMvpListener());
         switch_.setOnCheckedChangeListener(getMvpListener());
+        delay.setOnSeekBarChangeListener(getMvpListener());
     }
 
     @Override
@@ -52,6 +56,7 @@ public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, M
         } else {
             options.check(state.option);
         }
+        delay.setProgress((int) state.delay / 100);
     }
 
     @Override
