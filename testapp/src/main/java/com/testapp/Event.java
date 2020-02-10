@@ -34,4 +34,12 @@ class Event {
         this.info = info;
         this.view = 0;
     }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "type=" + type +
+                ", handler='" + handler + '\'' +
+                '}';
+    }
 }
