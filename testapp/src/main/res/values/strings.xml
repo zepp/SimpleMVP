@@ -12,4 +12,6 @@
     <string name="main_toast">toast</string>
     <string name="main_snackbar">snackbar</string>
     <string name="main_error">error</string>
+    <string name="main_request_perms">Permissions</string>
+    <string name="main_write_perms">Write external storage</string>
 </resources>

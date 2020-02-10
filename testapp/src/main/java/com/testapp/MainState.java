@@ -13,6 +13,7 @@ public class MainState extends MvpState {
     ActionDuration duration = ActionDuration.LongDuration;
     long delay;
     String searchPattern = "";
+    boolean isWriteGranted;
 
     void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -69,6 +70,11 @@ public class MainState extends MvpState {
     void setSearchPattern(String value) {
         setChanged(!searchPattern.equals(value));
         this.searchPattern = value;
+    }
+
+    void setWriteGranted(boolean writeGranted) {
+        setChanged(isWriteGranted != writeGranted);
+        isWriteGranted = writeGranted;
     }
 
     @Override

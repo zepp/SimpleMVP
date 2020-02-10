@@ -1,6 +1,7 @@
 package com.testapp;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -22,6 +24,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     private EditText toastText;
     private Spinner durationSpinner;
     private Button raiseError;
+    private Button reqPermissions;
+    private CheckBox writeGranted;
 
     public MainFragment() {
         // Required empty public constructor
@@ -46,6 +50,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         showSnackBar = view.findViewById(R.id.show_snackbar);
         durationSpinner = view.findViewById(R.id.duration_spinner);
         raiseError = view.findViewById(R.id.raise_error);
+        reqPermissions = view.findViewById(R.id.request_permissions);
+        writeGranted = view.findViewById(R.id.write_granted);
     }
 
     @Override
@@ -58,12 +64,15 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ActionDuration[]{
                 ActionDuration.LongDuration, ActionDuration.ShortDuration}));
         raiseError.setOnClickListener(getMvpListener());
+        reqPermissions.setOnClickListener(v ->
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0));
     }
 
     @Override
     public void onStateChanged(MainState state) {
         showToast.setEnabled(!state.text.isEmpty());
         showSnackBar.setEnabled(!state.text.isEmpty());
+        writeGranted.setChecked(state.isWriteGranted);
     }
 
     @Override

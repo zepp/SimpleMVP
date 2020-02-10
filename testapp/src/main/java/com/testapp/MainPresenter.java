@@ -1,16 +1,20 @@
 package com.testapp;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.support.v4.content.ContextCompat;
 
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpBasePresenter;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.testapp.EventType.UI;
@@ -30,6 +34,8 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         state.addEvent(new Event(UI, lastEventId.incrementAndGet(), "onFirstViewConnected", handle.getLayoutId()));
+        state.setWriteGranted(ContextCompat.checkSelfPermission(getBaseContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
 
     @Override
@@ -122,6 +128,14 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onProgressChanged(handle, viewId, progress);
         state.addEvent(new Event(lastEventId.incrementAndGet(), "onProgressChanged", viewId));
         state.setDelay(progress * 100);
+        commit(state.delay);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(MvpViewHandle<MainState> handle, int requestCode, Map<String, Integer> permissions) {
+        super.onRequestPermissionsResult(handle, requestCode, permissions);
+        state.addEvent(new Event(lastEventId.incrementAndGet(), "onRequestPermissionsResult", handle.getLayoutId()));
+        state.setWriteGranted(permissions.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         commit(state.delay);
     }
 
