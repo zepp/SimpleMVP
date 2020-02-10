@@ -8,18 +8,18 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
-import com.simplemvp.view.MvpEditText;
 import com.simplemvp.view.MvpFragment;
 
 
 public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {
     private Button showToast;
     private Button showSnackBar;
-    private MvpEditText toastText;
+    private EditText toastText;
     private Spinner durationSpinner;
 
     public MainFragment() {
@@ -59,7 +59,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
 
     @Override
     public void onStateChanged(MainState state) {
-        toastText.setTextNoWatchers(state.text);
+        showToast.setEnabled(!state.text.isEmpty());
+        showSnackBar.setEnabled(!state.text.isEmpty());
     }
 
     @Override
