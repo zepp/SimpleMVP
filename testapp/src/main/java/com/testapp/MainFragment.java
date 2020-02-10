@@ -21,6 +21,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     private Button showSnackBar;
     private EditText toastText;
     private Spinner durationSpinner;
+    private Button raiseError;
 
     public MainFragment() {
         // Required empty public constructor
@@ -44,6 +45,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         showToast = view.findViewById(R.id.show_toast);
         showSnackBar = view.findViewById(R.id.show_snackbar);
         durationSpinner = view.findViewById(R.id.duration_spinner);
+        raiseError = view.findViewById(R.id.raise_error);
     }
 
     @Override
@@ -55,6 +57,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         durationSpinner.setOnItemSelectedListener(getMvpListener());
         durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ActionDuration[]{
                 ActionDuration.LongDuration, ActionDuration.ShortDuration}));
+        raiseError.setOnClickListener(getMvpListener());
     }
 
     @Override

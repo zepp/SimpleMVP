@@ -53,6 +53,8 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onViewClicked(handle, viewId);
         if (viewId == R.id.clear_all) {
             state.clearEvents();
+        } else if (viewId == R.id.raise_error) {
+            throw new RuntimeException("Runtime exception");
         } else {
             if (viewId == R.id.show_toast) {
                 handle.showToast(state.text, state.duration.toastDuration);

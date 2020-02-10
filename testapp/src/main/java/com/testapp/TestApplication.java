@@ -32,7 +32,7 @@ public class TestApplication extends Application {
 
     Notification getErrorNotification(String text) {
         NotificationCompat.Builder builder = getBuilder(true)
-                .setSmallIcon(R.drawable.ic_gear)
+                .setSmallIcon(R.drawable.ic_error)
                 .setContentTitle(getString(R.string.app_error))
                 .setContentText(text);
         return builder.build();
