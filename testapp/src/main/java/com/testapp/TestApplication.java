@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.util.Consumer;
+import android.util.Log;
 
 import com.simplemvp.presenter.MvpPresenterManager;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TestApplication extends Application {
+    private final static String tag = TestApplication.class.getSimpleName();
     private final static int ERROR_NOTIFICATION_ID = 1;
     private MvpPresenterManager presenterManager;
     private NotificationManager notificationManager;
@@ -24,8 +26,11 @@ public class TestApplication extends Application {
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         executor = Executors.newSingleThreadExecutor();
-        errorHandler = error -> notificationManager
-                .notify(ERROR_NOTIFICATION_ID, getErrorNotification(error.getMessage()));
+        errorHandler = error -> {
+            notificationManager
+                    .notify(ERROR_NOTIFICATION_ID, getErrorNotification(error.getMessage()));
+            Log.e(tag, "error: ", error);
+        };
         presenterManager = MvpPresenterManager.getInstance(this);
         presenterManager.initialize(executor, errorHandler);
     }
