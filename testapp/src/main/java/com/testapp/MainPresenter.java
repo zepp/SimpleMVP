@@ -28,10 +28,14 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
+    private int getEventId() {
+        return lastEventId.incrementAndGet();
+    }
+
     @Override
     protected void onFirstViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onFirstViewConnected(handle);
-        state.addEvent(new Event(UI, lastEventId.incrementAndGet(), "onFirstViewConnected", handle.getLayoutId()));
+        state.addEvent(new Event(UI, getEventId(), "onFirstViewConnected", handle.getLayoutId()));
         state.setWriteGranted(ContextCompat.checkSelfPermission(getBaseContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
@@ -39,7 +43,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @Override
     protected void onViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onViewConnected(handle);
-        state.addEvent(new Event(UI, lastEventId.incrementAndGet(), "onViewConnected", handle.getLayoutId()));
+        state.addEvent(new Event(UI, getEventId(), "onViewConnected", handle.getLayoutId()));
     }
 
     @Override
@@ -50,7 +54,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             state.setSearchPattern(text.toLowerCase());
         } else if (viewId == R.id.toast_text) {
             state.setText(text);
-            state.addEvent(new Event(lastEventId.incrementAndGet(), "onTextChanged", viewId));
+            state.addEvent(new Event(getEventId(), "onTextChanged", viewId));
         } else if (viewId == R.id.expression) {
             state.setExpression(text.trim());
         }
@@ -71,7 +75,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             } else if (viewId == R.id.show_snackbar) {
                 handle.showSnackBar(state.text, state.duration.snackBarDuration);
             }
-            state.addEvent(new Event(lastEventId.incrementAndGet(), "onViewClicked", viewId));
+            state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
         }
         commit(state.delay);
     }
@@ -86,7 +90,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
             }
-            state.addEvent(new Event(lastEventId.incrementAndGet(), "onItemSelected", viewId));
+            state.addEvent(new Event(getEventId(), "onItemSelected", viewId));
         }
         commit(state.delay);
     }
@@ -95,13 +99,17 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpHandler
     public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onCheckedChanged", viewId));
+        state.addEvent(new Event(getEventId(), "onCheckedChanged", viewId));
         if (viewId == R.id.settings_connectivity) {
+            if (!state.isSubscribedToConnectivity) {
+                subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            }
             state.setSubscribedToConnectivity(isChecked);
-            subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         } else if (viewId == R.id.settings_power_supply) {
+            if (!state.isSubscribedToPowerSupply) {
+                subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            }
             state.setSubscribedToPowerSupply(isChecked);
-            subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         }
         commit(state.delay);
     }
@@ -113,7 +121,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         if (itemId == R.id.action_settings) {
             handle.showDialog(SettingsDialog.newInstance(getId()));
         }
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onOptionsItemSelected", itemId));
+        state.addEvent(new Event(getEventId(), "onOptionsItemSelected", itemId));
         commit(state.delay);
     }
 
@@ -121,7 +129,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @MvpHandler
     public void onProgressChanged(MvpViewHandle<MainState> handle, int viewId, int progress) {
         super.onProgressChanged(handle, viewId, progress);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onProgressChanged", viewId));
+        state.addEvent(new Event(getEventId(), "onProgressChanged", viewId));
         state.setDelay(progress * 100);
         commit(state.delay);
     }
@@ -129,7 +137,7 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @Override
     public void onRequestPermissionsResult(MvpViewHandle<MainState> handle, int requestCode, Map<String, Integer> permissions) {
         super.onRequestPermissionsResult(handle, requestCode, permissions);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onRequestPermissionsResult", handle.getLayoutId()));
+        state.addEvent(new Event(getEventId(), "onRequestPermissionsResult", handle.getLayoutId()));
         state.setWriteGranted(permissions.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         commit(state.delay);
     }
@@ -140,26 +148,21 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();
             if (info == null) {
-                state.addEvent(new Event(lastEventId.incrementAndGet(),
-                        intent.getAction(), "OFFLINE"));
+                state.addEvent(new Event(getEventId(), intent.getAction(), "OFFLINE"));
             } else {
-                state.addEvent(new Event(lastEventId.incrementAndGet(),
-                        intent.getAction(), info.getTypeName()));
+                state.addEvent(new Event(getEventId(), intent.getAction(), info.getTypeName()));
             }
             commit(state.delay);
         } else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
             switch (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)) {
                 case BatteryManager.BATTERY_PLUGGED_USB:
-                    state.addEvent(new Event(lastEventId.incrementAndGet(),
-                            intent.getAction(), "USB power supply"));
+                    state.addEvent(new Event(getEventId(), intent.getAction(), "USB power supply"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_AC:
-                    state.addEvent(new Event(lastEventId.incrementAndGet(),
-                            intent.getAction(), "AC power supply"));
+                    state.addEvent(new Event(getEventId(), intent.getAction(), "AC power supply"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_WIRELESS:
-                    state.addEvent(new Event(lastEventId.incrementAndGet(),
-                            intent.getAction(), "Wireless power supply"));
+                    state.addEvent(new Event(getEventId(), intent.getAction(), "Wireless power supply"));
                     break;
             }
             commit(state.delay);
