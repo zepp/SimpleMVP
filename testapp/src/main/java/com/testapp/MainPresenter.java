@@ -53,6 +53,8 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         } else if (viewId == R.id.toast_text) {
             state.setText(text);
             state.addEvent(new Event(lastEventId.incrementAndGet(), "onTextChanged", viewId));
+        } else if (viewId == R.id.expression) {
+            state.setExpression(text.trim());
         }
         commit(state.delay);
     }
@@ -63,8 +65,8 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         super.onViewClicked(handle, viewId);
         if (viewId == R.id.clear_all) {
             state.clearEvents();
-        } else if (viewId == R.id.raise_error) {
-            throw new RuntimeException("Runtime exception");
+        } else if (viewId == R.id.eval) {
+            state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
         } else {
             if (viewId == R.id.show_toast) {
                 handle.showToast(state.text, state.duration.toastDuration);

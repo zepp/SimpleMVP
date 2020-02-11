@@ -11,7 +11,9 @@
     <string name="settings_switch">Enable</string>
     <string name="main_toast">toast</string>
     <string name="main_snackbar">snackbar</string>
-    <string name="main_error">error</string>
-    <string name="main_request_perms">Permissions</string>
+    <string name="main_expression">Mathematical expression</string>
+    <string name="main_eval">Evaluate</string>
+    <string name="main_permissions">Permissions</string>
+    <string name="main_perm_request">Request</string>
     <string name="main_write_perms">Write external storage</string>
 </resources>

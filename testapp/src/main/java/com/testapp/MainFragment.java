@@ -15,6 +15,7 @@ import android.widget.Spinner;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
+import com.simplemvp.view.MvpEditText;
 import com.simplemvp.view.MvpFragment;
 
 
@@ -23,7 +24,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     private Button showSnackBar;
     private EditText toastText;
     private Spinner durationSpinner;
-    private Button raiseError;
+    private MvpEditText expression;
+    private Button eval;
     private Button reqPermissions;
     private CheckBox writeGranted;
 
@@ -49,7 +51,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         showToast = view.findViewById(R.id.show_toast);
         showSnackBar = view.findViewById(R.id.show_snackbar);
         durationSpinner = view.findViewById(R.id.duration_spinner);
-        raiseError = view.findViewById(R.id.raise_error);
+        expression = view.findViewById(R.id.expression);
+        eval = view.findViewById(R.id.eval);
         reqPermissions = view.findViewById(R.id.request_permissions);
         writeGranted = view.findViewById(R.id.write_granted);
     }
@@ -60,10 +63,13 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         showToast.setOnClickListener(getMvpListener());
         showSnackBar.setOnClickListener(getMvpListener());
         toastText.addTextChangedListener(newTextWatcher(toastText));
+        toastText.setText(state.text);
         durationSpinner.setOnItemSelectedListener(getMvpListener());
         durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ActionDuration[]{
                 ActionDuration.LongDuration, ActionDuration.ShortDuration}));
-        raiseError.setOnClickListener(getMvpListener());
+        expression.setText(state.expression);
+        expression.addTextChangedListener(newTextWatcher(expression));
+        eval.setOnClickListener(getMvpListener());
         reqPermissions.setOnClickListener(v ->
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0));
     }
@@ -73,6 +79,8 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         showToast.setEnabled(!state.text.isEmpty());
         showSnackBar.setEnabled(!state.text.isEmpty());
         writeGranted.setChecked(state.isWriteGranted);
+        expression.setTextNoWatchers(state.expression);
+        eval.setEnabled(!state.expression.isEmpty());
     }
 
     @Override

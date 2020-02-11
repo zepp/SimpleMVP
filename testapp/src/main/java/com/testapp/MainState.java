@@ -14,6 +14,7 @@ public class MainState extends MvpState {
     long delay;
     String searchPattern = "";
     boolean isWriteGranted;
+    String expression = "";
 
     void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -75,6 +76,11 @@ public class MainState extends MvpState {
     void setWriteGranted(boolean writeGranted) {
         setChanged(isWriteGranted != writeGranted);
         isWriteGranted = writeGranted;
+    }
+
+    void setExpression(String expression) {
+        setChanged(!this.expression.equals(expression));
+        this.expression = expression;
     }
 
     @Override
