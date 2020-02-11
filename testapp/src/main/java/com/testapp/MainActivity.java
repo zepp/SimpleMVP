@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.simplemvp.common.MvpPresenter;
@@ -54,6 +55,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
         tabLayout.setupWithViewPager(viewPager);
         clearAll = findViewById(R.id.clear_all);
         viewPager.addOnPageChangeListener(new OnPageSelected(i -> {
+            presenter.onItemSelected(getViewHandle(), viewPager.getId(), i);
             if (i == 1) {
                 imm.hideSoftInputFromWindow(getView().getApplicationWindowToken(), 0);
             }
@@ -68,6 +70,7 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
 
     @Override
     public void onStateChanged(MainState state) {
+        search.setVisibility(state.currentPage == 0 ? View.GONE : View.VISIBLE);
     }
 
     @Override

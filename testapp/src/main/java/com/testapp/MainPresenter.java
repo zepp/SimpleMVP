@@ -89,6 +89,8 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         } else {
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
+            } else if (viewId == R.id.view_pager) {
+                state.setCurrentPage((int) item);
             }
             state.addEvent(new Event(getEventId(), "onItemSelected", viewId));
         }

@@ -15,6 +15,7 @@ public class MainState extends MvpState {
     String searchPattern = "";
     boolean isWriteGranted;
     String expression = "";
+    int currentPage;
 
     void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -81,6 +82,11 @@ public class MainState extends MvpState {
     void setExpression(String expression) {
         setChanged(!this.expression.equals(expression));
         this.expression = expression;
+    }
+
+    void setCurrentPage(int currentPage) {
+        setChanged(this.currentPage != currentPage);
+        this.currentPage = currentPage;
     }
 
     @Override
