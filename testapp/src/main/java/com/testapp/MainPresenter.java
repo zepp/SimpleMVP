@@ -31,8 +31,6 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     @Override
     protected void onFirstViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onFirstViewConnected(handle);
-        subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         state.addEvent(new Event(UI, lastEventId.incrementAndGet(), "onFirstViewConnected", handle.getLayoutId()));
         state.setWriteGranted(ContextCompat.checkSelfPermission(getBaseContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -98,18 +96,13 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
     public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
         state.addEvent(new Event(lastEventId.incrementAndGet(), "onCheckedChanged", viewId));
-        if (viewId == R.id.settings_switch) {
-            state.setSwitchChecked(isChecked);
+        if (viewId == R.id.settings_connectivity) {
+            state.setSubscribedToConnectivity(isChecked);
+            subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        } else if (viewId == R.id.settings_power_supply) {
+            state.setSubscribedToPowerSupply(isChecked);
+            subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         }
-        commit(state.delay);
-    }
-
-    @Override
-    @MvpHandler
-    public void onRadioCheckedChanged(MvpViewHandle<MainState> handle, int radioViewId, int viewId) {
-        super.onRadioCheckedChanged(handle, radioViewId, viewId);
-        state.addEvent(new Event(lastEventId.incrementAndGet(), "onRadioCheckedChanged", radioViewId));
-        state.setOption(viewId);
         commit(state.delay);
     }
 

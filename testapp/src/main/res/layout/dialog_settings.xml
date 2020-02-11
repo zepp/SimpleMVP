@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:minWidth="160dp">
+    android:minWidth="180dp">
 
     <TextView
         android:id="@+id/title"
@@ -39,48 +39,37 @@
         app:layout_constraintStart_toStartOf="@id/settings_delay_title"
         app:layout_constraintTop_toBottomOf="@id/settings_delay_title" />
 
-
-    <RadioGroup
-        android:id="@+id/options"
+    <TextView
+        android:id="@+id/settings_broadcast"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="@+id/settings_delay"
-        app:layout_constraintStart_toStartOf="@+id/settings_delay"
-        app:layout_constraintTop_toBottomOf="@id/settings_delay">
+        android:layout_marginEnd="16dp"
+        android:text="@string/settings_broadcast"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/settings_delay"
+        app:layout_constraintTop_toBottomOf="@id/settings_delay" />
 
-        <RadioButton
-            android:id="@+id/settings_option_1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settings_option_1" />
-
-        <RadioButton
-            android:id="@+id/settings_option_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settings_option_2" />
-
-        <RadioButton
-            android:id="@+id/settings_option_3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settings_option_3" />
-
-    </RadioGroup>
 
     <android.support.v7.widget.SwitchCompat
-        android:id="@+id/settings_switch"
+        android:id="@+id/settings_connectivity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/settings_switch"
-        app:layout_constraintEnd_toEndOf="@+id/options"
-        app:layout_constraintStart_toStartOf="@+id/options"
-        app:layout_constraintTop_toBottomOf="@id/options" />
+        android:layout_marginTop="8dp"
+        android:text="@string/settings_connectivity"
+        app:layout_constraintEnd_toEndOf="@+id/settings_broadcast"
+        app:layout_constraintStart_toStartOf="@id/settings_broadcast"
+        app:layout_constraintTop_toBottomOf="@id/settings_broadcast" />
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/settings_power_supply"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/settings_power_supply"
+        app:layout_constraintEnd_toEndOf="@+id/settings_broadcast"
+        app:layout_constraintStart_toStartOf="@id/settings_broadcast"
+        app:layout_constraintTop_toBottomOf="@id/settings_connectivity" />
 
     <Button
         android:id="@+id/settings_ok"
@@ -92,6 +81,6 @@
         android:text="@android:string/ok"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_switch" />
+        app:layout_constraintTop_toBottomOf="@+id/settings_power_supply" />
 
 </android.support.constraint.ConstraintLayout>

@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainState extends MvpState {
-    String text = "";
     List<Event> events = new ArrayList<>();
-    int option;
-    boolean isSwitchChecked;
-    ActionDuration duration = ActionDuration.LongDuration;
     long delay;
+    String text = "";
+    ActionDuration duration = ActionDuration.LongDuration;
+    boolean isSubscribedToConnectivity;
+    boolean isSubscribedToPowerSupply;
     String searchPattern = "";
     boolean isWriteGranted;
     String expression = "";
@@ -48,14 +48,14 @@ public class MainState extends MvpState {
         return result;
     }
 
-    void setOption(int option) {
-        setChanged(this.option != option);
-        this.option = option;
+    void setSubscribedToConnectivity(boolean subscribedToConnectivity) {
+        setChanged(isSubscribedToConnectivity != subscribedToConnectivity);
+        isSubscribedToConnectivity = subscribedToConnectivity;
     }
 
-    void setSwitchChecked(boolean switchChecked) {
-        setChanged(isSwitchChecked != switchChecked);
-        isSwitchChecked = switchChecked;
+    void setSubscribedToPowerSupply(boolean subscribedToPowerSupply) {
+        setChanged(isSubscribedToPowerSupply != subscribedToPowerSupply);
+        isSubscribedToPowerSupply = subscribedToPowerSupply;
     }
 
     void setDuration(ActionDuration duration) {
@@ -94,7 +94,14 @@ public class MainState extends MvpState {
     public String toString() {
         return "MainState{" +
                 "text='" + text + '\'' +
-                ", option=" + option +
-                "} ";
+                ", events=" + events +
+                ", isSubscribedToConnectivity=" + isSubscribedToConnectivity +
+                ", isSubscribedToPowerSupply=" + isSubscribedToPowerSupply +
+                ", duration=" + duration +
+                ", delay=" + delay +
+                ", searchPattern='" + searchPattern + '\'' +
+                ", isWriteGranted=" + isWriteGranted +
+                ", expression='" + expression + '\'' +
+                '}';
     }
 }
