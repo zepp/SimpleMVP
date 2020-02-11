@@ -11,6 +11,8 @@ import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpFragment;
 
+import java.util.List;
+
 
 public class EventsFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {
     private RecyclerView events;
@@ -48,7 +50,9 @@ public class EventsFragment extends MvpFragment<MvpPresenter<MainState>, MainSta
 
     @Override
     public void onStateChanged(MainState state) {
-        eventsAdapter.setEvents(state.getFilteredEvents());
+        List<Event> items = state.getFilteredEvents();
+        eventsAdapter.setEvents(items);
+        events.scrollToPosition(items.size() - 1);
     }
 
     @Override
