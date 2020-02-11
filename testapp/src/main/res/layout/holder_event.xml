@@ -16,10 +16,11 @@
 
         <TextView
             android:id="@+id/event_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:gravity="center"
             android:padding="8dp"
+            android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -27,25 +28,40 @@
             tools:text="1" />
 
         <TextView
-            android:id="@+id/event_type"
+            android:id="@+id/event_handler"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toStartOf="@id/event_delete"
             app:layout_constraintStart_toEndOf="@id/event_id"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@+id/event_id"
             tools:text="OnTextChanged" />
 
         <TextView
-            android:id="@+id/event_info"
+            android:id="@+id/event_source"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:lines="1"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="start"
+            android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="@id/event_id"
-            app:layout_constraintEnd_toEndOf="@+id/event_type"
-            app:layout_constraintStart_toStartOf="@id/event_type"
+            app:layout_constraintEnd_toStartOf="@+id/event_info"
+            app:layout_constraintStart_toEndOf="@+id/event_id"
             tools:text="spinner" />
+
+        <TextView
+            android:id="@+id/event_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="@id/event_source"
+            app:layout_constraintEnd_toStartOf="@+id/event_delete"
+            tools:text="WIFI" />
 
         <ImageButton
             android:id="@+id/event_delete"

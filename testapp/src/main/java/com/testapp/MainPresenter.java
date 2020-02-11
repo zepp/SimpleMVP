@@ -158,13 +158,13 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
         } else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
             switch (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)) {
                 case BatteryManager.BATTERY_PLUGGED_USB:
-                    state.addEvent(new Event(getEventId(), intent.getAction(), "USB power supply"));
+                    state.addEvent(new Event(getEventId(), intent.getAction(), "USB"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_AC:
-                    state.addEvent(new Event(getEventId(), intent.getAction(), "AC power supply"));
+                    state.addEvent(new Event(getEventId(), intent.getAction(), "AC"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_WIRELESS:
-                    state.addEvent(new Event(getEventId(), intent.getAction(), "Wireless power supply"));
+                    state.addEvent(new Event(getEventId(), intent.getAction(), "WIRELESS"));
                     break;
             }
             commit(state.delay);

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TestApp</string>
+    <string name="app_name">SimpleMVP</string>
     <string name="app_error">Error</string>
     <string name="main_menu_search">Search</string>
     <string name="action_settings">Settings</string>
