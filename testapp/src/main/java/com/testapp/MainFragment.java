@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -20,6 +21,7 @@ import com.simplemvp.view.MvpFragment;
 
 
 public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {
+    private InputMethodManager imm;
     private Button showToast;
     private Button showSnackBar;
     private EditText toastText;
@@ -42,6 +44,12 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     @Override
     public int getLayoutId() {
         return R.layout.fragment_main;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     @Override
@@ -69,7 +77,10 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
                 ActionDuration.LongDuration, ActionDuration.ShortDuration}));
         expression.setText(state.expression);
         expression.addTextChangedListener(newTextWatcher(expression));
-        eval.setOnClickListener(getMvpListener());
+        eval.setOnClickListener(v -> {
+            imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+            getMvpListener().onClick(v);
+        });
         reqPermissions.setOnClickListener(v ->
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0));
     }
