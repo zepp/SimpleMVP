@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.view;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.testapp.R;
+import com.testapp.common.Event;
+import com.testapp.common.EventType;
 
 import java.util.Collections;
 import java.util.List;

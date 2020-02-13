@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.common;
 
 public enum EventType {
     LIFECYCLE,

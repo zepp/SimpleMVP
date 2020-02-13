@@ -1,42 +1,44 @@
-package com.testapp;
+package com.testapp.presenter;
 
 import com.simplemvp.common.MvpState;
+import com.testapp.common.ActionDuration;
+import com.testapp.common.Event;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainState extends MvpState {
-    List<Event> events = new ArrayList<>();
-    long delay;
-    String text = "";
-    ActionDuration duration = ActionDuration.LongDuration;
-    boolean isSubscribedToConnectivity;
-    boolean isSubscribedToPowerSupply;
-    String searchPattern = "";
-    boolean isWriteGranted;
-    String expression = "";
-    int currentPage;
+    public List<Event> events = new ArrayList<>();
+    public long delay;
+    public String text = "";
+    public ActionDuration duration = ActionDuration.LongDuration;
+    public boolean isSubscribedToConnectivity;
+    public boolean isSubscribedToPowerSupply;
+    public String searchPattern = "";
+    public boolean isWriteGranted;
+    public String expression = "";
+    public int currentPage;
 
-    void setText(String text) {
+    public void setText(String text) {
         setChanged(!this.text.equals(text));
         this.text = text;
     }
 
-    void addEvent(Event event) {
+    public void addEvent(Event event) {
         setChanged(true);
         events.add(event);
     }
 
-    void removeEvent(Event event) {
+    public void removeEvent(Event event) {
         setChanged(events.remove(event));
     }
 
-    void clearEvents() {
+    public void clearEvents() {
         setChanged(true);
         events.clear();
     }
 
-    List<Event> getFilteredEvents() {
+    public List<Event> getFilteredEvents() {
         if (searchPattern.isEmpty()) {
             return events;
         }
@@ -49,42 +51,42 @@ public class MainState extends MvpState {
         return result;
     }
 
-    void setSubscribedToConnectivity(boolean subscribedToConnectivity) {
+    public void setSubscribedToConnectivity(boolean subscribedToConnectivity) {
         setChanged(isSubscribedToConnectivity != subscribedToConnectivity);
         isSubscribedToConnectivity = subscribedToConnectivity;
     }
 
-    void setSubscribedToPowerSupply(boolean subscribedToPowerSupply) {
+    public void setSubscribedToPowerSupply(boolean subscribedToPowerSupply) {
         setChanged(isSubscribedToPowerSupply != subscribedToPowerSupply);
         isSubscribedToPowerSupply = subscribedToPowerSupply;
     }
 
-    void setDuration(ActionDuration duration) {
+    public void setDuration(ActionDuration duration) {
         setChanged(!this.duration.equals(duration));
         this.duration = duration;
     }
 
-    void setDelay(long delay) {
+    public void setDelay(long delay) {
         setChanged(this.delay != delay);
         this.delay = delay;
     }
 
-    void setSearchPattern(String value) {
+    public void setSearchPattern(String value) {
         setChanged(!searchPattern.equals(value));
         this.searchPattern = value;
     }
 
-    void setWriteGranted(boolean writeGranted) {
+    public void setWriteGranted(boolean writeGranted) {
         setChanged(isWriteGranted != writeGranted);
         isWriteGranted = writeGranted;
     }
 
-    void setExpression(String expression) {
+    public void setExpression(String expression) {
         setChanged(!this.expression.equals(expression));
         this.expression = expression;
     }
 
-    void setCurrentPage(int currentPage) {
+    public void setCurrentPage(int currentPage) {
         setChanged(this.currentPage != currentPage);
         this.currentPage = currentPage;
     }

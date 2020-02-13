@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.view;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,11 +16,14 @@ import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpActivity;
+import com.testapp.R;
+import com.testapp.presenter.MainPresenter;
+import com.testapp.presenter.MainPresenterImpl;
+import com.testapp.presenter.MainState;
 
-public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState> {
+public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     private InputMethodManager imm;
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -39,8 +42,8 @@ public class MainActivity extends MvpActivity<MvpPresenter<MainState>, MainState
     }
 
     @Override
-    public MvpPresenter<MainState> onInitPresenter(MvpPresenterManager manager) {
-        return manager.newPresenterInstance(MainPresenter.class, MainState.class);
+    public MainPresenter onInitPresenter(MvpPresenterManager manager) {
+        return manager.newPresenterInstance(MainPresenterImpl.class, MainState.class);
     }
 
     @Override

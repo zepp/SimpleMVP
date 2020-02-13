@@ -1,9 +1,9 @@
-package com.testapp;
+package com.testapp.common;
 
 import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
-enum ActionDuration {
+public enum ActionDuration {
     LongDuration(Toast.LENGTH_LONG, Snackbar.LENGTH_LONG, "Long"),
     ShortDuration(Toast.LENGTH_SHORT, Snackbar.LENGTH_SHORT, "Short");
 
@@ -15,6 +15,14 @@ enum ActionDuration {
         this.toastDuration = duration;
         this.snackBarDuration = snackBarDuration;
         this.description = description;
+    }
+
+    public int getToastDuration() {
+        return toastDuration;
+    }
+
+    public int getSnackBarDuration() {
+        return snackBarDuration;
     }
 
     @Override

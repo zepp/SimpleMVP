@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.presenter;
 
 // https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form
 class MathExpression {

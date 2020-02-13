@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.view;
 
 
 import android.Manifest;
@@ -19,6 +19,9 @@ import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpEditText;
 import com.simplemvp.view.MvpFragment;
+import com.testapp.R;
+import com.testapp.common.ActionDuration;
+import com.testapp.presenter.MainState;
 
 
 public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {

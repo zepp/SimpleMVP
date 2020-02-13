@@ -1,18 +1,18 @@
-package com.testapp;
+package com.testapp.common;
 
 import java.util.Date;
 
-class Event {
-    final String threadMain = Thread.currentThread().getName();
-    final Date timestamp = new Date();
-    final EventType type;
-    final int id;
-    final String handler;
-    final int view;
-    final String broadcast;
-    final String info;
+public class Event {
+    public final String threadMain = Thread.currentThread().getName();
+    public final Date timestamp = new Date();
+    public final EventType type;
+    public final int id;
+    public final String handler;
+    public final int view;
+    public final String broadcast;
+    public final String info;
 
-    Event(EventType type, int id, String handler, int view) {
+    public Event(EventType type, int id, String handler, int view) {
         this.type = type;
         this.id = id;
         this.handler = handler;
@@ -21,7 +21,7 @@ class Event {
         this.info = null;
     }
 
-    Event(int id, String handler, int view) {
+    public Event(int id, String handler, int view) {
         this.type = EventType.UI;
         this.id = id;
         this.handler = handler;
@@ -30,7 +30,7 @@ class Event {
         this.info = null;
     }
 
-    Event(int id, String broadcast, String info) {
+    public Event(int id, String broadcast, String info) {
         this.type = EventType.BROADCAST;
         this.id = id;
         this.handler = "onBroadcastReceived";

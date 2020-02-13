@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.view;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,10 +9,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 
-import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.view.MvpDialogFragment;
+import com.testapp.R;
+import com.testapp.presenter.MainPresenter;
+import com.testapp.presenter.MainState;
 
-public class SettingsDialog extends MvpDialogFragment<MvpPresenter<MainState>, MainState> {
+public class SettingsDialog extends MvpDialogFragment<MainPresenter, MainState> {
     private SeekBar delay;
     private SwitchCompat connectivity;
     private SwitchCompat powerSupply;

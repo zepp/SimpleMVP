@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.presenter;
 
 import android.Manifest;
 import android.content.Context;
@@ -13,17 +13,21 @@ import android.support.v4.content.ContextCompat;
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpBasePresenter;
+import com.testapp.R;
+import com.testapp.common.ActionDuration;
+import com.testapp.common.Event;
+import com.testapp.view.SettingsDialog;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.testapp.EventType.UI;
+import static com.testapp.common.EventType.UI;
 
-public class MainPresenter extends MvpBasePresenter<MainState> {
+public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
     private final AtomicInteger lastEventId = new AtomicInteger();
     private final ConnectivityManager connectivityManager;
 
-    public MainPresenter(Context context, MainState state) {
+    public MainPresenterImpl(Context context, MainState state) {
         super(context, state);
         connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
@@ -71,9 +75,9 @@ public class MainPresenter extends MvpBasePresenter<MainState> {
             state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
         } else {
             if (viewId == R.id.show_toast) {
-                handle.showToast(state.text, state.duration.toastDuration);
+                handle.showToast(state.text, state.duration.getToastDuration());
             } else if (viewId == R.id.show_snackbar) {
-                handle.showSnackBar(state.text, state.duration.snackBarDuration);
+                handle.showSnackBar(state.text, state.duration.getSnackBarDuration());
             }
             state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
         }
