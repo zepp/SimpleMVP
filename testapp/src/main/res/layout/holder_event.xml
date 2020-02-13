@@ -33,9 +33,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/event_delete"
             app:layout_constraintStart_toEndOf="@id/event_id"
-            android:textStyle="bold"
             app:layout_constraintTop_toTopOf="@+id/event_id"
             tools:text="OnTextChanged" />
 
@@ -65,10 +65,9 @@
 
         <ImageButton
             android:id="@+id/event_delete"
+            style="@style/OvalImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:padding="8dp"
             android:src="@drawable/ic_trashcan"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
