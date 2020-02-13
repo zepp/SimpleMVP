@@ -3,7 +3,7 @@ package com.testapp.common;
 import java.util.Date;
 
 public class Event {
-    public final String threadMain = Thread.currentThread().getName();
+    public final String thread = Thread.currentThread().getName();
     public final Date timestamp = new Date();
     public final EventType type;
     public final int id;

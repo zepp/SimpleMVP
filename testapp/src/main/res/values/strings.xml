@@ -17,4 +17,9 @@
     <string name="main_write_perms">Write external storage</string>
     <string name="main_custom_handler_title">Custom handler</string>
     <string name="main_custom_handler">Invoke</string>
+    <string name="info_timestamp">time</string>
+    <string name="info_thread">thread</string>
+    <string name="info_view">view</string>
+    <string name="info_broadcast">broadcast</string>
+    <string name="info_broadcast_info">info</string>
 </resources>

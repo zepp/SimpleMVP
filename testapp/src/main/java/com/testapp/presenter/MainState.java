@@ -51,6 +51,15 @@ public class MainState extends MvpState {
         return result;
     }
 
+    public Event getEventById(int eventId) {
+        for (Event event : events) {
+            if (event.id == eventId) {
+                return event;
+            }
+        }
+        throw new RuntimeException("event is not found");
+    }
+
     public void setSubscribedToConnectivity(boolean subscribedToConnectivity) {
         setChanged(isSubscribedToConnectivity != subscribedToConnectivity);
         isSubscribedToConnectivity = subscribedToConnectivity;

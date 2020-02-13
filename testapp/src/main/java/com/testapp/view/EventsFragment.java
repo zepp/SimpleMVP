@@ -46,8 +46,8 @@ public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
     @Override
     public void onFirstStateChange(MainState state) {
         super.onFirstStateChange(state);
-        eventsAdapter.setListener(event ->
-                presenter.onItemSelected(getViewHandle(), events.getId(), event));
+        eventsAdapter.setListener(pair ->
+                presenter.onItemSelected(getViewHandle(), pair.first.getId(), pair.second));
         events.setAdapter(eventsAdapter);
     }
 

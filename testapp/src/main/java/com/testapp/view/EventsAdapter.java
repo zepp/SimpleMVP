@@ -3,6 +3,7 @@ package com.testapp.view;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Consumer;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,7 @@ import java.util.List;
 class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
     private final Resources resources;
     private List<Event> events = Collections.emptyList();
-    private Consumer<Event> listener;
+    private Consumer<Pair<View, Event>> listener;
 
     EventsAdapter(Resources resources) {
         this.resources = resources;
@@ -34,7 +35,7 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
         notifyDataSetChanged();
     }
 
-    void setListener(Consumer<Event> listener) {
+    void setListener(Consumer<Pair<View, Event>> listener) {
         this.listener = listener;
     }
 
@@ -61,19 +62,19 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
     }
 
     public final class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final View view;
         private final TextView id;
         private final TextView handler;
         private final TextView source;
-        private final TextView info;
         private final ImageButton delete;
         private Event event;
 
         EventHolder(@NonNull View itemView) {
             super(itemView);
+            view = itemView;
             id = itemView.findViewById(R.id.event_id);
             handler = itemView.findViewById(R.id.event_handler);
             source = itemView.findViewById(R.id.event_source);
-            info = itemView.findViewById(R.id.event_info);
             delete = itemView.findViewById(R.id.event_delete);
         }
 
@@ -83,18 +84,16 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
             handler.setText(event.handler);
             if (event.type == EventType.LIFECYCLE || event.type == EventType.UI) {
                 source.setText(resources.getResourceEntryName(event.view));
-                info.setVisibility(View.GONE);
             } else {
                 source.setText(event.broadcast);
-                info.setVisibility(View.VISIBLE);
-                info.setText(event.info);
             }
             delete.setOnClickListener(this);
+            view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            listener.accept(event);
+            listener.accept(new Pair<>(view, event));
         }
     }
 }

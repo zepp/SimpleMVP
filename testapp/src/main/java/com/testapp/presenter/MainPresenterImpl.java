@@ -16,6 +16,7 @@ import com.simplemvp.presenter.MvpBasePresenter;
 import com.testapp.R;
 import com.testapp.common.ActionDuration;
 import com.testapp.common.Event;
+import com.testapp.view.EventInfoDialog;
 import com.testapp.view.SettingsDialog;
 
 import java.util.Map;
@@ -48,6 +49,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     protected void onViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onViewConnected(handle);
         state.addEvent(new Event(UI, getEventId(), "onViewConnected", handle.getLayoutId()));
+        commit(state.delay);
     }
 
     @Override
@@ -56,11 +58,13 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         super.onTextChanged(handle, viewId, text);
         if (viewId == R.id.main_search) {
             state.setSearchPattern(text.toLowerCase());
-        } else if (viewId == R.id.toast_text) {
-            state.setText(text);
+        } else {
             state.addEvent(new Event(getEventId(), "onTextChanged", viewId));
-        } else if (viewId == R.id.expression) {
-            state.setExpression(text.trim());
+            if (viewId == R.id.toast_text) {
+                state.setText(text);
+            } else if (viewId == R.id.expression) {
+                state.setExpression(text.trim());
+            }
         }
         commit(state.delay);
     }
@@ -79,8 +83,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             } else if (viewId == R.id.show_snackbar) {
                 handle.showSnackBar(state.text, state.duration.getSnackBarDuration());
             }
-            state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
         }
+        state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
         commit(state.delay);
     }
 
@@ -88,15 +92,17 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @MvpHandler
     public void onItemSelected(MvpViewHandle<MainState> handle, int viewId, Object item) {
         super.onItemSelected(handle, viewId, item);
-        if (viewId == R.id.events) {
+        if (viewId == R.id.event_delete) {
             state.removeEvent((Event) item);
         } else {
+            state.addEvent(new Event(getEventId(), "onItemSelected", viewId));
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
             } else if (viewId == R.id.view_pager) {
                 state.setCurrentPage((int) item);
+            } else if (viewId == R.id.event_layout) {
+                handle.showDialog(EventInfoDialog.newInstance(getId(), ((Event) item).id));
             }
-            state.addEvent(new Event(getEventId(), "onItemSelected", viewId));
         }
         commit(state.delay);
     }
@@ -124,10 +130,10 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @MvpHandler
     public void onOptionsItemSelected(MvpViewHandle<MainState> handle, int itemId) {
         super.onOptionsItemSelected(handle, itemId);
+        state.addEvent(new Event(getEventId(), "onOptionsItemSelected", itemId));
         if (itemId == R.id.action_settings) {
             handle.showDialog(SettingsDialog.newInstance(getId()));
         }
-        state.addEvent(new Event(getEventId(), "onOptionsItemSelected", itemId));
         commit(state.delay);
     }
 
@@ -141,6 +147,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
+    @MvpHandler
     public void onRequestPermissionsResult(MvpViewHandle<MainState> handle, int requestCode, Map<String, Integer> permissions) {
         super.onRequestPermissionsResult(handle, requestCode, permissions);
         state.addEvent(new Event(getEventId(), "onRequestPermissionsResult", handle.getLayoutId()));

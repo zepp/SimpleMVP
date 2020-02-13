@@ -22,4 +22,8 @@
         <item name="android:padding">8dp</item>
     </style>
 
+    <style name="TextHeader" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>
