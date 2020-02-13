@@ -41,17 +41,12 @@ public class SettingsDialog extends MvpDialogFragment<MainPresenter, MainState> 
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onFirstStateChange(MainState state) {
+        super.onFirstStateChange(state);
         ok.setOnClickListener(view -> finish());
         connectivity.setOnCheckedChangeListener(getMvpListener());
         powerSupply.setOnCheckedChangeListener(getMvpListener());
         delay.setOnSeekBarChangeListener(getMvpListener());
-    }
-
-    @Override
-    public void onFirstStateChange(MainState state) {
-        super.onFirstStateChange(state);
         delay.setProgress((int) state.delay / 100);
     }
 
