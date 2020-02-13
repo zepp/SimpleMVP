@@ -1,6 +1,10 @@
 package com.testapp;
 
+import java.util.Date;
+
 class Event {
+    final String threadMain = Thread.currentThread().getName();
+    final Date timestamp = new Date();
     final EventType type;
     final int id;
     final String handler;
