@@ -15,16 +15,16 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 
-import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpEditText;
 import com.simplemvp.view.MvpFragment;
 import com.testapp.R;
 import com.testapp.common.ActionDuration;
+import com.testapp.presenter.MainPresenter;
 import com.testapp.presenter.MainState;
 
 
-public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {
+public class MainFragment extends MvpFragment<MainPresenter, MainState> {
     private InputMethodManager imm;
     private Button showToast;
     private Button showSnackBar;
@@ -34,6 +34,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     private ImageButton eval;
     private Button reqPermissions;
     private CheckBox writeGranted;
+    private Button invoke;
 
     public MainFragment() {
         // Required empty public constructor
@@ -67,6 +68,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         eval = view.findViewById(R.id.eval);
         reqPermissions = view.findViewById(R.id.request_permissions);
         writeGranted = view.findViewById(R.id.write_granted);
+        invoke = view.findViewById(R.id.custom_handler_invoke);
     }
 
     @Override
@@ -87,6 +89,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
         });
         reqPermissions.setOnClickListener(v ->
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0));
+        invoke.setOnClickListener(v -> presenter.customHandler(getViewHandle(), v.getId()));
     }
 
     @Override
@@ -99,7 +102,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     }
 
     @Override
-    public MvpPresenter<MainState> onInitPresenter(MvpPresenterManager manager) {
+    public MainPresenter onInitPresenter(MvpPresenterManager manager) {
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 

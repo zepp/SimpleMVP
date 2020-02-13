@@ -149,6 +149,13 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
+    @MvpHandler(executor = false)
+    public void customHandler(MvpViewHandle<MainState> handle, int viewId) {
+        state.addEvent(new Event(getEventId(), "customHandler", viewId));
+        commit(state.delay);
+    }
+
+    @Override
     protected void onBroadcastReceived(Intent intent) {
         super.onBroadcastReceived(intent);
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
