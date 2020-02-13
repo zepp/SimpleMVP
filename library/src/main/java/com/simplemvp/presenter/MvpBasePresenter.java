@@ -316,7 +316,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         try {
             return (S) state.clone();
         } catch (CloneNotSupportedException e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
