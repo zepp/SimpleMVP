@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import com.simplemvp.common.MvpPresenter;
@@ -27,7 +28,7 @@ public class MainFragment extends MvpFragment<MvpPresenter<MainState>, MainState
     private EditText toastText;
     private Spinner durationSpinner;
     private MvpEditText expression;
-    private Button eval;
+    private ImageButton eval;
     private Button reqPermissions;
     private CheckBox writeGranted;
 

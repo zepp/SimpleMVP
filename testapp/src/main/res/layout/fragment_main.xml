@@ -7,160 +7,149 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:padding="8dp">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
+        <android.support.constraint.Guideline
+            android:id="@+id/guide_start"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/margin_start" />
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/toast_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="32dp"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    app:layout_constraintEnd_toStartOf="@id/duration_spinner"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Name" />
-
-                <Spinner
-                    android:id="@+id/duration_spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="24dp"
-                    app:layout_constraintBottom_toBottomOf="@id/toast_text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/toast_text"
-                    app:layout_constraintTop_toTopOf="@+id/toast_text" />
-
-                <Button
-                    android:id="@+id/show_toast"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:layout_marginBottom="16dp"
-                    android:text="@string/main_toast"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/toast_text"
-                    app:layout_constraintTop_toBottomOf="@id/toast_text" />
-
-                <Button
-                    android:id="@+id/show_snackbar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:text="@string/main_snackbar"
-                    app:layout_constraintStart_toEndOf="@id/show_toast"
-                    app:layout_constraintTop_toTopOf="@id/show_toast" />
-
-            </android.support.constraint.ConstraintLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
+        <android.support.constraint.Guideline
+            android:id="@+id/guide_end"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/margin_end" />
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/expression_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="24dp"
-                    android:text="@string/main_expression"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.simplemvp.view.MvpEditText
-                    android:id="@+id/expression"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:singleLine="true"
-                    app:layout_constraintEnd_toEndOf="@+id/expression_title"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="@id/expression_title"
-                    app:layout_constraintTop_toBottomOf="@id/expression_title" />
-
-                <Button
-                    android:id="@+id/eval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:text="@string/main_eval"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/expression"
-                    app:layout_constraintTop_toBottomOf="@id/expression" />
-
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/toast_text"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
+            android:layout_marginTop="@dimen/margin_top"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toStartOf="@id/duration_spinner"
+            app:layout_constraintStart_toStartOf="@+id/guide_start"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Name" />
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <Spinner
+            android:id="@+id/duration_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="@id/toast_text"
+            app:layout_constraintEnd_toStartOf="@+id/guide_end"
+            app:layout_constraintStart_toEndOf="@+id/toast_text"
+            app:layout_constraintTop_toTopOf="@+id/toast_text" />
 
-                <TextView
-                    android:id="@+id/permission_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="24dp"
-                    android:text="@string/main_permissions"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/show_toast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/main_toast"
+            app:layout_constraintStart_toStartOf="@+id/guide_start"
+            app:layout_constraintTop_toBottomOf="@id/toast_text" />
 
-                <Button
-                    android:id="@+id/request_permissions"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/main_perm_request"
-                    app:layout_constraintStart_toStartOf="@id/permission_title"
-                    app:layout_constraintTop_toBottomOf="@id/permission_title" />
+        <Button
+            android:id="@+id/show_snackbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:text="@string/main_snackbar"
+            app:layout_constraintStart_toEndOf="@id/show_toast"
+            app:layout_constraintTop_toTopOf="@id/show_toast" />
 
-                <CheckBox
-                    android:id="@+id/write_granted"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:enabled="false"
-                    android:text="@string/main_write_perms"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/request_permissions"
-                    app:layout_constraintTop_toBottomOf="@+id/request_permissions" />
+        <View
+            android:id="@+id/separator_1"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_top"
+            android:background="@drawable/gray_rectangle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/show_toast" />
 
-            </android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/expression_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_top"
+            android:layout_marginEnd="24dp"
+            android:text="@string/main_expression"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guide_start"
+            app:layout_constraintTop_toBottomOf="@id/separator_1" />
 
-        </android.support.v7.widget.CardView>
+        <com.simplemvp.view.MvpEditText
+            android:id="@+id/expression"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:singleLine="true"
+            app:layout_constraintEnd_toStartOf="@+id/eval"
+            app:layout_constraintStart_toStartOf="@+id/guide_start"
+            app:layout_constraintTop_toBottomOf="@id/expression_title" />
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/eval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_chip"
+            android:text="@string/main_eval"
+            app:layout_constraintBottom_toBottomOf="@id/expression"
+            app:layout_constraintEnd_toStartOf="@+id/guide_end"
+            app:layout_constraintTop_toTopOf="@+id/expression" />
+
+        <View
+            android:id="@+id/separator_2"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_top"
+            android:background="@drawable/gray_rectangle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/expression" />
+
+        <TextView
+            android:id="@+id/permission_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_top"
+            android:text="@string/main_permissions"
+            app:layout_constraintEnd_toStartOf="@+id/guide_end"
+            app:layout_constraintStart_toStartOf="@+id/guide_start"
+            app:layout_constraintTop_toBottomOf="@id/separator_2" />
+
+        <Button
+            android:id="@+id/request_permissions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/main_perm_request"
+            app:layout_constraintStart_toStartOf="@+id/guide_start"
+            app:layout_constraintTop_toBottomOf="@id/permission_title" />
+
+        <CheckBox
+            android:id="@+id/write_granted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            android:text="@string/main_write_perms"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guide_start"
+            app:layout_constraintTop_toBottomOf="@+id/request_permissions" />
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.v4.widget.NestedScrollView>
