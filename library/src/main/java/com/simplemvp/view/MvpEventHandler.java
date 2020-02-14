@@ -10,8 +10,6 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -36,26 +34,18 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 class MvpEventHandler<S extends MvpState> extends ContextWrapper
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
-    private final static Thread mainThread = Looper.getMainLooper().getThread();
     private final static String tag = MvpEventHandler.class.getSimpleName();
     private final MvpView<S, ?> view;
     private final MvpPresenter<S> presenter;
@@ -277,11 +267,11 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         if (view instanceof AppCompatActivity) {
             ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
         } else {
-            Log.e(tag, "only activity can start activity for result");
+            throw new RuntimeException("only activity can start activity for result");
         }
     }
 
-    private boolean isResumed() {
+    boolean isResumed() {
         return isEnabled.get() && isResumed.get();
     }
 
@@ -289,11 +279,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         return isFirstStateChange.getAndSet(false);
     }
 
-    private static boolean isMainThread(Thread thread) {
-        return mainThread.equals(thread);
-    }
-
-    private void postEvent(Callable<?> event) {
+    void postEvent(Callable<?> event) {
         events.add(event);
     }
 
@@ -310,67 +296,6 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     private MvpViewHandle<S> newProxy() {
         return (MvpViewHandle<S>) Proxy.newProxyInstance(getClass().getClassLoader(),
-                new Class<?>[]{MvpViewHandle.class}, new MvpProxyHandler(this, presenter));
-    }
-
-    private static class MvpProxyHandler<S extends MvpState> implements InvocationHandler {
-        private final WeakReference<MvpEventHandler<S>> eventHandler;
-        private final Set<Method> annotatedMethods;
-        private final MvpPresenter<S> presenter;
-        private final Handler handler;
-        private final int layoutId;
-
-        MvpProxyHandler(MvpEventHandler<S> eventHandler, MvpPresenter<S> presenter) {
-            this.eventHandler = new WeakReference<>(eventHandler);
-            this.presenter = presenter;
-            annotatedMethods = Collections.synchronizedSet(getAnnotatedMethods(eventHandler));
-            handler = new Handler(Looper.getMainLooper());
-            layoutId = eventHandler.getLayoutId();
-        }
-
-        private Set<Method> getAnnotatedMethods(MvpViewHandle<S> view) {
-            Set<Method> result = new TreeSet<>((o1, o2) -> o1.getName().compareTo(o2.getName()));
-            for (Method method : view.getClass().getMethods()) {
-                if (method.getAnnotation(MvpHandler.class) != null) {
-                    result.add(method);
-                }
-            }
-            return result;
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            MvpEventHandler<S> eventHandler = this.eventHandler.get();
-            if (eventHandler == null) {
-                presenter.disconnect(layoutId);
-                return null;
-            } else {
-                if (annotatedMethods.contains(method)) {
-                    if (isMainThread(Thread.currentThread())) {
-                        return invoke(eventHandler, method, args);
-                    } else {
-                        handler.post(() -> {
-                            try {
-                                invoke(eventHandler, method, args);
-                            } catch (Exception e) {
-                                Log.e(tag, "error: ", e);
-                            }
-                        });
-                        return null;
-                    }
-                } else {
-                    return method.invoke(eventHandler, args);
-                }
-            }
-        }
-
-        private Object invoke(MvpEventHandler<S> handler, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
-            if (handler.isResumed()) {
-                return method.invoke(handler, args);
-            } else {
-                handler.postEvent(() -> method.invoke(handler, args));
-                return null;
-            }
-        }
+                new Class<?>[]{MvpViewHandle.class}, new ProxyHandler(this, presenter));
     }
 }
