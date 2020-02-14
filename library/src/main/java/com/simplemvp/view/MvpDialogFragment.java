@@ -134,8 +134,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     @Override
     public P onInitPresenter(MvpPresenterManager manager) {
         if (getArguments() == null) {
-            Log.w(tag, "presenter ID is not supplied");
-            return null;
+            throw new RuntimeException("presenter ID is not supplied");
         } else {
             return manager.getPresenterInstance(getPresenterId(getArguments()));
         }
