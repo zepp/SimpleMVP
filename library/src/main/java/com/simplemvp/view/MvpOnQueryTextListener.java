@@ -1,6 +1,5 @@
 package com.simplemvp.view;
 
-import android.support.annotation.IdRes;
 import android.support.v7.widget.SearchView;
 
 import com.simplemvp.common.MvpPresenter;
@@ -18,13 +17,12 @@ import com.simplemvp.common.MvpViewHandle;
 class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTextListener {
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
-    @IdRes
-    private final int viewId;
+    private final SearchView view;
 
-    MvpOnQueryTextListener(MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
+    MvpOnQueryTextListener(MvpViewHandle<S> handle, MvpPresenter<S> presenter, SearchView view) {
         this.handle = handle;
         this.presenter = presenter;
-        this.viewId = viewId;
+        this.view = view;
     }
 
     @Override
@@ -34,7 +32,7 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextChange(String s) {
-        presenter.onTextChanged(handle, viewId, s);
+        presenter.onTextChanged(handle, view.getId(), s);
         return false;
     }
 }

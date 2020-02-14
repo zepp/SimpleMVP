@@ -12,6 +12,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 
 import com.simplemvp.presenter.MvpPresenterManager;
 
@@ -114,10 +115,10 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
      * This method returns new {@link android.text.TextWatcher TextWatcher} for provided view to
      * handle text change.
      *
-     * @param view view that supports {@link android.text.TextWatcher TextWatcher} callback
+     * @param view {@link EditText} instance
      * @return new listener instance
      */
-    TextWatcher newTextWatcher(View view);
+    TextWatcher newTextWatcher(EditText view);
 
     /**
      * This method return new {@link android.support.v7.widget.SearchView.OnQueryTextListener OnQueryTextListener}

@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -59,7 +60,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private final MvpView<S, ?> view;
     private final MvpPresenter<S> presenter;
     private final Queue<Callable<?>> events = new LinkedList<>();
-    private final List<TextWatcher> textWatchers = new ArrayList<>();
+    private final List<MvpTextWatcher<S>> textWatchers = new ArrayList<>();
     private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
     private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
     private final AtomicBoolean isEnabled = new AtomicBoolean();
@@ -83,6 +84,10 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     public void onPaused() {
         isResumed.set(false);
         isFirstStateChange.set(true);
+        for (MvpTextWatcher<S> watcher : textWatchers) {
+            watcher.unregister();
+        }
+        textWatchers.clear();
     }
 
     private void onEnabledResumed() {
@@ -185,16 +190,16 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     }
 
-    TextWatcher newTextWatcher(View view) {
+    TextWatcher newTextWatcher(EditText view) {
         Log.d(tag, "new text watcher for view: " + view);
-        TextWatcher watcher = new MvpTextWatcher<>(getProxy(), presenter, view.getId());
+        MvpTextWatcher<S> watcher = new MvpTextWatcher<>(getProxy(), presenter, view);
         textWatchers.add(watcher);
         return watcher;
     }
 
     SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
         Log.d(tag, "new query text listener for view: " + view);
-        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view.getId());
+        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view);
         queryTextListeners.add(listener);
         return listener;
     }
