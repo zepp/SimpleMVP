@@ -1,8 +1,8 @@
 package com.simplemvp.view;
 
-import android.support.annotation.IdRes;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.widget.EditText;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
@@ -19,13 +19,12 @@ import com.simplemvp.common.MvpViewHandle;
 class MvpTextWatcher<S extends MvpState> implements TextWatcher {
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
-    @IdRes
-    private final int viewId;
+    private final EditText view;
 
-    MvpTextWatcher(MvpViewHandle<S> handle, MvpPresenter<S> presenter, int viewId) {
+    MvpTextWatcher(MvpViewHandle<S> handle, MvpPresenter<S> presenter, EditText view) {
         this.handle = handle;
         this.presenter = presenter;
-        this.viewId = viewId;
+        this.view = view;
     }
 
     @Override
@@ -40,6 +39,10 @@ class MvpTextWatcher<S extends MvpState> implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable s) {
-        presenter.onTextChanged(handle, viewId, s.toString());
+        presenter.onTextChanged(handle, view.getId(), s.toString());
+    }
+
+    void unregister() {
+        view.removeTextChangedListener(this);
     }
 }

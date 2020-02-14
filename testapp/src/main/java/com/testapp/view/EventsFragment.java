@@ -1,4 +1,4 @@
-package com.testapp;
+package com.testapp.view;
 
 
 import android.os.Bundle;
@@ -7,12 +7,17 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpFragment;
+import com.testapp.R;
+import com.testapp.common.Event;
+import com.testapp.presenter.MainPresenter;
+import com.testapp.presenter.MainState;
+
+import java.util.List;
 
 
-public class EventsFragment extends MvpFragment<MvpPresenter<MainState>, MainState> {
+public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
     private RecyclerView events;
     private EventsAdapter eventsAdapter;
 
@@ -41,18 +46,20 @@ public class EventsFragment extends MvpFragment<MvpPresenter<MainState>, MainSta
     @Override
     public void onFirstStateChange(MainState state) {
         super.onFirstStateChange(state);
-        eventsAdapter.setListener(event ->
-                presenter.onItemSelected(getViewHandle(), events.getId(), event));
+        eventsAdapter.setListener(pair ->
+                presenter.onItemSelected(getViewHandle(), pair.first.getId(), pair.second));
         events.setAdapter(eventsAdapter);
     }
 
     @Override
     public void onStateChanged(MainState state) {
-        eventsAdapter.setEvents(state.events);
+        List<Event> items = state.getFilteredEvents();
+        eventsAdapter.setEvents(items);
+        events.scrollToPosition(items.size() - 1);
     }
 
     @Override
-    public MvpPresenter<MainState> onInitPresenter(MvpPresenterManager manager) {
+    public MainPresenter onInitPresenter(MvpPresenterManager manager) {
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 }

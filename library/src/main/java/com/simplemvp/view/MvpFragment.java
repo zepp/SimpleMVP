@@ -20,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
@@ -124,7 +125,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
-    public TextWatcher newTextWatcher(View view) {
+    public TextWatcher newTextWatcher(EditText view) {
         return eventHandler.newTextWatcher(view);
     }
 

@@ -10,5 +10,5 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="parent"
-    tools:context=".MainActivity"
+    tools:context=".view.MainActivity"
     tools:listitem="@layout/holder_event" />

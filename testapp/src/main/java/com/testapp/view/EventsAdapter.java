@@ -1,7 +1,9 @@
-package com.testapp;
+package com.testapp.view;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Consumer;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,17 +11,23 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.testapp.R;
+import com.testapp.common.Event;
+import com.testapp.common.EventType;
+
 import java.util.Collections;
 import java.util.List;
 
 class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
     private final Resources resources;
     private List<Event> events = Collections.emptyList();
-    private ItemClickListener listener;
+    private Consumer<Pair<View, Event>> listener;
 
     EventsAdapter(Resources resources) {
         this.resources = resources;
         setHasStableIds(true);
+        listener = event -> {
+        };
     }
 
     void setEvents(List<Event> events) {
@@ -27,9 +35,8 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
         notifyDataSetChanged();
     }
 
-    void setListener(ItemClickListener listener) {
+    void setListener(Consumer<Pair<View, Event>> listener) {
         this.listener = listener;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -54,42 +61,39 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
         return events.get(position).id;
     }
 
-    interface ItemClickListener {
-        void onItemClicked(Event event);
-    }
-
     public final class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final View view;
         private final TextView id;
-        private final TextView type;
-        private final TextView view;
+        private final TextView handler;
+        private final TextView source;
         private final ImageButton delete;
         private Event event;
 
         EventHolder(@NonNull View itemView) {
             super(itemView);
+            view = itemView;
             id = itemView.findViewById(R.id.event_id);
-            type = itemView.findViewById(R.id.event_type);
-            view = itemView.findViewById(R.id.event_view);
+            handler = itemView.findViewById(R.id.event_handler);
+            source = itemView.findViewById(R.id.event_source);
             delete = itemView.findViewById(R.id.event_delete);
         }
 
         void bind(Event event) {
             this.event = event;
             id.setText(String.valueOf(event.id));
-            type.setText(event.type);
-            if (event.view == 0) {
-                view.setText("-");
+            handler.setText(event.handler);
+            if (event.type == EventType.LIFECYCLE || event.type == EventType.UI) {
+                source.setText(resources.getResourceEntryName(event.view));
             } else {
-                view.setText(resources.getResourceEntryName(event.view));
+                source.setText(event.broadcast);
             }
             delete.setOnClickListener(this);
+            view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            if (listener != null) {
-                listener.onItemClicked(event);
-            }
+            listener.accept(new Pair<>(view, event));
         }
     }
 }
