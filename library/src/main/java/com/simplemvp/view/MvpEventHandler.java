@@ -51,7 +51,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private final MvpPresenter<S> presenter;
     private final Queue<Callable<?>> events = new LinkedList<>();
     private final List<MvpTextWatcher<S>> textWatchers = new ArrayList<>();
-    private final List<SearchView.OnQueryTextListener> queryTextListeners = new ArrayList<>();
+    private final List<MvpOnQueryTextListener<S>> queryTextListeners = new ArrayList<>();
     private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
@@ -78,6 +78,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
             watcher.unregister();
         }
         textWatchers.clear();
+        queryTextListeners.clear();
     }
 
     private void onEnabledResumed() {
@@ -189,7 +190,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
         Log.d(tag, "new query text listener for view: " + view);
-        SearchView.OnQueryTextListener listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view);
+        MvpOnQueryTextListener<S> listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view);
         queryTextListeners.add(listener);
         return listener;
     }
