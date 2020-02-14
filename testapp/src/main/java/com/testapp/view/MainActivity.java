@@ -24,6 +24,8 @@ import com.testapp.presenter.MainPresenterImpl;
 import com.testapp.presenter.MainState;
 
 public class MainActivity extends MvpActivity<MainPresenter, MainState> {
+    private final static int FRAGMENT_MAIN = 0;
+    private final static int FRAGMENT_EVENTS = 1;
     private InputMethodManager imm;
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -59,7 +61,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         clearAll = findViewById(R.id.clear_all);
         viewPager.addOnPageChangeListener(new OnPageSelected(i -> {
             presenter.onItemSelected(getViewHandle(), viewPager.getId(), i);
-            if (i == 1) {
+            if (i == FRAGMENT_EVENTS) {
                 imm.hideSoftInputFromWindow(getView().getApplicationWindowToken(), 0);
             }
         }));
@@ -73,7 +75,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
     @Override
     public void onStateChanged(MainState state) {
-        search.setVisibility(state.currentPage == 0 ? View.GONE : View.VISIBLE);
+        search.setVisibility(state.currentPage == FRAGMENT_MAIN ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -90,7 +92,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
         @Override
         public Fragment getItem(int i) {
-            if (i == 0) {
+            if (i == FRAGMENT_MAIN) {
                 return MainFragment.newInstance(getPresenter().getId());
             } else {
                 return EventsFragment.newInstance(getPresenter().getId());
@@ -100,10 +102,10 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
-            if (position == 0) {
-                return "main";
+            if (position == FRAGMENT_MAIN) {
+                return getString(R.string.fragment_main);
             } else {
-                return "events";
+                return getString(R.string.fragment_events);
             }
         }
 
