@@ -73,6 +73,10 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPaused() {
         isResumed.set(false);
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onStopped() {
         isFirstStateChange.set(true);
         for (MvpTextWatcher<S> watcher : textWatchers) {
             watcher.unregister();
