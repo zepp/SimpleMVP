@@ -48,7 +48,9 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @Override
     protected void onViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onViewConnected(handle);
-        state.addEvent(new Event(UI, getEventId(), "onViewConnected", handle.getLayoutId()));
+        if (handle.getLayoutId() != R.layout.dialog_event_info) {
+            state.addEvent(new Event(UI, getEventId(), "onViewConnected", handle.getLayoutId()));
+        }
     }
 
     @Override
@@ -75,6 +77,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         if (viewId == R.id.clear_all) {
             state.clearEvents();
         } else {
+            state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
             if (viewId == R.id.show_toast) {
                 handle.showToast(state.text, state.duration.getToastDuration());
             } else if (viewId == R.id.show_snackbar) {
@@ -84,7 +87,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             } else if (viewId == R.id.action_settings) {
                 handle.showDialog(SettingsDialog.newInstance(getId()));
             }
-            state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
         }
         commit(state.delay);
     }
@@ -95,14 +97,14 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         super.onItemSelected(handle, viewId, item);
         if (viewId == R.id.event_delete) {
             state.removeEvent((Event) item);
+        } else if (viewId == R.id.event_layout) {
+            handle.showDialog(EventInfoDialog.newInstance(getId(), ((Event) item).id));
         } else {
             state.addEvent(new Event(getEventId(), "onItemSelected", viewId));
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
             } else if (viewId == R.id.view_pager) {
                 state.setCurrentPage((int) item);
-            } else if (viewId == R.id.event_layout) {
-                handle.showDialog(EventInfoDialog.newInstance(getId(), ((Event) item).id));
             }
         }
         commit(state.delay);
@@ -162,7 +164,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             } else {
                 state.addEvent(new Event(getEventId(), intent.getAction(), info.getTypeName()));
             }
-            commit(state.delay);
         } else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
             switch (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)) {
                 case BatteryManager.BATTERY_PLUGGED_USB:
@@ -175,7 +176,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                     state.addEvent(new Event(getEventId(), intent.getAction(), "WIRELESS"));
                     break;
             }
-            commit(state.delay);
         }
+        commit(state.delay);
     }
 }
