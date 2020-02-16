@@ -78,7 +78,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                             onFirstViewConnected(handle);
                         }
                         onViewConnected(handle);
-                        commit();
+                        handle.post(cloneState());
                     }
                 } catch (Exception e) {
                     errorHandler.accept(e);

@@ -50,6 +50,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         super.onViewConnected(handle);
         if (handle.getLayoutId() != R.layout.dialog_event_info) {
             state.addEvent(new Event(UI, getEventId(), "onViewConnected", handle.getLayoutId()));
+            commit();
         }
     }
 
