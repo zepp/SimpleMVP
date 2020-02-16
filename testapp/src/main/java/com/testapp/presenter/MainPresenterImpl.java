@@ -100,12 +100,12 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             state.removeEvent((Event) item);
         } else if (viewId == R.id.event_layout) {
             handle.showDialog(EventInfoDialog.newInstance(getId(), ((Event) item).id));
+        } else if (viewId == R.id.view_pager) {
+            state.setCurrentPage((int) item);
         } else {
             state.addEvent(new Event(getEventId(), "onItemSelected", viewId));
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
-            } else if (viewId == R.id.view_pager) {
-                state.setCurrentPage((int) item);
             }
         }
         commit(state.delay);
@@ -175,6 +175,9 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                     break;
                 case BatteryManager.BATTERY_PLUGGED_WIRELESS:
                     state.addEvent(new Event(getEventId(), intent.getAction(), "WIRELESS"));
+                    break;
+                default:
+                    state.addEvent(new Event(getEventId(), intent.getAction(), "N/A"));
                     break;
             }
         }
