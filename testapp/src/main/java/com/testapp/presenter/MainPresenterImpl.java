@@ -83,7 +83,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             if (viewId == R.id.show_toast) {
                 handle.showToast(state.text, state.duration.getToastDuration());
             } else if (viewId == R.id.show_snackbar) {
-                handle.showSnackBar(state.text, state.duration.getSnackBarDuration());
+                handle.showSnackBar(state.text, state.duration.getSnackBarDuration(),
+                        getString(R.string.main_snackbar_action));
             } else if (viewId == R.id.eval) {
                 state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
             } else if (viewId == R.id.action_settings) {

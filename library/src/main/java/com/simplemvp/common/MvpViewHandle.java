@@ -75,9 +75,19 @@ public interface MvpViewHandle<S extends MvpState> {
      *
      * @param res      string ID to be shown
      * @param duration How long to display text. Either {@link android.support.design.widget.Snackbar#LENGTH_SHORT}
-     *                 *                 or {@link android.support.design.widget.Snackbar#LENGTH_LONG}
+     *                 or {@link android.support.design.widget.Snackbar#LENGTH_LONG}
      */
     void showSnackBar(@StringRes int res, int duration);
+
+    /**
+     * This method shows {@link android.support.design.widget.Snackbar} using root view as parent view
+     *
+     * @param text     string ID to be shown
+     * @param duration How long to display text. Either {@link android.support.design.widget.Snackbar#LENGTH_SHORT}
+     *                 or {@link android.support.design.widget.Snackbar#LENGTH_LONG}
+     * @param action   action title to be displayed
+     */
+    void showSnackBar(String text, int duration, String action);
 
     /**
      * This method starts new activity. It is a wrapper around {@link android.app.Activity#startActivity(Intent)}

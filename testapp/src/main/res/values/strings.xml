@@ -12,6 +12,7 @@
     <string name="settings_power_supply">Power supply</string>
     <string name="main_toast">toast</string>
     <string name="main_snackbar">snackbar</string>
+    <string name="main_snackbar_action">Ok</string>
     <string name="main_expression">Mathematical expression</string>
     <string name="main_eval">Evaluate</string>
     <string name="main_permissions">Permissions</string>

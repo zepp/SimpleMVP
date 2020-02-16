@@ -271,6 +271,17 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     @Override
     @MvpHandler
+    public void showSnackBar(String text, int duration, String action) {
+        Snackbar bar = Snackbar.make(view.getView(), text, duration);
+        bar.setAction(action, v -> {
+            bar.dismiss();
+            onClick(v);
+        });
+        bar.show();
+    }
+
+    @Override
+    @MvpHandler
     public void showToast(String text, int duration) {
         Toast.makeText(view.getContext(), text, duration).show();
     }
