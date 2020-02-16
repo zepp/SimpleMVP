@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpViewHandle;
@@ -152,6 +153,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @MvpHandler(executor = false)
     public void customHandler(MvpViewHandle<MainState> handle, int viewId) {
         state.addEvent(new Event(getEventId(), "customHandler", viewId));
+        handle.showToast(R.string.main_invoked, Toast.LENGTH_SHORT);
         commit(state.delay);
     }
 
