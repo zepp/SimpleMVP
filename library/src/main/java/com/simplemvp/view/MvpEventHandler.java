@@ -196,18 +196,13 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     }
 
     @Override
-    public MvpView<S, ?> getMvpView() {
-        return view;
-    }
-
-    @Override
     public int getLayoutId() {
         return view.getLayoutId();
     }
 
     @Override
     public Bundle getArguments() {
-        return view.getArguments() == null ? new Bundle() : view.getArguments();
+        return view.getArguments() == null ? new Bundle() : new Bundle(view.getArguments());
     }
 
     @Override

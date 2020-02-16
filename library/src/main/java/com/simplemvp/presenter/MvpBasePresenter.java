@@ -298,7 +298,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      */
     @CallSuper
     protected void onFirstViewConnected(MvpViewHandle<S> handle) throws Exception {
-        Log.d(tag, "onFirstViewConnected(" + handle.getMvpView() + ")");
+        Log.d(tag, "onFirstViewConnected(" + getResources().getResourceName(handle.getLayoutId()) + ")");
     }
 
     /**
@@ -308,7 +308,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      */
     @CallSuper
     protected void onViewConnected(MvpViewHandle<S> handle) throws Exception {
-        Log.d(tag, "onViewConnected(" + handle.getMvpView() + ")");
+        Log.d(tag, "onViewConnected(" + getResources().getResourceName(handle.getLayoutId()) + ")");
     }
 
     /**

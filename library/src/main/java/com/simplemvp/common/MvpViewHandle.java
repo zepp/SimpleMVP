@@ -17,13 +17,6 @@ import android.support.v4.app.DialogFragment;
 public interface MvpViewHandle<S extends MvpState> {
 
     /**
-     * Method to access {@link MvpView} reference.
-     *
-     * @return null or reference to real view
-     */
-    MvpView<S, ?> getMvpView();
-
-    /**
      * This method returns layout Id of real view
      *
      * @return layout ID
