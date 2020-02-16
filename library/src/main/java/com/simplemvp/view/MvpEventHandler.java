@@ -81,30 +81,10 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         queryTextListeners.clear();
     }
 
-    private void onEnabledResumed() {
-        if (isResumed()) {
-            if (events.isEmpty()) {
-                postLastState();
-            } else {
-                drainEvents();
-            }
-        }
-    }
-
     /**
-     * This method posts last saved state.
-     */
-    void postLastState() {
-        if (state != null) {
-            post(state);
-        }
-    }
-
-    /**
-     * This method enables or disables queue drain. State queue must not be drained in some cases
-     * since view is not ready to handle a state. If menu is not inflated for example.
+     * This method enables or disables event processing. Event is {@link MvpViewHandle} method call.
      *
-     * @param enabled true to enable queue drain, false to stop it
+     * @param enabled true to enable event processing
      * @return true if state is changed
      */
     boolean setEnabled(boolean enabled) {
@@ -115,11 +95,57 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         return isChanged;
     }
 
+    /**
+     * This method is called when view is resumed or event processing is enabled
+     */
+    private void onEnabledResumed() {
+        if (isResumed()) {
+            if (events.isEmpty()) {
+                postLastState();
+            } else {
+                drainEvents();
+            }
+        }
+    }
+
+    boolean isResumed() {
+        return isEnabled.get() && isResumed.get();
+    }
+
+    void postLastState() {
+        if (state != null) {
+            post(state);
+        }
+    }
+
+    private void drainEvents() {
+        try {
+            while (!events.isEmpty()) {
+                events.remove().call();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void postEvent(Callable<?> event) {
+        events.add(event);
+    }
+
+    private boolean isFirstStateChange() {
+        return isFirstStateChange.getAndSet(false);
+    }
+
     MvpViewHandle<S> getProxy() {
         if (proxy == null) {
             proxy = newProxy();
         }
         return proxy;
+    }
+
+    private MvpViewHandle<S> newProxy() {
+        return (MvpViewHandle<S>) Proxy.newProxyInstance(getClass().getClassLoader(),
+                new Class<?>[]{MvpViewHandle.class}, new ProxyHandler(this, presenter));
     }
 
     @Override
@@ -153,14 +179,6 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         presenter.onRadioCheckedChanged(getProxy(), group.getId(), checkedId);
     }
 
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Map<String, Integer> perms = new TreeMap<>();
-        for (int i = 0; i < permissions.length; i++) {
-            perms.put(permissions[i], grantResults[i]);
-        }
-        presenter.onRequestPermissionsResult(getProxy(), requestCode, perms);
-    }
-
     @Override
     public boolean onDrag(View v, DragEvent event) {
         presenter.onDrag(getProxy(), v.getId(), event);
@@ -179,6 +197,14 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Map<String, Integer> perms = new TreeMap<>();
+        for (int i = 0; i < permissions.length; i++) {
+            perms.put(permissions[i], grantResults[i]);
+        }
+        presenter.onRequestPermissionsResult(getProxy(), requestCode, perms);
     }
 
     TextWatcher newTextWatcher(EditText view) {
@@ -265,33 +291,5 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         } else {
             throw new RuntimeException("only activity can start activity for result");
         }
-    }
-
-    boolean isResumed() {
-        return isEnabled.get() && isResumed.get();
-    }
-
-    private boolean isFirstStateChange() {
-        return isFirstStateChange.getAndSet(false);
-    }
-
-    void postEvent(Callable<?> event) {
-        events.add(event);
-    }
-
-    private void drainEvents() {
-        try {
-            while (!events.isEmpty()) {
-                events.remove().call();
-            }
-        } catch (Exception e) {
-            events.clear();
-            Log.e(tag, "error: ", e);
-        }
-    }
-
-    private MvpViewHandle<S> newProxy() {
-        return (MvpViewHandle<S>) Proxy.newProxyInstance(getClass().getClassLoader(),
-                new Class<?>[]{MvpViewHandle.class}, new ProxyHandler(this, presenter));
     }
 }
