@@ -78,8 +78,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                             onFirstViewConnected(handle);
                         }
                         onViewConnected(handle);
-                        // post state after onViewConnected finished (state is initialized)
-                        handle.post(cloneState());
+                        commit();
                     }
                 } catch (Exception e) {
                     errorHandler.accept(e);
@@ -222,12 +221,6 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @Override
     public void onViewClicked(MvpViewHandle<S> handle, int viewId) {
         Log.d(tag, "onViewClicked(" + getResources().getResourceName(viewId) + ")");
-    }
-
-    @CallSuper
-    @Override
-    public void onOptionsItemSelected(MvpViewHandle<S> handle, int itemId) {
-        Log.d(tag, "onOptionsItemSelected(" + getResources().getResourceName(itemId) + ")");
     }
 
     @CallSuper

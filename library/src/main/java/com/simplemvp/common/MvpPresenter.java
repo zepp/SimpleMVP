@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.view.DragEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
@@ -93,14 +92,6 @@ public interface MvpPresenter<S extends MvpState> {
      * @param viewId view's ID
      */
     void onViewClicked(MvpViewHandle<S> handle, @IdRes int viewId);
-
-    /**
-     * This method has the same purpose as {@link android.app.Activity#onOptionsItemSelected(MenuItem)}
-     *
-     * @param handle {@link MvpViewHandle} interface that hides real view
-     * @param itemId menu item ID
-     */
-    void onOptionsItemSelected(MvpViewHandle<S> handle, @IdRes int itemId);
 
     /**
      * This method handles {@link android.widget.AdapterView.OnItemSelectedListener} callbacks and also

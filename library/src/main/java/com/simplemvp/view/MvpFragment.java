@@ -151,7 +151,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        presenter.onOptionsItemSelected(getViewHandle(), item.getItemId());
+        presenter.onViewClicked(getViewHandle(), item.getItemId());
         return true;
     }
 

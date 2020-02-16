@@ -49,7 +49,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     protected void onViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onViewConnected(handle);
         state.addEvent(new Event(UI, getEventId(), "onViewConnected", handle.getLayoutId()));
-        commit(state.delay);
     }
 
     @Override
@@ -75,16 +74,18 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         super.onViewClicked(handle, viewId);
         if (viewId == R.id.clear_all) {
             state.clearEvents();
-        } else if (viewId == R.id.eval) {
-            state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
         } else {
             if (viewId == R.id.show_toast) {
                 handle.showToast(state.text, state.duration.getToastDuration());
             } else if (viewId == R.id.show_snackbar) {
                 handle.showSnackBar(state.text, state.duration.getSnackBarDuration());
+            } else if (viewId == R.id.eval) {
+                state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
+            } else if (viewId == R.id.action_settings) {
+                handle.showDialog(SettingsDialog.newInstance(getId()));
             }
+            state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
         }
-        state.addEvent(new Event(getEventId(), "onViewClicked", viewId));
         commit(state.delay);
     }
 
@@ -122,17 +123,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
             }
             state.setSubscribedToPowerSupply(isChecked);
-        }
-        commit(state.delay);
-    }
-
-    @Override
-    @MvpHandler
-    public void onOptionsItemSelected(MvpViewHandle<MainState> handle, int itemId) {
-        super.onOptionsItemSelected(handle, itemId);
-        state.addEvent(new Event(getEventId(), "onOptionsItemSelected", itemId));
-        if (itemId == R.id.action_settings) {
-            handle.showDialog(SettingsDialog.newInstance(getId()));
         }
         commit(state.delay);
     }

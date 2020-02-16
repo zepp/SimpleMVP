@@ -155,7 +155,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        presenter.onOptionsItemSelected(getProxy(), item.getItemId());
+        presenter.onViewClicked(getProxy(), item.getItemId());
         return true;
     }
 
