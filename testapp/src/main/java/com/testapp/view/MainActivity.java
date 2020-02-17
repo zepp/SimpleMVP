@@ -60,9 +60,8 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         tabLayout.setupWithViewPager(viewPager);
         clearAll = findViewById(R.id.clear_all);
         viewPager.addOnPageChangeListener(new OnPageSelected(i -> {
-            presenter.onItemSelected(getViewHandle(), viewPager.getId(), i);
             if (i == FRAGMENT_EVENTS) {
-                imm.hideSoftInputFromWindow(getView().getApplicationWindowToken(), 0);
+                imm.hideSoftInputFromWindow(viewPager.getApplicationWindowToken(), 0);
             }
         }));
     }
@@ -83,6 +82,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         super.onFirstStateChange(state);
         clearAll.setOnClickListener(getMvpListener());
         search.setOnQueryTextListener(newQueryTextListener(search));
+        viewPager.addOnPageChangeListener(newOnPageChangeListener(viewPager));
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -115,7 +115,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         }
     }
 
-    private class OnPageSelected implements ViewPager.OnPageChangeListener {
+    private static class OnPageSelected implements ViewPager.OnPageChangeListener {
         private final Consumer<Integer> consumer;
 
         public OnPageSelected(Consumer<Integer> consumer) {
