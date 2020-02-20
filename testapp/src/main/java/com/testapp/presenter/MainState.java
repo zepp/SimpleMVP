@@ -18,6 +18,8 @@ public class MainState extends MvpState {
     public boolean isWriteGranted;
     public String expression = "";
     public int currentPage;
+    public int progress;
+    public boolean isStarted;
 
     public void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -100,6 +102,23 @@ public class MainState extends MvpState {
         this.currentPage = currentPage;
     }
 
+    public void setProgress(int progress) {
+        setChanged(this.progress != progress);
+        this.progress = progress;
+    }
+
+    public void incProgress() {
+        if (isStarted) {
+            setChanged(true);
+            progress++;
+        }
+    }
+
+    public void setStarted(boolean started) {
+        setChanged(isStarted != started);
+        isStarted = started;
+    }
+
     @Override
     public synchronized MainState clone() throws CloneNotSupportedException {
         MainState state = (MainState) super.clone();
@@ -110,15 +129,17 @@ public class MainState extends MvpState {
     @Override
     public String toString() {
         return "MainState{" +
-                "text='" + text + '\'' +
-                ", events=" + events +
+                "delay=" + delay +
+                ", text='" + text + '\'' +
+                ", duration=" + duration +
                 ", isSubscribedToConnectivity=" + isSubscribedToConnectivity +
                 ", isSubscribedToPowerSupply=" + isSubscribedToPowerSupply +
-                ", duration=" + duration +
-                ", delay=" + delay +
                 ", searchPattern='" + searchPattern + '\'' +
                 ", isWriteGranted=" + isWriteGranted +
                 ", expression='" + expression + '\'' +
+                ", currentPage=" + currentPage +
+                ", progress=" + progress +
+                ", isStarted=" + isStarted +
                 '}';
     }
 }

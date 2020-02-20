@@ -13,12 +13,12 @@
         <FrameLayout
             android:layout_width="200dp"
             android:layout_height="200dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.testapp.view.CircleProgress
+                android:id="@+id/timer_progress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -28,16 +28,28 @@
                 app:units="60"
                 app:width="4dp" />
 
-            <TextView
+            <ImageButton
+                android:id="@+id/timer_start_stop"
+                style="@style/OvalImageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_start"
+                android:tint="@android:color/black" />
+
+            <TextView
+                android:id="@+id/timer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"
                 android:lines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="30sp"
                 tools:text="00:01" />
         </FrameLayout>
-
-
     </android.support.constraint.ConstraintLayout>
 
 </android.support.v4.widget.NestedScrollView>

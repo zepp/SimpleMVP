@@ -22,6 +22,8 @@ import com.testapp.view.EventInfoDialog;
 import com.testapp.view.SettingsDialog;
 
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.testapp.common.EventType.UI;
@@ -29,6 +31,7 @@ import static com.testapp.common.EventType.UI;
 public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
     private final AtomicInteger lastEventId = new AtomicInteger();
     private final ConnectivityManager connectivityManager;
+    private ScheduledFuture<?> timer;
 
     public MainPresenterImpl(Context context, MainState state) {
         super(context, state);
@@ -90,6 +93,19 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
             } else if (viewId == R.id.action_settings) {
                 handle.showDialog(SettingsDialog.newInstance(getId()));
+            } else if (viewId == R.id.timer_start_stop) {
+                if (timer == null || timer.isDone()) {
+                    state.setProgress(0);
+                    state.setStarted(true);
+                    timer = schedulePeriodic(() -> {
+                        state.incProgress();
+                        commit();
+                    }, 1, TimeUnit.SECONDS);
+                } else {
+                    timer.cancel(false);
+                    state.setStarted(false);
+                    commit();
+                }
             }
         }
         commit(state.delay);
