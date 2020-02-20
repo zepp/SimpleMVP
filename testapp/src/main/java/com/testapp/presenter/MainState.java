@@ -6,6 +6,7 @@ import com.testapp.common.Event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainState extends MvpState {
     public List<Event> events = new ArrayList<>();
@@ -114,13 +115,22 @@ public class MainState extends MvpState {
     public void incProgress() {
         if (isStarted) {
             setChanged(true);
-            progress++;
+            progress = (progress + 1) % 3600;
         }
     }
 
     public void setStarted(boolean started) {
         setChanged(isStarted != started);
         isStarted = started;
+    }
+
+    public String getTextProgress() {
+        return String.format(Locale.getDefault(), "%02d:%02d",
+                progress / 60, progress % 60);
+    }
+
+    public boolean isTimerStateChanged() {
+        return (progress == 0 && isStarted) || (progress > 0 && !isStarted);
     }
 
     @Override

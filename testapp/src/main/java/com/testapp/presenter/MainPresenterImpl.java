@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
@@ -104,6 +105,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 } else {
                     timer.cancel(false);
                     state.setStarted(false);
+                    handle.showSnackBar(state.getTextProgress(), Snackbar.LENGTH_SHORT,
+                            getString(R.string.main_snackbar_action));
                 }
             }
         }

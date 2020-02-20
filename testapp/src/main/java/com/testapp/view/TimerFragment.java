@@ -14,8 +14,6 @@ import com.testapp.R;
 import com.testapp.presenter.MainPresenter;
 import com.testapp.presenter.MainState;
 
-import java.util.Locale;
-
 
 public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
     private CircleProgress progress;
@@ -54,9 +52,11 @@ public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
     @Override
     public void onStateChanged(MainState state) {
         progress.setProgress(state.progress);
-        text.setText(String.format(Locale.getDefault(), "%02d:%02d",
-                (state.progress / 60) % 60, state.progress % 60));
-        startStop.setImageDrawable(getResources().getDrawable(state.isStarted ? R.drawable.ic_stop : R.drawable.ic_start));
+        text.setText(state.getTextProgress());
+        if (state.isTimerStateChanged()) {
+            startStop.setImageDrawable(getResources()
+                    .getDrawable(state.isStarted ? R.drawable.ic_stop : R.drawable.ic_start));
+        }
     }
 
     @Override
