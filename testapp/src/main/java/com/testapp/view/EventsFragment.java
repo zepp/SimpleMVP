@@ -49,13 +49,16 @@ public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
         eventsAdapter.setListener(pair ->
                 presenter.onItemSelected(getViewHandle(), pair.first.getId(), pair.second));
         events.setAdapter(eventsAdapter);
+        eventsAdapter.setEvents(state.getFilteredEvents());
     }
 
     @Override
     public void onStateChanged(MainState state) {
         List<Event> items = state.getFilteredEvents();
-        eventsAdapter.setEvents(items);
-        events.scrollToPosition(items.size() - 1);
+        if (state.isEventsUpdated) {
+            eventsAdapter.setEvents(items);
+            events.scrollToPosition(items.size() - 1);
+        }
     }
 
     @Override

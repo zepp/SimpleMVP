@@ -9,6 +9,7 @@ import java.util.List;
 
 public class MainState extends MvpState {
     public List<Event> events = new ArrayList<>();
+    public boolean isEventsUpdated;
     public long delay;
     public String text = "";
     public ActionDuration duration = ActionDuration.LongDuration;
@@ -29,15 +30,18 @@ public class MainState extends MvpState {
     public void addEvent(Event event) {
         setChanged(true);
         events.add(event);
+        isEventsUpdated = true;
     }
 
     public void removeEvent(Event event) {
         setChanged(events.remove(event));
+        isEventsUpdated = isChanged();
     }
 
     public void clearEvents() {
         setChanged(true);
         events.clear();
+        isEventsUpdated = true;
     }
 
     public List<Event> getFilteredEvents() {

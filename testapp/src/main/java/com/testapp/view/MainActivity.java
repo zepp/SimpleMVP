@@ -61,7 +61,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         tabLayout.setupWithViewPager(viewPager);
         clearAll = findViewById(R.id.clear_all);
         viewPager.addOnPageChangeListener(new OnPageSelected(i -> {
-            if (i == FRAGMENT_EVENTS) {
+            if (i != FRAGMENT_MAIN) {
                 imm.hideSoftInputFromWindow(viewPager.getApplicationWindowToken(), 0);
             }
         }));
@@ -75,7 +75,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
     @Override
     public void onStateChanged(MainState state) {
-        search.setVisibility(state.currentPage == FRAGMENT_MAIN ? View.GONE : View.VISIBLE);
+        search.setVisibility(state.currentPage == FRAGMENT_EVENTS ? View.VISIBLE : View.GONE);
     }
 
     @Override

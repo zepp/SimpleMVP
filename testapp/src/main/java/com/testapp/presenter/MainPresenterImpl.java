@@ -104,7 +104,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 } else {
                     timer.cancel(false);
                     state.setStarted(false);
-                    commit();
                 }
             }
         }
@@ -202,5 +201,10 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             }
         }
         commit(state.delay);
+    }
+
+    @Override
+    protected void afterCommit() {
+        state.isEventsUpdated = false;
     }
 }

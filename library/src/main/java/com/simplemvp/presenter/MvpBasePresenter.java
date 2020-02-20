@@ -60,7 +60,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.handles = Collections.synchronizedMap(new TreeMap<>());
         this.receivers = new TreeMap<>();
         this.commit = scheduler.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
-        futures = new TreeMap<>((o1, o2) -> o1.hashCode() - o2.hashCode());
+        this.futures = new TreeMap<>((o1, o2) -> o1.hashCode() - o2.hashCode());
     }
 
     /**
@@ -163,20 +163,21 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * be delivered to {@link MvpView#onStateChanged(MvpState)} before the another state snapshot with
      * bigger revision number.
      */
-    protected synchronized void commit() {
+    protected final synchronized void commit() {
         commit.cancel(false);
         if (state.isChanged() || state.isInitial()) {
             S snapshot = cloneState();
-            state.clearChanged();
             synchronized (handles) {
                 for (MvpViewHandle<S> handle : handles.values()) {
                     handle.post(snapshot);
                 }
             }
+            afterCommit();
+            state.clearChanged();
         }
     }
 
-    protected synchronized void commit(long millis) {
+    protected final synchronized void commit(long millis) {
         if (millis > 0) {
             commit.cancel(false);
             commit = scheduler.schedule(() -> commit(), millis, TimeUnit.MILLISECONDS);
@@ -186,11 +187,17 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     /**
+     * This method is run when {@link #commit} method is about to finish it's work
+     */
+    protected void afterCommit() {
+    }
+
+    /**
      * This method returns copy of the state.
      *
      * @return {@link S} instance
      */
-    protected synchronized S cloneState() {
+    protected final synchronized S cloneState() {
         try {
             return (S) state.clone();
         } catch (CloneNotSupportedException e) {
@@ -207,7 +214,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @return {@link ScheduledFuture} instance
      */
     protected final synchronized ScheduledFuture<?> schedulePeriodic(Runnable runnable, long time, TimeUnit unit) {
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> runSync(runnable), time, time, unit);
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> runSync(runnable, true), time, time, unit);
         futures.put(runnable, future);
         return future;
     }
@@ -221,21 +228,26 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @return {@link ScheduledFuture} instance
      */
     protected final synchronized ScheduledFuture<?> schedule(Runnable runnable, long time, TimeUnit unit) {
-        ScheduledFuture<?> future = scheduler.schedule(() -> runSync(runnable), time, unit);
+        ScheduledFuture<?> future = scheduler.schedule(() -> runSync(runnable, false), time, unit);
         futures.put(runnable, future);
         return future;
     }
 
-    private synchronized void runSync(Runnable runnable) {
+    private synchronized void runSync(Runnable runnable, boolean isPeriodic) {
         try {
-            runnable.run();
+            if (!isDetached()) {
+                runnable.run();
+            }
         } catch (Exception e) {
             errorHandler.accept(e);
         } finally {
-            futures.remove(runnable);
+            if (!isPeriodic) {
+                futures.remove(runnable);
+            }
         }
     }
 
+    @CallSuper
     @Override
     public void finish() {
         synchronized (handles) {
