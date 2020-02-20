@@ -45,6 +45,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private final ScheduledExecutorService scheduler;
     private final Map<String, AsyncBroadcastReceiver> receivers;
     private final Consumer<Throwable> errorHandler;
+    private final Map<Runnable, ScheduledFuture<?>> futures;
     private int parentId;
     private ScheduledFuture<?> commit;
 
@@ -59,6 +60,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.handles = Collections.synchronizedMap(new TreeMap<>());
         this.receivers = new TreeMap<>();
         this.commit = scheduler.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
+        futures = new TreeMap<>((o1, o2) -> o1.hashCode() - o2.hashCode());
     }
 
     /**
@@ -196,6 +198,44 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         }
     }
 
+    /**
+     * Schedule periodic task at fixed rate
+     *
+     * @param runnable {@link Runnable} instance to be invoked
+     * @param time     time
+     * @param unit     time units
+     * @return {@link ScheduledFuture} instance
+     */
+    protected final synchronized ScheduledFuture<?> schedulePeriodic(Runnable runnable, long time, TimeUnit unit) {
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> runSync(runnable), time, time, unit);
+        futures.put(runnable, future);
+        return future;
+    }
+
+    /**
+     * Schedule single shot task
+     *
+     * @param runnable {@link Runnable} instance to be invoked
+     * @param time     time
+     * @param unit     time units
+     * @return {@link ScheduledFuture} instance
+     */
+    protected final synchronized ScheduledFuture<?> schedule(Runnable runnable, long time, TimeUnit unit) {
+        ScheduledFuture<?> future = scheduler.schedule(() -> runSync(runnable), time, unit);
+        futures.put(runnable, future);
+        return future;
+    }
+
+    private synchronized void runSync(Runnable runnable) {
+        try {
+            runnable.run();
+        } catch (Exception e) {
+            errorHandler.accept(e);
+        } finally {
+            futures.remove(runnable);
+        }
+    }
+
     @Override
     public void finish() {
         synchronized (handles) {
@@ -257,7 +297,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     /**
      * This method subscribes current presenter to broadcast intents to be processed in
-     * {@link MvpBasePresenter#onBroadcastReceived(Intent)} method.
+     * {@link MvpBasePresenter#onBroadcastReceived(Intent, BroadcastReceiver.PendingResult)} method.
      *
      * @param filter {@link IntentFilter} instance
      */
@@ -274,11 +314,11 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     /**
      * This method is called when broadcast intent is received.
-     *
-     * @param intent {@link Intent} instance
+     *  @param intent {@link Intent} instance
+     * @param result
      */
     @CallSuper
-    protected void onBroadcastReceived(Intent intent) {
+    protected void onBroadcastReceived(Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
         Log.d(tag, "onBroadcastReceived(" + intent + ")");
     }
 
@@ -315,6 +355,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
             unregisterReceiver(receiver);
         }
         receivers.clear();
+        for (ScheduledFuture<?> future : futures.values()) {
+            future.cancel(false);
+        }
+        futures.clear();
         commit.cancel(false);
         manager.releasePresenter(this);
     }
@@ -338,7 +382,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                 try {
                     synchronized (this) {
                         if (!isDetached()) {
-                            onBroadcastReceived(intent);
+                            onBroadcastReceived(intent, result);
                         }
                     }
                 } catch (Exception e) {

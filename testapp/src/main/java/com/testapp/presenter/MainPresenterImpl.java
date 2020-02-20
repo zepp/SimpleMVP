@@ -1,6 +1,7 @@
 package com.testapp.presenter;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -159,8 +160,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onBroadcastReceived(Intent intent) {
-        super.onBroadcastReceived(intent);
+    protected void onBroadcastReceived(Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
+        super.onBroadcastReceived(intent, result);
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();
             if (info == null) {
