@@ -208,6 +208,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     protected void afterCommit() {
-        state.isEventsUpdated = false;
+        state.isEventAdded = false;
     }
 }
