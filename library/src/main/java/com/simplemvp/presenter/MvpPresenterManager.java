@@ -76,9 +76,9 @@ public final class MvpPresenterManager extends ContextWrapper {
      * @param sClass class of state
      * @return new presenter
      */
-    public <S extends MvpState, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends I> pClass, Class<S> sClass) {
+    public <S extends MvpState, P extends MvpBasePresenter<S>, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends P> pClass, Class<S> sClass) {
         S state = newState(sClass);
-        I presenter = ProxyHandler.newProxy(executor, errorHandler, newPresenter(pClass, sClass, state));
+        I presenter = ProxyHandler.newProxy(newPresenter(pClass, sClass, state));
         map.put(presenter.getId(), presenter);
         Log.d(tag, "new presenter: " + presenter);
         return presenter;
@@ -109,7 +109,7 @@ public final class MvpPresenterManager extends ContextWrapper {
         }
     }
 
-    private <P extends MvpPresenter<S>, S extends MvpState> P newPresenter(Class<P> pClass, Class<S> sClass, S state) {
+    private <S extends MvpState, P extends MvpBasePresenter<S>> P newPresenter(Class<P> pClass, Class<S> sClass, S state) {
         try {
             return pClass.getConstructor(Context.class, sClass).newInstance(getBaseContext(), state);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {

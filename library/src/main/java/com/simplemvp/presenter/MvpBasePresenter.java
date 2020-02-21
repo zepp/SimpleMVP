@@ -199,10 +199,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @param executable {@link Executable} task to be invoked
      * @return {@link Future} instance
      */
-    protected final synchronized Future<?> submit(Executable executable) {
-        Future<?> future = executor.submit(() -> executeSync(executable, true));
-        collectFuture(future, executable);
-        return future;
+    public final Future<?> submit(Executable executable) {
+        return executor.submit(() -> executeSync(executable, false));
     }
 
     /**

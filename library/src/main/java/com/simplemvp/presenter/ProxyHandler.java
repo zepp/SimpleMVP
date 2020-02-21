@@ -3,7 +3,6 @@
  */
 package com.simplemvp.presenter;
 
-import android.support.v4.util.Consumer;
 import android.util.Log;
 
 import com.simplemvp.annotations.MvpHandler;
@@ -17,22 +16,17 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
 
 class ProxyHandler<S extends MvpState> implements InvocationHandler {
-    private final ExecutorService executor;
-    private final Consumer<Throwable> handler;
-    private final MvpPresenter<S> presenter;
+    private final MvpBasePresenter<S> presenter;
     private final Map<String, MvpHandler> handlers;
 
-    private ProxyHandler(ExecutorService executor, Consumer<Throwable> handler, MvpPresenter<S> presenter) {
-        this.executor = executor;
-        this.handler = handler;
+    private ProxyHandler(MvpBasePresenter<S> presenter) {
         this.presenter = presenter;
-        this.handlers = getPresenterAnnotations(presenter);
+        this.handlers = getMethodAnnotations(presenter);
     }
 
-    private static <S extends MvpState> Map<String, MvpHandler> getPresenterAnnotations(MvpPresenter<S> presenter) {
+    private static <S extends MvpState> Map<String, MvpHandler> getMethodAnnotations(MvpPresenter<S> presenter) {
         String tag = presenter.getClass().getSimpleName();
         Map<String, MvpHandler> result = new TreeMap<>();
         for (Method method : presenter.getClass().getMethods()) {
@@ -67,11 +61,9 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         }
     }
 
-    static <S extends MvpState, P extends MvpPresenter<S>> P newProxy(
-            ExecutorService executor, Consumer<Throwable> handler, P presenter) {
+    static <S extends MvpState, P extends MvpPresenter<S>> P newProxy(MvpBasePresenter<S> presenter) {
         return (P) Proxy.newProxyInstance(presenter.getClass().getClassLoader(),
-                getAllImplementedInterfaces(presenter.getClass()),
-                new ProxyHandler<>(executor, handler, presenter));
+                getAllImplementedInterfaces(presenter.getClass()), new ProxyHandler<>(presenter));
     }
 
     @Override
@@ -81,7 +73,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
             return invoke(true, method, args);
         } else {
             if (handler.executor()) {
-                execute(handler.sync(), method, args);
+                presenter.submit(() -> method.invoke(presenter, args));
             } else {
                 return invoke(handler.sync(), method, args);
             }
@@ -97,16 +89,5 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         } else {
             return method.invoke(presenter, args);
         }
-    }
-
-    private void execute(boolean sync, Method method, Object[] args) {
-        executor.execute(() -> {
-            try {
-                invoke(sync, method, args);
-            } catch (Exception e) {
-                Throwable cause = e.getCause();
-                handler.accept(cause == null ? e : cause);
-            }
-        });
     }
 }
