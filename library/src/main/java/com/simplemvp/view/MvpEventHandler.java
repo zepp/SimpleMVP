@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
@@ -52,6 +53,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private final Queue<Callable<?>> events = new LinkedList<>();
     private final List<MvpTextWatcher<S>> textWatchers = new ArrayList<>();
     private final List<MvpOnQueryTextListener<S>> queryTextListeners = new ArrayList<>();
+    private final List<MvpOnPageChangeListener<S>> pageChangeListeners = new ArrayList<>();
     private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
     private final AtomicBoolean isEnabled = new AtomicBoolean();
     private final AtomicBoolean isResumed = new AtomicBoolean();
@@ -82,6 +84,10 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
             watcher.unregister();
         }
         textWatchers.clear();
+        for (MvpOnPageChangeListener<S> listener : pageChangeListeners) {
+            listener.unregister();
+        }
+        pageChangeListeners.clear();
         queryTextListeners.clear();
     }
 
@@ -222,6 +228,13 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         Log.d(tag, "new query text listener for view: " + view);
         MvpOnQueryTextListener<S> listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view);
         queryTextListeners.add(listener);
+        return listener;
+    }
+
+    ViewPager.OnPageChangeListener newOnPageChangeListener(ViewPager view) {
+        Log.d(tag, "new page change lster for view: " + view);
+        MvpOnPageChangeListener<S> listener = new MvpOnPageChangeListener<>(getProxy(), presenter, view);
+        pageChangeListeners.add(listener);
         return listener;
     }
 

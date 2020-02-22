@@ -25,7 +25,8 @@ import com.testapp.presenter.MainState;
 
 public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     private final static int FRAGMENT_MAIN = 0;
-    private final static int FRAGMENT_EVENTS = 1;
+    private final static int FRAGMENT_TIMER = 1;
+    private final static int FRAGMENT_EVENTS = 2;
     private InputMethodManager imm;
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -60,9 +61,8 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         tabLayout.setupWithViewPager(viewPager);
         clearAll = findViewById(R.id.clear_all);
         viewPager.addOnPageChangeListener(new OnPageSelected(i -> {
-            presenter.onItemSelected(getViewHandle(), viewPager.getId(), i);
-            if (i == FRAGMENT_EVENTS) {
-                imm.hideSoftInputFromWindow(getView().getApplicationWindowToken(), 0);
+            if (i != FRAGMENT_MAIN) {
+                imm.hideSoftInputFromWindow(viewPager.getApplicationWindowToken(), 0);
             }
         }));
     }
@@ -75,7 +75,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
     @Override
     public void onStateChanged(MainState state) {
-        search.setVisibility(state.currentPage == FRAGMENT_MAIN ? View.GONE : View.VISIBLE);
+        search.setVisibility(state.currentPage == FRAGMENT_EVENTS ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -83,6 +83,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         super.onFirstStateChange(state);
         clearAll.setOnClickListener(getMvpListener());
         search.setOnQueryTextListener(newQueryTextListener(search));
+        viewPager.addOnPageChangeListener(newOnPageChangeListener(viewPager));
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -94,6 +95,8 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         public Fragment getItem(int i) {
             if (i == FRAGMENT_MAIN) {
                 return MainFragment.newInstance(getPresenter().getId());
+            } else if (i == FRAGMENT_TIMER) {
+                return TimerFragment.newInstance(getPresenter().getId());
             } else {
                 return EventsFragment.newInstance(getPresenter().getId());
             }
@@ -104,6 +107,8 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         public CharSequence getPageTitle(int position) {
             if (position == FRAGMENT_MAIN) {
                 return getString(R.string.fragment_main);
+            } else if (position == FRAGMENT_TIMER) {
+                return getString(R.string.fragment_timer);
             } else {
                 return getString(R.string.fragment_events);
             }
@@ -111,11 +116,11 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
     }
 
-    private class OnPageSelected implements ViewPager.OnPageChangeListener {
+    private static class OnPageSelected implements ViewPager.OnPageChangeListener {
         private final Consumer<Integer> consumer;
 
         public OnPageSelected(Consumer<Integer> consumer) {

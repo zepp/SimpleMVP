@@ -2,6 +2,7 @@
     <string name="app_name">SimpleMVP</string>
     <string name="app_error">Error</string>
     <string name="fragment_main">main</string>
+    <string name="fragment_timer">timer</string>
     <string name="fragment_events">events</string>
     <string name="main_menu_search">Search</string>
     <string name="action_settings">Settings</string>

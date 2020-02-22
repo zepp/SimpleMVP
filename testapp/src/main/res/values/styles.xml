@@ -22,6 +22,11 @@
         <item name="android:padding">8dp</item>
     </style>
 
+    <style name="DialogTitle" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:lines">1</item>
+        <item name="android:textColor">@color/primaryDarkColor</item>
+    </style>
+
     <style name="TextHeader" parent="TextAppearance.AppCompat.Small">
         <item name="android:textStyle">bold</item>
     </style>

@@ -14,6 +14,7 @@ import android.support.v4.util.Consumer;
 import android.util.Log;
 import android.view.DragEvent;
 
+import com.simplemvp.common.Executable;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +47,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private final ScheduledExecutorService scheduler;
     private final Map<String, AsyncBroadcastReceiver> receivers;
     private final Consumer<Throwable> errorHandler;
+    private final Map<Executable, Future<?>> futures;
     private int parentId;
     private ScheduledFuture<?> commit;
 
@@ -59,6 +62,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.handles = Collections.synchronizedMap(new TreeMap<>());
         this.receivers = new TreeMap<>();
         this.commit = scheduler.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
+        this.futures = new TreeMap<>((o1, o2) -> o1.hashCode() - o2.hashCode());
     }
 
     /**
@@ -70,19 +74,13 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     public final synchronized void connect(MvpViewHandle<S> handle) {
         boolean isFirst = handles.isEmpty();
         if (handles.put(handle.getLayoutId(), handle) == null) {
-            executor.execute(() -> {
-                try {
-                    synchronized (this) {
-                        if (isFirst) {
-                            parentId = handle.getLayoutId();
-                            onFirstViewConnected(handle);
-                        }
-                        onViewConnected(handle);
-                        handle.post(cloneState());
-                    }
-                } catch (Exception e) {
-                    errorHandler.accept(e);
+            submit(() -> {
+                if (isFirst) {
+                    parentId = handle.getLayoutId();
+                    onFirstViewConnected(handle);
                 }
+                onViewConnected(handle);
+                handle.post(cloneState());
             });
         } else {
             handle.post(cloneState());
@@ -108,15 +106,9 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private synchronized void disconnectById(int layoutId) {
         if (handles.remove(layoutId) != null) {
             boolean isLast = handles.isEmpty();
-            executor.execute(() -> {
-                try {
-                    synchronized (this) {
-                        if (isLast) {
-                            onLastViewDisconnected();
-                        }
-                    }
-                } catch (Exception e) {
-                    errorHandler.accept(e);
+            submit(() -> {
+                if (isLast) {
+                    onLastViewDisconnected();
                 }
             });
         }
@@ -161,26 +153,31 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * be delivered to {@link MvpView#onStateChanged(MvpState)} before the another state snapshot with
      * bigger revision number.
      */
-    protected synchronized void commit() {
+    protected final synchronized void commit() {
         commit.cancel(false);
         if (state.isChanged() || state.isInitial()) {
             S snapshot = cloneState();
-            state.clearChanged();
-            synchronized (handles) {
-                for (MvpViewHandle<S> handle : handles.values()) {
-                    handle.post(snapshot);
-                }
+            for (MvpViewHandle<S> handle : handles.values()) {
+                handle.post(snapshot);
             }
+            afterCommit();
+            state.clearChanged();
         }
     }
 
-    protected synchronized void commit(long millis) {
+    protected final synchronized void commit(long millis) {
         if (millis > 0) {
             commit.cancel(false);
-            commit = scheduler.schedule(() -> commit(), millis, TimeUnit.MILLISECONDS);
+            commit = schedule(this::commit, millis, TimeUnit.MILLISECONDS);
         } else {
             commit();
         }
+    }
+
+    /**
+     * This method is run when {@link #commit} method is about to finish it's work
+     */
+    protected void afterCommit() {
     }
 
     /**
@@ -188,7 +185,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      *
      * @return {@link S} instance
      */
-    protected synchronized S cloneState() {
+    protected final synchronized S cloneState() {
         try {
             return (S) state.clone();
         } catch (CloneNotSupportedException e) {
@@ -196,12 +193,83 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         }
     }
 
+    /**
+     * Submits task to execution
+     *
+     * @param executable {@link Executable} task to be invoked
+     * @return {@link Future} instance
+     */
+    public final Future<?> submit(Executable executable) {
+        return executor.submit(() -> executeSync(executable, false));
+    }
+
+    /**
+     * Schedule periodic task at fixed rate
+     *
+     * @param executable {@link Executable} task to be invoked
+     * @param time     time
+     * @param unit     time units
+     * @return {@link ScheduledFuture} instance
+     */
+    protected final synchronized ScheduledFuture<?> schedulePeriodic(Executable executable, long time, TimeUnit unit) {
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> executeSync(executable, false), time, time, unit);
+        collectFuture(future, executable);
+        return future;
+    }
+
+    /**
+     * Schedule single shot task
+     *
+     * @param executable {@link Executable} task to be invoked
+     * @param time     time
+     * @param unit     time units
+     * @return {@link ScheduledFuture} instance
+     */
+    protected final synchronized ScheduledFuture<?> schedule(Executable executable, long time, TimeUnit unit) {
+        ScheduledFuture<?> future = scheduler.schedule(() -> executeSync(executable, true), time, unit);
+        collectFuture(future, executable);
+        return future;
+    }
+
+    /**
+     * Executes method in synchronized context with respect to presenter life cycle and handles errors
+     *
+     * @param executable {@link Executable} task to be invoked
+     * @param isRemove   if true then remove future from the collection
+     */
+    private synchronized void executeSync(Executable executable, boolean isRemove) {
+        try {
+            if (!isDetached()) {
+                executable.execute();
+            }
+        } catch (Exception e) {
+            errorHandler.accept(e);
+        } finally {
+            if (isRemove) {
+                futures.remove(executable);
+            }
+        }
+    }
+
+    /**
+     * Collects provided future to cancel it in case of presenter lifecycle is finished
+     *
+     * @param future     {@link Future} instance
+     * @param executable {@link Executable} instance
+     */
+    private synchronized void collectFuture(Future<?> future, Executable executable) {
+        Future<?> previous = futures.put(executable, future);
+        if (previous != null) {
+            previous.cancel(false);
+            Log.w(tag, future.toString() + " is cancelled");
+        }
+    }
+
+    @CallSuper
     @Override
     public void finish() {
-        synchronized (handles) {
-            for (MvpViewHandle<S> handle : handles.values()) {
-                handle.finish();
-            }
+        for (MvpViewHandle<S> handle : handles.values()) {
+            handle.finish();
         }
     }
 
@@ -257,11 +325,11 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     /**
      * This method subscribes current presenter to broadcast intents to be processed in
-     * {@link MvpBasePresenter#onBroadcastReceived(Intent)} method.
+     * {@link MvpBasePresenter#onBroadcastReceived(Intent, BroadcastReceiver.PendingResult)} method.
      *
      * @param filter {@link IntentFilter} instance
      */
-    protected final void subscribeToBroadcast(IntentFilter filter) {
+    protected final synchronized void subscribeToBroadcast(IntentFilter filter) {
         AsyncBroadcastReceiver receiver = new AsyncBroadcastReceiver();
         registerReceiver(receiver, filter);
         for (int i = 0; i < filter.countActions(); i++) {
@@ -274,11 +342,11 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     /**
      * This method is called when broadcast intent is received.
-     *
-     * @param intent {@link Intent} instance
+     *  @param intent {@link Intent} instance
+     * @param result
      */
     @CallSuper
-    protected void onBroadcastReceived(Intent intent) {
+    protected void onBroadcastReceived(Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
         Log.d(tag, "onBroadcastReceived(" + intent + ")");
     }
 
@@ -315,7 +383,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
             unregisterReceiver(receiver);
         }
         receivers.clear();
-        commit.cancel(false);
+        for (Future<?> future : futures.values()) {
+            future.cancel(false);
+        }
+        futures.clear();
         manager.releasePresenter(this);
     }
 
@@ -335,17 +406,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         public void onReceive(Context context, Intent intent) {
             PendingResult result = goAsync();
             executor.submit(() -> {
-                try {
-                    synchronized (this) {
-                        if (!isDetached()) {
-                            onBroadcastReceived(intent);
-                        }
-                    }
-                } catch (Exception e) {
-                    errorHandler.accept(e);
-                } finally {
-                    result.finish();
-                }
+                executeSync(() -> onBroadcastReceived(intent, result), false);
+                result.finish();
             });
         }
     }

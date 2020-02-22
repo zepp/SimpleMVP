@@ -6,9 +6,11 @@ import com.testapp.common.Event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainState extends MvpState {
     public List<Event> events = new ArrayList<>();
+    public boolean isEventAdded;
     public long delay;
     public String text = "";
     public ActionDuration duration = ActionDuration.LongDuration;
@@ -18,6 +20,8 @@ public class MainState extends MvpState {
     public boolean isWriteGranted;
     public String expression = "";
     public int currentPage;
+    public int progress;
+    public boolean isStarted;
 
     public void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -27,6 +31,7 @@ public class MainState extends MvpState {
     public void addEvent(Event event) {
         setChanged(true);
         events.add(event);
+        isEventAdded = true;
     }
 
     public void removeEvent(Event event) {
@@ -100,6 +105,32 @@ public class MainState extends MvpState {
         this.currentPage = currentPage;
     }
 
+    public void setProgress(int progress) {
+        setChanged(this.progress != progress);
+        this.progress = progress;
+    }
+
+    public void incProgress() {
+        if (isStarted) {
+            setChanged(true);
+            progress = (progress + 1) % 3600;
+        }
+    }
+
+    public void setStarted(boolean started) {
+        setChanged(isStarted != started);
+        isStarted = started;
+    }
+
+    public String getTextProgress() {
+        return String.format(Locale.getDefault(), "%02d:%02d",
+                progress / 60, progress % 60);
+    }
+
+    public boolean isTimerStateChanged() {
+        return (progress == 0 && isStarted) || (progress > 0 && !isStarted);
+    }
+
     @Override
     public synchronized MainState clone() throws CloneNotSupportedException {
         MainState state = (MainState) super.clone();
@@ -110,15 +141,17 @@ public class MainState extends MvpState {
     @Override
     public String toString() {
         return "MainState{" +
-                "text='" + text + '\'' +
-                ", events=" + events +
+                "delay=" + delay +
+                ", text='" + text + '\'' +
+                ", duration=" + duration +
                 ", isSubscribedToConnectivity=" + isSubscribedToConnectivity +
                 ", isSubscribedToPowerSupply=" + isSubscribedToPowerSupply +
-                ", duration=" + duration +
-                ", delay=" + delay +
                 ", searchPattern='" + searchPattern + '\'' +
                 ", isWriteGranted=" + isWriteGranted +
                 ", expression='" + expression + '\'' +
+                ", currentPage=" + currentPage +
+                ", progress=" + progress +
+                ", isStarted=" + isStarted +
                 '}';
     }
 }

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:minWidth="200dp">
+    android:minWidth="220dp">
 
     <android.support.constraint.Guideline
         android:id="@+id/guide_start"
@@ -21,17 +21,18 @@
 
     <TextView
         android:id="@+id/title"
+        style="@style/DialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/dialog_title_margin"
         android:text="@string/settings_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toStartOf="@+id/guide_end"
         app:layout_constraintStart_toStartOf="@+id/guide_start"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/settings_delay_title"
+        style="@style/TextHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -54,6 +55,7 @@
 
     <TextView
         android:id="@+id/settings_broadcast"
+        style="@style/TextHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -67,6 +69,7 @@
         android:id="@+id/settings_connectivity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
         android:text="@string/settings_connectivity"
         app:layout_constraintEnd_toStartOf="@+id/guide_end"
@@ -77,6 +80,7 @@
         android:id="@+id/settings_power_supply"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
         android:text="@string/settings_power_supply"
         app:layout_constraintEnd_toStartOf="@+id/guide_end"
@@ -89,7 +93,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
         android:text="@android:string/ok"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

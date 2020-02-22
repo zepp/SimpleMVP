@@ -1,6 +1,7 @@
 package com.testapp.presenter;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -8,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
@@ -21,6 +23,8 @@ import com.testapp.view.EventInfoDialog;
 import com.testapp.view.SettingsDialog;
 
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.testapp.common.EventType.UI;
@@ -28,6 +32,7 @@ import static com.testapp.common.EventType.UI;
 public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
     private final AtomicInteger lastEventId = new AtomicInteger();
     private final ConnectivityManager connectivityManager;
+    private ScheduledFuture<?> timer;
 
     public MainPresenterImpl(Context context, MainState state) {
         super(context, state);
@@ -89,6 +94,20 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
             } else if (viewId == R.id.action_settings) {
                 handle.showDialog(SettingsDialog.newInstance(getId()));
+            } else if (viewId == R.id.timer_start_stop) {
+                if (timer == null || timer.isDone()) {
+                    state.setProgress(0);
+                    state.setStarted(true);
+                    timer = schedulePeriodic(() -> {
+                        state.incProgress();
+                        commit();
+                    }, 1, TimeUnit.SECONDS);
+                } else {
+                    timer.cancel(false);
+                    state.setStarted(false);
+                    handle.showSnackBar(state.getTextProgress(), Snackbar.LENGTH_SHORT,
+                            getString(R.string.main_snackbar_action));
+                }
             }
         }
         commit(state.delay);
@@ -159,8 +178,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onBroadcastReceived(Intent intent) {
-        super.onBroadcastReceived(intent);
+    protected void onBroadcastReceived(Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
+        super.onBroadcastReceived(intent, result);
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();
             if (info == null) {
@@ -185,5 +204,10 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             }
         }
         commit(state.delay);
+    }
+
+    @Override
+    protected void afterCommit() {
+        state.isEventAdded = false;
     }
 }
