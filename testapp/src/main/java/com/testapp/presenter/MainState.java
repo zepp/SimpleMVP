@@ -19,6 +19,7 @@ public class MainState extends MvpState {
     public String searchPattern = "";
     public boolean isWriteGranted;
     public String expression = "";
+    public boolean isEvaluated;
     public int currentPage;
     public int progress;
     public boolean isStarted;
@@ -95,9 +96,10 @@ public class MainState extends MvpState {
         isWriteGranted = writeGranted;
     }
 
-    public void setExpression(String expression) {
+    public void setExpression(String expression, boolean isEvaluated) {
         setChanged(!this.expression.equals(expression));
         this.expression = expression;
+        this.isEvaluated = isEvaluated;
     }
 
     public void setCurrentPage(int currentPage) {

@@ -98,7 +98,9 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
         showToast.setEnabled(!state.text.isEmpty());
         showSnackBar.setEnabled(!state.text.isEmpty());
         writeGranted.setChecked(state.isWriteGranted);
-        expression.setTextNoWatchers(state.expression);
+        if (state.isEvaluated) {
+            expression.setTextNoWatchers(state.expression);
+        }
         eval.setEnabled(!state.expression.isEmpty());
     }
 

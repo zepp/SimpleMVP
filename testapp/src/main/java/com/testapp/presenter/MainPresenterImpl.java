@@ -71,7 +71,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             if (viewId == R.id.toast_text) {
                 state.setText(text);
             } else if (viewId == R.id.expression) {
-                state.setExpression(text.trim());
+                state.setExpression(text.trim(), false);
             }
         }
         commit(state.delay);
@@ -91,7 +91,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 handle.showSnackBar(state.text, state.duration.getSnackBarDuration(),
                         getString(R.string.main_snackbar_action));
             } else if (viewId == R.id.eval) {
-                state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()));
+                state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()), true);
             } else if (viewId == R.id.action_settings) {
                 handle.showDialog(SettingsDialog.newInstance(getId()));
             } else if (viewId == R.id.timer_start_stop) {
@@ -209,5 +209,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @Override
     protected void afterCommit() {
         state.isEventAdded = false;
+        state.isEvaluated = false;
     }
 }
