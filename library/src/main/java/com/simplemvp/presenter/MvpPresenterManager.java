@@ -102,7 +102,7 @@ public final class MvpPresenterManager extends ContextWrapper {
      * @param presenter instance to be released if one has no attached views
      */
     public void releasePresenter(MvpPresenter<?> presenter) {
-        if (presenter.isDetached()) {
+        if (presenter.isDisconnected()) {
             if (map.remove(presenter.getId()) != null) {
                 Log.d(tag, "release presenter: " + presenter);
             }

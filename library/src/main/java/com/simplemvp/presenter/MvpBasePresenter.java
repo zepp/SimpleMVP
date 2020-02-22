@@ -118,7 +118,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @return true if there is no attached views
      */
     @Override
-    public final boolean isDetached() {
+    public final boolean isDisconnected() {
         return handles.isEmpty();
     }
 
@@ -198,7 +198,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @return {@link Future} instance
      */
     public final Future<?> submit(Executable executable) {
-        return executor.submit(() -> executeSync(executable, false));
+        return executor.submit(() -> executeSync(executable, false, false));
     }
 
     /**
@@ -210,7 +210,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @return {@link ScheduledFuture} instance
      */
     protected final synchronized ScheduledFuture<?> schedulePeriodic(Executable executable, long time, TimeUnit unit) {
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> executeSync(executable, false), time, time, unit);
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> executeSync(executable, true, false), time, time, unit);
         collectFuture(future, executable);
         return future;
     }
@@ -224,20 +224,20 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @return {@link ScheduledFuture} instance
      */
     protected final synchronized ScheduledFuture<?> schedule(Executable executable, long time, TimeUnit unit) {
-        ScheduledFuture<?> future = scheduler.schedule(() -> executeSync(executable, true), time, unit);
+        ScheduledFuture<?> future = scheduler.schedule(() -> executeSync(executable, true, true), time, unit);
         collectFuture(future, executable);
         return future;
     }
 
     /**
      * Executes method in synchronized context with respect to presenter life cycle and handles errors
-     *
      * @param executable {@link Executable} task to be invoked
+     * @param isCheckDisconnected check if presenter has been disconnected from all views
      * @param isRemove   if true then remove future from the collection
      */
-    private synchronized void executeSync(Executable executable, boolean isRemove) {
+    private synchronized void executeSync(Executable executable, boolean isCheckDisconnected, boolean isRemove) {
         try {
-            if (!isDetached()) {
+            if (!(isCheckDisconnected && isDisconnected())) {
                 executable.execute();
             }
         } catch (Exception e) {
@@ -258,8 +258,9 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private synchronized void collectFuture(Future<?> future, Executable executable) {
         Future<?> previous = futures.put(executable, future);
         if (previous != null) {
-            previous.cancel(false);
-            Log.w(tag, future.toString() + " is cancelled");
+            if (previous.cancel(false)) {
+                Log.w(tag, future.toString() + " is cancelled");
+            }
         }
     }
 
@@ -404,7 +405,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         public void onReceive(Context context, Intent intent) {
             PendingResult result = goAsync();
             executor.submit(() -> {
-                executeSync(() -> onBroadcastReceived(intent, result), false);
+                executeSync(() -> onBroadcastReceived(intent, result), true, false);
                 result.finish();
             });
         }
