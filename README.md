@@ -1,54 +1,106 @@
 # SimpleMVP
 Another implementation of MVP for Android that is built using:
 
-* Proxy classes to handle presenter and view methods invocation
-* Annotations to specify how to run presenter handlers
-* Executor to offload main thread
+* Proxy classes and reflection to handle presenter and view methods invocation
+* Annotations to specify how to run presenter methods
+* Executors to offload main thread and schedule periodic tasks
 
 # Basics
 
-* State (a class that is inherited from the `MvpState` class) holds a data to be rendered by view. After state change a copy is sent to connected views to update ones appearance.
-* Presenter handles view events such as clicks, item selection and so on. It alters state. Typically presenter lifetime goes beyond view lifetime.
-* View updates itself after new state is received. Also view implicitly invokes presenter handlers.
-* Handler is an annotated presenter method to be invoked by view.
+* State holds a data to be rendered by view. After state change a copy is sent to connected views to update ones appearance.
+* Presenter handles view events such as clicks, item selection and so on. It modifies state. Typically presenter lifetime goes beyond view lifetime.
+* View updates itself after new state is received.
+* Handler is an annotated presenter method to be explicitly on implicitly invoked by view
+
+## State
+
+State is inherited from `MvpState` class.
+
+It keeps all data to update or restore view's appearance. It can be text to setup `TextView` or some boolean properties to enable/disable a particular `View`. Changed state is delivered to connected views when presenter handler invokes `commit()` method. 
+
+State has special flag that indicates that it has been changed. It is important to update this flag after field change otherwise state is not delivered to connected views when `commit()` is called. Every field has to have setter that updates this flag in other words.
+
+So typical state may look following:
+
+```java
+public class MainState extends MvpState {
+    public String text = "";
+ 
+    public void setText(String text) {
+       setChanged(!this.text.equals(text));
+       this.text = text;
+    }
+}
+```
+
+View and presenter do not share the same state instance. `commit()` clones state before sending one to connected views so if state contains a complex object or collection then `clone()` method **must** be overridden. It performs defencive copy of such object or collection.   
+
+```java
+public class MainState extends MvpState {
+    public List<Event> events = new ArrayList<>();
+ 
+    @Override
+    public synchronized MainState clone() throws CloneNotSupportedException {
+       MainState state = (MainState) super.clone();
+       state.events = new ArrayList<>(events);
+       return state;
+    }
+}
+```
 
 ## Presenter
 
-Usually presenter reacts to various event coming from a model or Android system to alter state. Altered state is sent to all connected views after `commit` method call.
+Presenters is inherited from `MvpBasePresenter` class.  
+
+Usually presenter reacts to various event coming from a model or Android system to modify state. Modified state is sent to all connected views after `commit()` method call.
 
 Multiple views can share single presenter so all related business logic is placed in a single class.
 
 Presenter handles various UI events such as:
 
-* View clicks (`onViewClicked` handler)
-* Item selection (`onItemSelected` handler)
-* Text changes (`onTextChanged` handler)
+* View clicks (`onViewClicked()` handler)
+* Item selection (`onItemSelected()` handler)
+* Text changes (`onTextChanged()` handler)
 
 System events:
 
-* Broadcast intents (`onBroadcastReceived` handler)
+* Broadcast intents (`onBroadcastReceived()` handler)
 
 There are following methods that reflect presenter lifetime:
 
-* `onFirstViewConnected` is called when first view is connected. It is suitable place to allocate resources or subscribe to various model events.
-* `onViewConnected` is called when view is connected 
-* `onLastViewDisconnected` is called when last view is disconnected. It is place to release allocated resources.
+* `onFirstViewConnected()` is called when first view is connected. It is suitable place to allocate resources or subscribe to various model events.
+* `onViewConnected()` is called when view is connected 
+* `onLastViewDisconnected()` is called when last view is disconnected. It is place to release allocated resources.
 
 Presenter stays alive on configuration change if one has been connected to `MvpActivity` instance.
 
 Presenter handlers are annotated using `@MvpHandler` annotation to specify how to invoke handler. Annotation has following fields:
 
-* `executor` - if true then run handler on executor to offload main thread
-* `sync` - if true then presenter is synchronized before handler invocation. It is better to leave default value.
+* `executor` - if true then run handler on executor to offload main thread (true by default)
 
 There are several methods to initiate state delivery:
 
-* `commit` immediately sends state to all connected view
+* `commit()` immediately sends state to all connected view
 * `commit(long millis)` sends state after short delay in milliseconds
 
-In both cases state **must** be changed (see the `setChanged` and `isChanged` methods)
+In both cases state **must** be changed (see the `setChanged()` and `isChanged()` methods)
 
-Presenter does not hold strong reference to connected view. It collects `MvpViewHandle` instance that encapsulates weak reference to view so if view is suddenly destroyed (`onDestroy` method is not invoked) then presenter disconnects itself from a such view. Presenter must use provided `MvpViewHandle` instance to interact with view (to finish view or show dialog and so on).
+Also there are following methods to submit and schedule tasks:
+
+* `submit()` - submits task to execution immediately
+* `schedulePeriodic()` - schedules periodic task that fires at fixed rate
+* `schedule()` - schedules single shot task
+
+Presenter does not hold strong reference to connected view. It collects `MvpViewHandle` instance that encapsulates weak reference to view so if view is suddenly destroyed (`onDestroy` method is not invoked) then presenter disconnects itself from a such view. Presenter interacts with a view using `MvpViewHandle` class reference that provides following methods:
+
+* `getArguments()` returns an argument bundle
+* `showToast()` shows a toast with a specified text
+* `showSnackBar()` show a snackbar with a specified text and action (optional)
+* `finish()` is called when view should be closed
+
+`MvpViewHandle` is passed to all default handlers. It is a best practice when custom handler is added.
+
+In some cases it is not suitable to use `MvpViewHandle` of the calling view if one is about to be destroyed for example. `getParentHandle()` method provides a way to perform an action on behalf of parent view in such case.   
 
 ## View
 
@@ -60,42 +112,69 @@ There are multiple `MvpView` implementations to inherit from:
 
 Every view has to implement following methods:
 
-* `getLayoutId` returns layout ID to be inflated
-* `getMenuId` returns menu ID to be inflated. 0 is returned if fragment or dialog does not have a menu.
-* `onStateChanged` updates views state
-* `onInitPresenter` creates or gets presenter
+* `getLayoutId()` returns layout ID to be inflated
+* `onStateChanged()` updates views state
+* `onInitPresenter()` creates new or gets existing presenter
 
-`onStateChanged` method is called when new state is received. Views appearance is updated in this method, e.g. controls are enabled or disabled, text is changed and so on. Some views or adapters do not need to be updated each time state is updated. `onFirstStateChange` method is preferable in such case because it is called only once when view is resumed. Both methods invocation is affected by views lifecycle so if view is paused then methods are not invoked but queued to be called later when view becomes ready. 
+If view has a menu then `getMenuId()` method should be overridden to provide menu ID.
 
-`onInitPresenter` method is called when presenter initialization is required (view has no valid presenter reference). `MvpPresenterManager` reference is passed to this method to instantiate new presenter or lookup existing presenter by ID.
+`onStateChanged` method is called when new state is received. Views appearance is updated in this method, e.g. controls are enabled or disabled, text is changed and so on. Some views or adapters do not need to be updated so frequently. `onFirstStateChange` method is preferable in such case because it is called only once when view becomes ready. Both methods invocation is affected by view's lifecycle so if view is paused for example then methods are not invoked but queued to be called later when view becomes ready. View becomes ready when it is resumed and menu is inflated if it has one so it is safe to update menu items from both methods.
+
+Also `onFirstStateChange` method is a safe place to setup listeners and watchers. There are several ways to do it:
+
+* using `getMvpListener()` method
+* using `newTextWatcher()`, `newQueryTextListener()`, `newOnPageChangeListener()` methods  
+
+`getMvpListener()` method returns unified listener that is suitable for the most cases. It handles clicks, checks and so on (see details in `MvpListener` interface declaration).
+
+`newTextWatcher()` creates watcher that handles text changes of `EditText` view. `newQueryTextListener()` creates listener that handles `SearchView` text change. `newOnPageChangeListener()` creates listener that handles page selection of `ViewPager`. All these listeners and watcher are implicitly unregistered when view is stopped.
+
+`onInitPresenter` method is called when presenter initialization is required (view has been just created and has no presenter instance reference). `MvpPresenterManager` reference is passed to this method to instantiate new presenter or lookup existing presenter by ID. Typically parent view creates presenter instance which ID is shared with child views. `MvpFragment` and `MvpDialogFragment` have `initArguments` method to initialize arguments bundle with presenter ID. `MvpDialogFragment` looks up for presenter instance implicitly.
 
 ## Error handling
 
-Every presenter handler invocation is wrapped by try-catch statement so application does not crash if something bad happens. Thrown exception is logged.
+Every presenter handler invocation is implicitly wrapped by try-catch statement so application does not crash if something bad happens. Thrown exception is passed to exception handler to be logged or displayed as notification.
 
-Custom error handler can be installed using `MvpPresenterManager::initialize` method.
+Custom error handler can be installed using `MvpPresenterManager::initialize` method. Application class is most suitable place to do it.
 
 # Custom presenter handlers
 
-If you want to implement presenter that has custom handlers to be invoked then new interface should be inherited from`MvpPresenter` to refer presenter instance. This new interface is to be implemented by presenter class.
+New interface should be inherited from `MvpPresenter` to refer presenter instance that has custom handlers. This new interface has to be implemented by presenter class.
 
-Presenter interface:
+Interface:
 
 ```java
-public interface MyPresenter extends MvpPresenter<MainState> {
-    void doSomething();
+public interface MainPresenter extends MvpPresenter<MainState> {
+    void customHandler(MvpViewHandle<MainState> handle);
 }
 ```
 
-Activity:
+Implementation:
 
 ```java
-public class MainActivity extends MvpActivity<MyPresenter, MainState> {
+public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
+    public MainPresenterImpl(Context context, MainState state) {
+        super(context, state);
+    }
+
+    @Override
+    @MvpHandler
+    public void customHandler(MvpViewHandle<MainState> handle) {
+      // do something
+    }
+}
+```
+
+
+View:
+
+```java
+public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
     @Override
     protected void onStart() {
         super.onStart();
-        presenter.doSomething();
+        presenter.customHandler(getViewHandle());
     }
 
     @Override
@@ -106,44 +185,46 @@ public class MainActivity extends MvpActivity<MyPresenter, MainState> {
 }
 ```
 
-Presenter:
+# Pros and cons
 
-```java
-public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MyPresenter {
-    public MainPresenter(Context context, MainState state) {
-        super(context, state);
-    }
+## Pros
 
-    @MvpHandler
-    void doSomething() {
-    }
-}
-```
+* view lifecycle is simplified
+* all business logic is placed in a single class
+* presenter handlers run on standalone thread (no problem with updating DB entries and so on)
+* error handling
 
-# Caveats
+## Cons
+* there is still no way to perform very long operations from presenter handlers (such as network requests).
+* connected view must have unique layout ID (no way to connect multiple views with the same layout ID)
+* `clone` method must be overridden in some cases  
+* `EditText` can not be update from `onStateChanged`
+* `RecyclerView` adapter must enable stable ID feature
 
-`EditText` can not be update from `onStateChanged` or endless cycle of `onTextChanged` and `onStateChanged` occurs. There is no way to update `EditText` text without `MvpTextWatcher` invocation in other words. It is better to set text once from `onFirstStateChange` or use `MvpEditText` implementation that provides `setTextNoWatchers` method.    
-
-There is still no way to perform very long operations from presenter handlers such as network requests. It blocks other methods invocation.  
-
+If `EditText` is updated from `onStateChanged` then endless cycle of `onTextChanged` and `onStateChanged` occurs. There is no way to update `EditText` text without `MvpTextWatcher` invocation in other words. It is better to set text once from `onFirstStateChange` or use `MvpEditText` implementation that provides `setTextNoWatchers` method.    
+  
 # Test application
 
 Test application demonstrates how various view events are processed by presenter. Every new event is logged to be displayed in UI.
 
-There are three fragments:
+There are following fragments:
 
 * Main fragment
-* Event fragments
+* Timer fragment
+* Events fragment
 * Settings dialog
+* Event info dialog
 
-Main fragment has several controls to show an android toast or a snackbar. Duration and text can be changed. Pay attention that in case of continuous input `onTextChanged` handler is invoked only once.
+Main fragment has several controls to show an android toast or a snackbar. Duration and text can be changed. Also there is a math expression calculator, permissions request and custom handler invocation. Pay attention how incorrect input and undefined mathematical operations are handled. 
 
-Event fragment displays all logged events. Every card has an ID, event title and resource name of view that produced an event. When floating action button is pressed all events are cleared. Precise event may be removed by pressing trashcan icon on the right side of the card. When new view is connected or disconnected an according event is displayed.
+Timer fragment provides a simple timer UI. There is stop/start button and elapsed time indicator. Timer is implemented using custom view (`CircleProgress`). 
 
-Settings dialog is just a mock-up that has radio button group and one switch. It is shown when toolbar gear icon is pressed. Controls state is saved to state so reopen does not change dialog appearance.
+Event fragment displays all logged events. Every card has an ID, event title and some info (resource name of view that produced an event, broadcast intent action). When floating action button is pressed all events are cleared. Precise event may be removed by pressing trashcan icon on the right side of the card. 
+
+Settings dialog provides a control over UI update delay and allows to subscribe to several broadcast events.  
 
 Presenter lifetime is not affected by configuration change so fragments appearance is fully restored when configuration change has been finished.
 
 # License
 MIT License
-Copyright (c) 2019 Pavel Sokolov
+Copyright (c) 2019-2020 Pavel Sokolov
