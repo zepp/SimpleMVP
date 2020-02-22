@@ -20,9 +20,4 @@ public @interface MvpHandler {
      * if true, runs handler using mode otherwise in the main thread
      */
     boolean executor() default true;
-
-    /**
-     * if true, synchronize presenter before running handler
-     */
-    boolean sync() default true;
 }

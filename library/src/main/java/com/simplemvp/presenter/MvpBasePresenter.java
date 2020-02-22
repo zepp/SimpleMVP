@@ -20,7 +20,6 @@ import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpView;
 import com.simplemvp.common.MvpViewHandle;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
@@ -59,7 +58,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.errorHandler = manager.getErrorHandler();
         this.state = state;
         this.id = lastId.incrementAndGet();
-        this.handles = Collections.synchronizedMap(new TreeMap<>());
+        this.handles = new TreeMap<>();
         this.receivers = new TreeMap<>();
         this.commit = scheduler.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
         this.futures = new TreeMap<>((o1, o2) -> o1.hashCode() - o2.hashCode());
@@ -71,6 +70,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      *
      * @param handle {@link MvpViewHandle MvpViewHandle} to connect to
      */
+    @Override
     public final synchronized void connect(MvpViewHandle<S> handle) {
         boolean isFirst = handles.isEmpty();
         if (handles.put(handle.getLayoutId(), handle) == null) {
@@ -87,6 +87,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         }
     }
 
+    @Override
     public final void disconnect(MvpViewHandle<S> handle) {
         disconnectById(handle.getLayoutId());
     }
@@ -105,12 +106,9 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      */
     private synchronized void disconnectById(int layoutId) {
         if (handles.remove(layoutId) != null) {
-            boolean isLast = handles.isEmpty();
-            submit(() -> {
-                if (isLast) {
-                    onLastViewDisconnected();
-                }
-            });
+            if (handles.isEmpty()) {
+                submit(this::onLastViewDisconnected);
+            }
         }
     }
 

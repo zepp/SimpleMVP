@@ -70,23 +70,19 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MvpHandler handler = handlers.get(method.getName());
         if (handler == null) {
-            return invoke(true, method, args);
+            return invoke(method, args);
         } else {
             if (handler.executor()) {
                 presenter.submit(() -> method.invoke(presenter, args));
             } else {
-                return invoke(handler.sync(), method, args);
+                return invoke(method, args);
             }
         }
         return null;
     }
 
-    private Object invoke(boolean sync, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
-        if (sync) {
-            synchronized (presenter) {
-                return method.invoke(presenter, args);
-            }
-        } else {
+    private Object invoke(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        synchronized (presenter) {
             return method.invoke(presenter, args);
         }
     }
