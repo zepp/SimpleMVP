@@ -7,10 +7,10 @@ Another implementation of MVP for Android that is built using:
 
 # Basics
 
-* State holds a data to be rendered by view. After state change a copy is sent to connected views to update ones appearance.
+* State holds a data to be rendered by view. After state change a copy is sent to connected views to update one's appearance.
 * Presenter handles view events such as clicks, item selection and so on. It modifies state. Typically presenter lifetime goes beyond view lifetime.
 * View updates itself after new state is received.
-* Handler is an annotated presenter method to be explicitly on implicitly invoked by view
+* Handler is an annotated presenter method to be explicitly or implicitly invoked by view
 
 ## State
 
@@ -18,9 +18,9 @@ State is inherited from `MvpState` class.
 
 It keeps all data to update or restore view's appearance. It can be text to setup `TextView` or some boolean properties to enable/disable a particular `View`. Changed state is delivered to connected views when presenter handler invokes `commit()` method. 
 
-State has special flag that indicates that it has been changed. It is important to update this flag after field change otherwise state is not delivered to connected views when `commit()` is called. Every field has to have setter that updates this flag in other words.
+State has special flag that indicates that it has been changed. It is important to update this flag after field change otherwise state is not delivered to connected views when `commit()` is called. In other words every field has to have setter to update this flag.
 
-So typical state may look following:
+So a typical state may look following:
 
 ```java
 public class MainState extends MvpState {
@@ -33,7 +33,7 @@ public class MainState extends MvpState {
 }
 ```
 
-View and presenter do not share the same state instance. `commit()` clones state before sending one to connected views so if state contains a complex object or collection then `clone()` method **must** be overridden. It performs defencive copy of such object or collection.   
+View and presenter do not share the same state instance. `commit()` clones state before sending one to connected views so if a state contains a complex object or a collection then `clone()` method **must** be overridden. It performs a defencive copy of such object or collection.   
 
 ```java
 public class MainState extends MvpState {
@@ -52,7 +52,7 @@ public class MainState extends MvpState {
 
 Presenters is inherited from `MvpBasePresenter` class.  
 
-Usually presenter reacts to various event coming from a model or Android system to modify state. Modified state is sent to all connected views after `commit()` method call.
+Usually presenter reacts to various events coming from a model or Android system to modify state. Modified state is sent to all connected views after `commit()` method calls.
 
 Multiple views can share single presenter so all related business logic is placed in a single class.
 
@@ -68,9 +68,9 @@ System events:
 
 There are following methods that reflect presenter lifetime:
 
-* `onFirstViewConnected()` is called when first view is connected. It is suitable place to allocate resources or subscribe to various model events.
+* `onFirstViewConnected()` is called when first view is connected. It is a suitable place to allocate resources or subscribe to various model events.
 * `onViewConnected()` is called when view is connected 
-* `onLastViewDisconnected()` is called when last view is disconnected. It is place to release allocated resources.
+* `onLastViewDisconnected()` is called when last view is disconnected. It is a place to release allocated resources.
 
 Presenter stays alive on configuration change if one has been connected to `MvpActivity` instance.
 
@@ -81,9 +81,9 @@ Presenter handlers are annotated using `@MvpHandler` annotation to specify how t
 There are several methods to initiate state delivery:
 
 * `commit()` immediately sends state to all connected view
-* `commit(long millis)` sends state after short delay in milliseconds
+* `commit(long millis)` sends state after a short delay in milliseconds
 
-In both cases state **must** be changed (see the `setChanged()` and `isChanged()` methods)
+In both cases the state **must** be changed (see the `setChanged()` and `isChanged()` methods)
 
 Also there are following methods to submit and schedule tasks:
 
@@ -118,14 +118,14 @@ Every view has to implement following methods:
 
 If view has a menu then `getMenuId()` method should be overridden to provide menu ID.
 
-`onStateChanged` method is called when new state is received. Views appearance is updated in this method, e.g. controls are enabled or disabled, text is changed and so on. Some views or adapters do not need to be updated so frequently. `onFirstStateChange` method is preferable in such case because it is called only once when view becomes ready. Both methods invocation is affected by view's lifecycle so if view is paused for example then methods are not invoked but queued to be called later when view becomes ready. View becomes ready when it is resumed and menu is inflated if it has one so it is safe to update menu items from both methods.
+`onStateChanged` method is called when new state is received. Views appearance is updated in this method, e.g. controls are enabled or disabled, text is changed and so on. Some views or adapters do not need to be updated so frequently. `onFirstStateChange` method is preferable in such case because it is called only once when view becomes ready. Both methods invocation is affected by view's lifecycle so if view is paused, for example, then methods are not invoked but queued to be called later when view becomes ready. View becomes ready when it is resumed and menu is inflated if it has one so it is safe to update menu items from both methods.
 
 Also `onFirstStateChange` method is a safe place to setup listeners and watchers. There are several ways to do it:
 
 * using `getMvpListener()` method
 * using `newTextWatcher()`, `newQueryTextListener()`, `newOnPageChangeListener()` methods  
 
-`getMvpListener()` method returns unified listener that is suitable for the most cases. It handles clicks, checks and so on (see details in `MvpListener` interface declaration).
+`getMvpListener()` method returns unified listener that is suitable for most cases. It handles clicks, checks and so on (see details in `MvpListener` interface declaration).
 
 `newTextWatcher()` creates watcher that handles text changes of `EditText` view. `newQueryTextListener()` creates listener that handles `SearchView` text change. `newOnPageChangeListener()` creates listener that handles page selection of `ViewPager`. All these listeners and watcher are implicitly unregistered when view is stopped.
 
@@ -197,11 +197,12 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 ## Cons
 * there is still no way to perform very long operations from presenter handlers (such as network requests).
 * connected view must have unique layout ID (no way to connect multiple views with the same layout ID)
-* `clone` method must be overridden in some cases  
-* `EditText` can not be update from `onStateChanged`
+* presenter is active all the time and it is not affected by views state
+* state's `clone()` method must be overridden in some cases   
+* `EditText` can not be updated from `onStateChanged`
 * `RecyclerView` adapter must enable stable ID feature
 
-If `EditText` is updated from `onStateChanged` then endless cycle of `onTextChanged` and `onStateChanged` occurs. There is no way to update `EditText` text without `MvpTextWatcher` invocation in other words. It is better to set text once from `onFirstStateChange` or use `MvpEditText` implementation that provides `setTextNoWatchers` method.    
+If `EditText` is updated from `onStateChanged` then endless cycle of `onTextChanged` and `onStateChanged` occurs. In other words there is no way to update `EditText` text without `MvpTextWatcher` invocation. It is better to set a text once from `onFirstStateChange` or use `MvpEditText` implementation that provides `setTextNoWatchers` method.    
   
 # Test application
 
@@ -215,15 +216,15 @@ There are following fragments:
 * Settings dialog
 * Event info dialog
 
-Main fragment has several controls to show an android toast or a snackbar. Duration and text can be changed. Also there is a math expression calculator, permissions request and custom handler invocation. Pay attention how incorrect input and undefined mathematical operations are handled. 
+Main fragment has several controls to show an android toast or a snackbar. Duration and text can be changed. Also there is a math expression calculator, a permissions request and a custom handler invocation. Pay attention how incorrect input and undefined mathematical operations are handled. 
 
 Timer fragment provides a simple timer UI. There is stop/start button and elapsed time indicator. Timer is implemented using custom view (`CircleProgress`). 
 
-Event fragment displays all logged events. Every card has an ID, event title and some info (resource name of view that produced an event, broadcast intent action). When floating action button is pressed all events are cleared. Precise event may be removed by pressing trashcan icon on the right side of the card. 
+Event fragment displays all logged events. Every card has an ID, an event title and some info (resource name of view that produced an event, broadcast intent action). When floating action button is pressed all events are cleared. Precise event may be removed by pressing trashcan icon on the right side of the card. 
 
 Settings dialog provides a control over UI update delay and allows to subscribe to several broadcast events.  
 
-Presenter lifetime is not affected by configuration change so fragments appearance is fully restored when configuration change has been finished.
+Presenter lifetime is not affected by a configuration change so fragment's appearance is fully restored when configuration change has been finished.
 
 # License
 MIT License
