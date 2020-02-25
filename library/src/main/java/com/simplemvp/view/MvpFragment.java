@@ -71,7 +71,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         eventHandler = new MvpEventHandler<>(this, presenter);
         eventHandler.setEnabled(getMenuId() == 0);
         getLifecycle().addObserver(eventHandler);
-        presenter.connect(getViewHandle());
+        presenter.connect(this);
     }
 
     @Nullable
@@ -90,7 +90,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.disconnect(getViewHandle());
+        presenter.disconnect(this);
         getLifecycle().removeObserver(eventHandler);
     }
 

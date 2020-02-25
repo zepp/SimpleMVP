@@ -68,12 +68,13 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * This method is called by a view to attached oneself to presenter that is instantiated by
      * {@link MvpPresenterManager}
      *
-     * @param handle {@link MvpViewHandle MvpViewHandle} to connect to
+     * @param view {@link MvpViewHandle MvpViewHandle} to connect to
      */
     @Override
-    public final synchronized void connect(MvpViewHandle<S> handle) {
+    public final synchronized void connect(MvpView<S, ?> view) {
         boolean isFirst = handles.isEmpty();
-        if (handles.put(handle.getLayoutId(), handle) == null) {
+        MvpViewHandle<S> handle = view.getViewHandle();
+        if (handles.put(view.getLayoutId(), handle) == null) {
             submit(() -> {
                 if (isFirst) {
                     parentId = handle.getLayoutId();
@@ -88,8 +89,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     @Override
-    public final void disconnect(MvpViewHandle<S> handle) {
-        disconnectById(handle.getLayoutId());
+    public final void disconnect(MvpView<S, ?> view) {
+        disconnectById(view.getLayoutId());
     }
 
     @Override

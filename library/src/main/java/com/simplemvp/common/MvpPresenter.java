@@ -25,17 +25,17 @@ public interface MvpPresenter<S extends MvpState> {
      * instance. Typically this method is called internally by {@link com.simplemvp.view.MvpFragment},
      * {@link com.simplemvp.view.MvpDialogFragment} or {@link com.simplemvp.view.MvpActivity}
      *
-     * @param handle {@link MvpViewHandle} reference
+     * @param view {@link MvpView} reference
      */
-    void connect(MvpViewHandle<S> handle);
+    void connect(MvpView<S, ?> view);
 
     /**
      * This method is called when {@link MvpView MvpView} is about to be closed. Presenter is no more
      * needed in other words. Typically it is called internally by view instance.
      *
-     * @param handle {@link MvpViewHandle} reference
+     * @param view {@link MvpView} reference
      */
-    void disconnect(MvpViewHandle<S> handle);
+    void disconnect(MvpView<S, ?> view);
 
     /**
      * This method disconnects view from presenter by layout ID.
