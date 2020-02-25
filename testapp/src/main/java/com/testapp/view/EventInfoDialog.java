@@ -67,7 +67,8 @@ public class EventInfoDialog extends MvpDialogFragment<MainPresenter, MainState>
             broadcast.setText(event.broadcast);
             broadcastInfo.setText(event.info);
         } else {
-            view.setText(getResources().getResourceEntryName(event.view));
+            view.setText(event.view == 0 ? getString(R.string.event_presenter)
+                    : getResources().getResourceEntryName(event.view));
             viewGroup.setVisibility(View.VISIBLE);
         }
     }

@@ -21,6 +21,15 @@ public class Event {
         this.info = null;
     }
 
+    public Event(EventType type, int id, String handler) {
+        this.type = type;
+        this.id = id;
+        this.handler = handler;
+        this.broadcast = null;
+        this.view = 0;
+        this.info = null;
+    }
+
     public Event(int id, String handler, int view) {
         this.type = EventType.UI;
         this.id = id;
