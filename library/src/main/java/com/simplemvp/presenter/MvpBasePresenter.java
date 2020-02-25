@@ -4,6 +4,9 @@
 
 package com.simplemvp.presenter;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -40,6 +43,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     protected final String tag = getClass().getSimpleName();
     protected final S state;
     private final MvpPresenterManager manager;
+    private final ViewLifecycleObserver observer;
     private final int id;
     private final Map<Integer, MvpViewHandle<S>> handles;
     private final ExecutorService executor;
@@ -53,6 +57,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     public MvpBasePresenter(Context context, S state) {
         super(context);
         this.manager = MvpPresenterManager.getInstance(context);
+        this.observer = new ViewLifecycleObserver();
         this.executor = manager.getExecutor();
         this.scheduler = manager.getScheduledExecutor();
         this.errorHandler = manager.getErrorHandler();
@@ -68,12 +73,13 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * This method is called by a view to attached oneself to presenter that is instantiated by
      * {@link MvpPresenterManager}
      *
-     * @param handle {@link MvpViewHandle MvpViewHandle} to connect to
+     * @param view {@link MvpViewHandle MvpViewHandle} to connect to
      */
     @Override
-    public final synchronized void connect(MvpViewHandle<S> handle) {
+    public final synchronized void connect(MvpView<S, ?> view) {
         boolean isFirst = handles.isEmpty();
-        if (handles.put(handle.getLayoutId(), handle) == null) {
+        MvpViewHandle<S> handle = view.getViewHandle();
+        if (handles.put(view.getLayoutId(), handle) == null) {
             submit(() -> {
                 if (isFirst) {
                     parentId = handle.getLayoutId();
@@ -85,11 +91,13 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         } else {
             handle.post(cloneState());
         }
+        view.getLifecycle().addObserver(observer);
     }
 
     @Override
-    public final void disconnect(MvpViewHandle<S> handle) {
-        disconnectById(handle.getLayoutId());
+    public final void disconnect(MvpView<S, ?> view) {
+        disconnectById(view.getLayoutId());
+        view.getLifecycle().removeObserver(observer);
     }
 
     @Override
@@ -379,6 +387,26 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     /**
+     * This method is called when there is at least one connected view has been started.
+     *
+     * @throws Exception
+     */
+    @CallSuper
+    protected void onActive() throws Exception {
+        Log.d(tag, "onActive()");
+    }
+
+    /**
+     * This method is called when all connected views have been stopped.
+     *
+     * @throws Exception
+     */
+    @CallSuper
+    protected void onInactive() throws Exception {
+        Log.d(tag, "onInactive()");
+    }
+
+    /**
      * This method is called when presenter has no connected views and it is about to be released
      * by {@link MvpPresenterManager}.
      */
@@ -415,6 +443,24 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                 executeSync(() -> onBroadcastReceived(intent, result), false);
                 result.finish();
             });
+        }
+    }
+
+    private class ViewLifecycleObserver implements LifecycleObserver {
+        private final AtomicInteger started = new AtomicInteger();
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        public void onStarted() {
+            if (started.incrementAndGet() == 1) {
+                submit(MvpBasePresenter.this::onActive);
+            }
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+        public void onStopped() {
+            if (started.decrementAndGet() == 0) {
+                submit(MvpBasePresenter.this::onInactive);
+            }
         }
     }
 }

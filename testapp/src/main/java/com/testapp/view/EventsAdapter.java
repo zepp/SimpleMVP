@@ -83,7 +83,11 @@ class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventHolder> {
             id.setText(String.valueOf(event.id));
             handler.setText(event.handler);
             if (event.type == EventType.LIFECYCLE || event.type == EventType.UI) {
-                source.setText(resources.getResourceEntryName(event.view));
+                if (event.view == 0) {
+                    source.setText(R.string.event_presenter);
+                } else {
+                    source.setText(resources.getResourceEntryName(event.view));
+                }
             } else {
                 source.setText(event.broadcast);
             }

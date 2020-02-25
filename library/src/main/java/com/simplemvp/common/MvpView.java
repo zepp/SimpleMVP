@@ -4,6 +4,7 @@
 
 package com.simplemvp.common;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -23,7 +24,7 @@ import com.simplemvp.presenter.MvpPresenterManager;
  * @param <S> state type
  * @param <P> presenter type
  */
-public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> {
+public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends LifecycleOwner {
     /**
      * This method returns layout Id to be inflated by a view
      *

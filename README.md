@@ -70,6 +70,8 @@ There are following methods that reflect presenter lifetime:
 
 * `onFirstViewConnected()` is called when first view is connected. It is a suitable place to allocate resources or subscribe to various model events.
 * `onViewConnected()` is called when view is connected 
+* `onActive()` is called when at least one connected view has been started
+* `onInactive()` is called when all connected views have been stopped
 * `onLastViewDisconnected()` is called when last view is disconnected. It is a place to release allocated resources.
 
 Presenter stays alive on configuration change if one has been connected to `MvpActivity` instance.
@@ -197,7 +199,6 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 ## Cons
 * there is still no way to perform very long operations from presenter handlers (such as network requests).
 * connected view must have unique layout ID (no way to connect multiple views with the same layout ID)
-* presenter is active all the time and it is not affected by views state
 * state's `clone()` method must be overridden in some cases   
 * `EditText` can not be updated from `onStateChanged`
 * `RecyclerView` adapter must enable stable ID feature

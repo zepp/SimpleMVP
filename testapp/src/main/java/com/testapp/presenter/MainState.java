@@ -11,7 +11,7 @@ import java.util.Locale;
 public class MainState extends MvpState {
     public List<Event> events = new ArrayList<>();
     public boolean isEventAdded;
-    public long delay;
+    public long delay = 100;
     public String text = "";
     public ActionDuration duration = ActionDuration.LongDuration;
     public boolean isSubscribedToConnectivity;
