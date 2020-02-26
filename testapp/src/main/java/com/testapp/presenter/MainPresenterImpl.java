@@ -61,16 +61,16 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onActive() throws Exception {
-        super.onActive();
-        state.addEvent(new Event(UI, getEventId(), "onActive"));
+    protected void onViewsActive() throws Exception {
+        super.onViewsActive();
+        state.addEvent(new Event(UI, getEventId(), "onViewsActive"));
         commit(state.delay);
     }
 
     @Override
-    protected void onInactive() throws Exception {
-        super.onInactive();
-        state.addEvent(new Event(UI, getEventId(), "onInactive"));
+    protected void onViewsInactive() throws Exception {
+        super.onViewsInactive();
+        state.addEvent(new Event(UI, getEventId(), "onViewsInactive"));
         commit(state.delay);
     }
 

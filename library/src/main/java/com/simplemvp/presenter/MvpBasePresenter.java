@@ -392,8 +392,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @throws Exception
      */
     @CallSuper
-    protected void onActive() throws Exception {
-        Log.d(tag, "onActive()");
+    protected void onViewsActive() throws Exception {
+        Log.d(tag, "onViewsActive()");
     }
 
     /**
@@ -402,8 +402,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @throws Exception
      */
     @CallSuper
-    protected void onInactive() throws Exception {
-        Log.d(tag, "onInactive()");
+    protected void onViewsInactive() throws Exception {
+        Log.d(tag, "onViewsInactive()");
     }
 
     /**
@@ -452,14 +452,14 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         public void onStarted() {
             if (started.incrementAndGet() == 1) {
-                submit(MvpBasePresenter.this::onActive);
+                submit(MvpBasePresenter.this::onViewsActive);
             }
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         public void onStopped() {
             if (started.decrementAndGet() == 0) {
-                submit(MvpBasePresenter.this::onInactive);
+                submit(MvpBasePresenter.this::onViewsInactive);
             }
         }
     }

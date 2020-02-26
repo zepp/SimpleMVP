@@ -70,8 +70,8 @@ There are following methods that reflect presenter lifetime:
 
 * `onFirstViewConnected()` is called when first view is connected. It is a suitable place to allocate resources or subscribe to various model events.
 * `onViewConnected()` is called when view is connected 
-* `onActive()` is called when at least one connected view has been started
-* `onInactive()` is called when all connected views have been stopped
+* `onViewsActive()` is called when at least one connected view has been started
+* `onViewsInactive()` is called when all connected views have been stopped
 * `onLastViewDisconnected()` is called when last view is disconnected. It is a place to release allocated resources.
 
 Presenter stays alive on configuration change if one has been connected to `MvpActivity` instance.
