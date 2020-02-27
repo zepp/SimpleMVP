@@ -16,12 +16,16 @@ import android.widget.Toast;
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpBasePresenter;
+import com.testapp.AppState;
 import com.testapp.R;
 import com.testapp.common.ActionDuration;
 import com.testapp.common.Event;
 import com.testapp.view.EventInfoDialog;
 import com.testapp.view.SettingsDialog;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -30,17 +34,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.testapp.common.EventType.UI;
 
 public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
+    private final AppState appState;
     private final AtomicInteger lastEventId = new AtomicInteger();
     private final ConnectivityManager connectivityManager;
+    private SimpleDateFormat format;
     private ScheduledFuture<?> timer;
 
     public MainPresenterImpl(Context context, MainState state) {
         super(context, state);
+        appState = AppState.getInstance(context);
         connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     private int getEventId() {
         return lastEventId.incrementAndGet();
+    }
+
+    private ScheduledFuture<?> startTimer() {
+        state.setStarted(true);
+        return schedulePeriodic(() -> {
+            state.incProgress();
+            commit();
+        }, 1, TimeUnit.SECONDS);
+    }
+
+    private void stopTimer(ScheduledFuture<?> timer) {
+        state.setStarted(false);
+        timer.cancel(false);
     }
 
     @Override
@@ -64,6 +84,13 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     protected void onViewsActive() throws Exception {
         super.onViewsActive();
         state.addEvent(new Event(UI, getEventId(), "onViewsActive"));
+        if (appState.isTimerStarted()) {
+            state.setProgress((int) ((System.currentTimeMillis() - appState.getTimerStartedTime()) / 1000));
+            if (timer == null) {
+                timer = startTimer();
+            }
+        }
+        format = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         commit(state.delay);
     }
 
@@ -110,17 +137,17 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 handle.showDialog(SettingsDialog.newInstance(getId()));
             } else if (viewId == R.id.timer_start_stop) {
                 if (timer == null || timer.isDone()) {
+                    appState.setTimerStarted(true);
+                    appState.setTimerStartedTime(System.currentTimeMillis());
                     state.setProgress(0);
-                    state.setStarted(true);
-                    timer = schedulePeriodic(() -> {
-                        state.incProgress();
-                        commit();
-                    }, 1, TimeUnit.SECONDS);
+                    timer = startTimer();
                 } else {
-                    timer.cancel(false);
-                    state.setStarted(false);
-                    handle.showSnackBar(state.getTextProgress(), Snackbar.LENGTH_SHORT,
-                            getString(R.string.main_snackbar_action));
+                    appState.setTimerStarted(false);
+                    stopTimer(timer);
+                    handle.showSnackBar(getString(R.string.timer_started_at) +
+                                    " " + format.format(new Date(appState.getTimerStartedTime())) +
+                                    " " + getString(R.string.timer_duration) + " " + state.getTextProgress(),
+                            Snackbar.LENGTH_LONG, getString(R.string.main_snackbar_action));
                 }
             }
         }

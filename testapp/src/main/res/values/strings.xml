@@ -28,4 +28,6 @@
     <string name="info_view">view</string>
     <string name="info_broadcast">broadcast</string>
     <string name="info_broadcast_info">info</string>
+    <string name="timer_started_at">timer started at </string>
+    <string name="timer_duration">duration</string>
 </resources>
