@@ -248,6 +248,11 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     }
 
     @Override
+    public int getMvpId() {
+        return view.getMvpId();
+    }
+
+    @Override
     public int getLayoutId() {
         return view.getLayoutId();
     }

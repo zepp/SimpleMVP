@@ -17,6 +17,13 @@ import android.support.v4.app.DialogFragment;
 public interface MvpViewHandle<S extends MvpState> {
 
     /**
+     * Returns the ID of the encapsulated view. See {@link MvpView#getMvpId()} for details
+     *
+     * @return ID
+     */
+    int getMvpId();
+
+    /**
      * This method returns layout Id of real view
      *
      * @return layout ID
