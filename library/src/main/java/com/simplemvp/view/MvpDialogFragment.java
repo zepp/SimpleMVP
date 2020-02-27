@@ -63,8 +63,8 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
             presenter = manager.getPresenterInstance(presenterId);
         }
         eventHandler = new MvpEventHandler<>(this, presenter);
+        eventHandler.initialize();
         eventHandler.setEnabled(getMenuId() == 0);
-        getLifecycle().addObserver(eventHandler);
         presenter.connect(this);
     }
 
@@ -85,7 +85,6 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     public void onDestroy() {
         super.onDestroy();
         presenter.disconnect(this);
-        getLifecycle().removeObserver(eventHandler);
     }
 
     @Override
