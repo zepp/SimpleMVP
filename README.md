@@ -198,7 +198,6 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
 ## Cons
 * there is still no way to perform very long operations from presenter handlers (such as network requests).
-* connected view must have unique layout ID (no way to connect multiple views with the same layout ID)
 * state's `clone()` method must be overridden in some cases   
 * `EditText` can not be updated from `onStateChanged`
 * `RecyclerView` adapter must enable stable ID feature
