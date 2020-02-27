@@ -25,6 +25,15 @@ import com.simplemvp.presenter.MvpPresenterManager;
  * @param <P> presenter type
  */
 public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends LifecycleOwner {
+
+    /**
+     * This method returns unique ID of the current view. It is totally unrelated to view ID
+     * specified in layout file.
+     *
+     * @return
+     */
+    int getMvpId();
+
     /**
      * This method returns layout Id to be inflated by a view
      *
