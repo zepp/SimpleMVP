@@ -6,7 +6,6 @@ package com.simplemvp.common;
 
 import android.content.Intent;
 import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
 import android.view.DragEvent;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -38,11 +37,11 @@ public interface MvpPresenter<S extends MvpState> {
     void disconnect(MvpView<S, ?> view);
 
     /**
-     * This method disconnects view from presenter by layout ID.
+     * This method disconnects view from presenter by ID. See {@link MvpView#getMvpId()} for details.
      *
-     * @param layoutId layout id of the connected view
+     * @param id ID
      */
-    void disconnect(@LayoutRes int layoutId);
+    void disconnect(int id);
 
     /**
      * Method to be used by {@link com.simplemvp.presenter.MvpPresenterManager MvpPresenterManager}

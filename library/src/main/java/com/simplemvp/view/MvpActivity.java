@@ -59,8 +59,8 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
             presenter = manager.getPresenterInstance(presenterId);
         }
         eventHandler = new MvpEventHandler<>(this, presenter);
+        eventHandler.initialize();
         eventHandler.setEnabled(getMenuId() == 0);
-        getLifecycle().addObserver(eventHandler);
         presenter.connect(this);
     }
 
@@ -76,7 +76,6 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         if (isFinishing()) {
             presenter.disconnect(this);
         }
-        getLifecycle().removeObserver(eventHandler);
     }
 
     @CallSuper
@@ -101,6 +100,11 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onFirstStateChange(S state) {
         Log.d(tag, "onFirstStateChange(" + state + ")");
+    }
+
+    @Override
+    public int getMvpId() {
+        return hashCode();
     }
 
     @Override

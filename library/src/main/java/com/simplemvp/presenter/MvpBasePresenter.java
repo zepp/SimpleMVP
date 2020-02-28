@@ -79,10 +79,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     public final synchronized void connect(MvpView<S, ?> view) {
         boolean isFirst = handles.isEmpty();
         MvpViewHandle<S> handle = view.getViewHandle();
-        if (handles.put(view.getLayoutId(), handle) == null) {
+        if (handles.put(view.getMvpId(), handle) == null) {
             submit(() -> {
                 if (isFirst) {
-                    parentId = handle.getLayoutId();
+                    parentId = handle.getMvpId();
                     onFirstViewConnected(handle);
                 }
                 onViewConnected(handle);
@@ -96,13 +96,13 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @Override
     public final void disconnect(MvpView<S, ?> view) {
-        disconnectById(view.getLayoutId());
+        disconnectById(view.getMvpId());
         view.getLifecycle().removeObserver(observer);
     }
 
     @Override
-    public final void disconnect(int layoutId) {
-        disconnectById(layoutId);
+    public final void disconnect(int id) {
+        disconnectById(id);
     }
 
     /**
@@ -110,10 +110,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * destroyed. This method call is mandatory otherwise presenter will not be stopped and acquired
      * resources will not be released.
      *
-     * @param layoutId layout ID of the connected view
+     * @param id ID
      */
-    private synchronized void disconnectById(int layoutId) {
-        if (handles.remove(layoutId) != null) {
+    private synchronized void disconnectById(int id) {
+        if (handles.remove(id) != null) {
             if (handles.isEmpty()) {
                 executor.submit(() -> {
                     synchronized (this) {

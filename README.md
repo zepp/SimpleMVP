@@ -198,7 +198,6 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 
 ## Cons
 * there is still no way to perform very long operations from presenter handlers (such as network requests).
-* connected view must have unique layout ID (no way to connect multiple views with the same layout ID)
 * state's `clone()` method must be overridden in some cases   
 * `EditText` can not be updated from `onStateChanged`
 * `RecyclerView` adapter must enable stable ID feature
@@ -219,11 +218,13 @@ There are following fragments:
 
 Main fragment has several controls to show an android toast or a snackbar. Duration and text can be changed. Also there is a math expression calculator, a permissions request and a custom handler invocation. Pay attention how incorrect input and undefined mathematical operations are handled. 
 
-Timer fragment provides a simple timer UI. There is stop/start button and elapsed time indicator. Timer is implemented using custom view (`CircleProgress`). 
+Timer fragment provides a simple timer UI. There is stop/start button and elapsed time indicator. Timer is implemented using custom view (`CircleProgress`). Progress and state are saved between application startup. 
 
 Event fragment displays all logged events. Every card has an ID, an event title and some info (resource name of view that produced an event, broadcast intent action). When floating action button is pressed all events are cleared. Precise event may be removed by pressing trashcan icon on the right side of the card. 
 
 Settings dialog provides a control over UI update delay and allows to subscribe to several broadcast events.  
+
+New DB entry is inserted each time presenter handler is invoked. Also some handlers commit data to shared preferences.  
 
 Presenter lifetime is not affected by a configuration change so fragment's appearance is fully restored when configuration change has been finished.
 

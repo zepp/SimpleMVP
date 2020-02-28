@@ -113,7 +113,7 @@ public final class MvpPresenterManager extends ContextWrapper {
         try {
             return pClass.getConstructor(Context.class, sClass).newInstance(getBaseContext(), state);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            Log.e(tag, e.getLocalizedMessage());
+            Log.e(tag, "error: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -122,7 +122,7 @@ public final class MvpPresenterManager extends ContextWrapper {
         try {
             return clazz.getConstructor().newInstance();
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            Log.e(tag, e.getLocalizedMessage());
+            Log.e(tag, "error: ", e);
             throw new RuntimeException(e);
         }
     }

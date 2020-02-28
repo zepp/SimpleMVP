@@ -29,6 +29,11 @@ public class MainState extends MvpState {
         this.text = text;
     }
 
+    public void setEvents(List<Event> events) {
+        setChanged(true);
+        this.events = events;
+    }
+
     public void addEvent(Event event) {
         setChanged(true);
         events.add(event);
@@ -57,7 +62,7 @@ public class MainState extends MvpState {
         return result;
     }
 
-    public Event getEventById(int eventId) {
+    public Event getEventById(long eventId) {
         for (Event event : events) {
             if (event.id == eventId) {
                 return event;

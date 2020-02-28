@@ -30,10 +30,10 @@ public class EventInfoDialog extends MvpDialogFragment<MainPresenter, MainState>
     private Group broadcastGroup;
 
 
-    public static EventInfoDialog newInstance(int presenterId, int eventId) {
+    public static EventInfoDialog newInstance(int presenterId, long eventId) {
         EventInfoDialog dialog = new EventInfoDialog();
         Bundle args = dialog.initArguments(presenterId);
-        args.putInt(EVENT_ID, eventId);
+        args.putLong(EVENT_ID, eventId);
         return dialog;
     }
 
@@ -58,7 +58,7 @@ public class EventInfoDialog extends MvpDialogFragment<MainPresenter, MainState>
     @Override
     public void onFirstStateChange(MainState state) {
         super.onFirstStateChange(state);
-        Event event = state.getEventById(getArguments().getInt(EVENT_ID));
+        Event event = state.getEventById(getArguments().getLong(EVENT_ID));
         title.setText(event.handler);
         time.setText(format.format(event.timestamp));
         thread.setText(event.thread);

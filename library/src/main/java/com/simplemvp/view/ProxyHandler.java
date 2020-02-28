@@ -28,14 +28,14 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final Set<Method> annotatedMethods;
     private final MvpPresenter<S> presenter;
     private final Handler handler;
-    private final int layoutId;
+    private final int viewId;
 
     ProxyHandler(MvpEventHandler<S> eventHandler, MvpPresenter<S> presenter) {
         this.eventHandler = new WeakReference<>(eventHandler);
         this.presenter = presenter;
         annotatedMethods = Collections.synchronizedSet(getAnnotatedMethods(eventHandler));
         handler = new Handler(Looper.getMainLooper());
-        layoutId = eventHandler.getLayoutId();
+        viewId = eventHandler.getMvpId();
     }
 
     private static boolean isMainThread(Thread thread) {
@@ -56,7 +56,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MvpEventHandler<S> eventHandler = this.eventHandler.get();
         if (eventHandler == null) {
-            presenter.disconnect(layoutId);
+            presenter.disconnect(viewId);
             return null;
         } else {
             if (annotatedMethods.contains(method)) {

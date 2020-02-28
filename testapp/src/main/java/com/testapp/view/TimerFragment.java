@@ -47,6 +47,8 @@ public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
     public void onFirstStateChange(MainState state) {
         super.onFirstStateChange(state);
         startStop.setOnClickListener(getMvpListener());
+        startStop.setImageDrawable(getResources()
+                .getDrawable(state.isStarted ? R.drawable.ic_stop : R.drawable.ic_start));
     }
 
     @Override

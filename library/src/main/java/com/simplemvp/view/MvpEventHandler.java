@@ -66,6 +66,10 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         this.presenter = presenter;
     }
 
+    void initialize() {
+        view.getLifecycle().addObserver(this);
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
         isResumed.set(true);
@@ -89,6 +93,11 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         }
         pageChangeListeners.clear();
         queryTextListeners.clear();
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    public void onDestroyed() {
+        view.getLifecycle().removeObserver(this);
     }
 
     /**
@@ -236,6 +245,11 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         MvpOnPageChangeListener<S> listener = new MvpOnPageChangeListener<>(getProxy(), presenter, view);
         pageChangeListeners.add(listener);
         return listener;
+    }
+
+    @Override
+    public int getMvpId() {
+        return view.getMvpId();
     }
 
     @Override
