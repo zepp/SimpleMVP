@@ -29,6 +29,11 @@ public class MainState extends MvpState {
         this.text = text;
     }
 
+    public void setEvents(List<Event> events) {
+        setChanged(true);
+        this.events = events;
+    }
+
     public void addEvent(Event event) {
         setChanged(true);
         events.add(event);
