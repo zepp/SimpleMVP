@@ -24,8 +24,8 @@ import com.testapp.presenter.MainPresenterImpl;
 import com.testapp.presenter.MainState;
 
 public class MainActivity extends MvpActivity<MainPresenter, MainState> {
-    private final static int FRAGMENT_MAIN = 0;
-    private final static int FRAGMENT_TIMER = 1;
+    private final static int FRAGMENT_TIMER = 0;
+    private final static int FRAGMENT_MAIN = 1;
     private final static int FRAGMENT_EVENTS = 2;
     private InputMethodManager imm;
     private Toolbar toolbar;
