@@ -13,7 +13,7 @@ public class Event {
     public Date timestamp = new Date();
     @Convert(converter = EventTypeConverter.class, dbType = Integer.class)
     public EventType type;
-    @Id(assignable = true)
+    @Id
     public long id;
     public String handler;
     public int view;
@@ -23,36 +23,32 @@ public class Event {
     public Event() {
     }
 
-    public Event(EventType type, long id, String handler, int view) {
+    public Event(EventType type, String handler, int view) {
         this.type = type;
-        this.id = id;
         this.handler = handler;
         this.broadcast = null;
         this.view = view;
         this.info = null;
     }
 
-    public Event(EventType type, long id, String handler) {
+    public Event(EventType type, String handler) {
         this.type = type;
-        this.id = id;
         this.handler = handler;
         this.broadcast = null;
         this.view = 0;
         this.info = null;
     }
 
-    public Event(long id, String handler, int view) {
+    public Event(String handler, int view) {
         this.type = EventType.UI;
-        this.id = id;
         this.handler = handler;
         this.view = view;
         this.broadcast = null;
         this.info = null;
     }
 
-    public Event(long id, String broadcast, String info) {
+    public Event(String broadcast, String info) {
         this.type = EventType.BROADCAST;
-        this.id = id;
         this.handler = "onBroadcastReceived";
         this.broadcast = broadcast;
         this.info = info;

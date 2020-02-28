@@ -30,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
@@ -39,7 +38,6 @@ import static com.testapp.common.EventType.UI;
 
 public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
     private final AppState appState;
-    private final AtomicLong lastEventId = new AtomicLong();
     private final ConnectivityManager connectivityManager;
     private final BoxStore store;
     private final Box<Event> eventBox;
@@ -52,10 +50,6 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         store = MyObjectBox.builder().androidContext(context).build();
         eventBox = store.boxFor(Event.class);
-    }
-
-    private long getEventId() {
-        return lastEventId.incrementAndGet();
     }
 
     private void recordEvent(Event event) {
@@ -80,7 +74,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     protected void onFirstViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onFirstViewConnected(handle);
         state.setEvents(eventBox.getAll());
-        recordEvent(new Event(UI, getEventId(), "onFirstViewConnected", handle.getLayoutId()));
+        recordEvent(new Event(UI, "onFirstViewConnected", handle.getLayoutId()));
         state.setWriteGranted(ContextCompat.checkSelfPermission(getBaseContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
@@ -89,7 +83,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     protected void onViewConnected(MvpViewHandle<MainState> handle) throws Exception {
         super.onViewConnected(handle);
         if (handle.getLayoutId() != R.layout.dialog_event_info) {
-            recordEvent(new Event(UI, getEventId(), "onViewConnected", handle.getLayoutId()));
+            recordEvent(new Event(UI, "onViewConnected", handle.getLayoutId()));
             commit();
         }
     }
@@ -97,7 +91,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @Override
     protected void onViewsActive() throws Exception {
         super.onViewsActive();
-        recordEvent(new Event(UI, getEventId(), "onViewsActive"));
+        recordEvent(new Event(UI, "onViewsActive"));
         if (appState.isTimerStarted()) {
             state.setProgress((int) ((System.currentTimeMillis() - appState.getTimerStartedTime()) / 1000));
             if (timer == null) {
@@ -111,13 +105,14 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @Override
     protected void onViewsInactive() throws Exception {
         super.onViewsInactive();
-        recordEvent(new Event(UI, getEventId(), "onViewsInactive"));
+        recordEvent(new Event(UI, "onViewsInactive"));
         commit(state.delay);
     }
 
     @Override
     protected void onLastViewDisconnected() throws Exception {
         super.onLastViewDisconnected();
+        recordEvent(new Event(UI, "onLastViewDisconnected"));
         store.close();
     }
 
@@ -128,7 +123,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         if (viewId == R.id.main_search) {
             state.setSearchPattern(text.toLowerCase());
         } else {
-            recordEvent(new Event(getEventId(), "onTextChanged", viewId));
+            recordEvent(new Event("onTextChanged", viewId));
             if (viewId == R.id.toast_text) {
                 state.setText(text);
             } else if (viewId == R.id.expression) {
@@ -145,9 +140,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         if (viewId == R.id.clear_all) {
             state.clearEvents();
             eventBox.removeAll();
-            lastEventId.set(0);
         } else {
-            recordEvent(new Event(getEventId(), "onViewClicked", viewId));
+            recordEvent(new Event("onViewClicked", viewId));
             if (viewId == R.id.show_toast) {
                 handle.showToast(state.text, state.duration.getToastDuration());
             } else if (viewId == R.id.show_snackbar) {
@@ -189,7 +183,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         } else if (viewId == R.id.view_pager) {
             state.setCurrentPage((int) item);
         } else {
-            recordEvent(new Event(getEventId(), "onItemSelected", viewId));
+            recordEvent(new Event("onItemSelected", viewId));
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
             }
@@ -201,7 +195,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @MvpHandler
     public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
-        recordEvent(new Event(getEventId(), "onCheckedChanged", viewId));
+        recordEvent(new Event("onCheckedChanged", viewId));
         if (viewId == R.id.settings_connectivity) {
             if (!state.isSubscribedToConnectivity) {
                 subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -220,7 +214,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @MvpHandler
     public void onProgressChanged(MvpViewHandle<MainState> handle, int viewId, int progress) {
         super.onProgressChanged(handle, viewId, progress);
-        recordEvent(new Event(getEventId(), "onProgressChanged", viewId));
+        recordEvent(new Event("onProgressChanged", viewId));
         state.setDelay(progress * 100);
         commit(state.delay);
     }
@@ -229,7 +223,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @MvpHandler
     public void onRequestPermissionsResult(MvpViewHandle<MainState> handle, int requestCode, Map<String, Integer> permissions) {
         super.onRequestPermissionsResult(handle, requestCode, permissions);
-        recordEvent(new Event(getEventId(), "onRequestPermissionsResult", handle.getLayoutId()));
+        recordEvent(new Event("onRequestPermissionsResult", handle.getLayoutId()));
         state.setWriteGranted(permissions.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         commit(state.delay);
     }
@@ -237,7 +231,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @Override
     @MvpHandler(executor = false)
     public void customHandler(MvpViewHandle<MainState> handle, int viewId) {
-        recordEvent(new Event(getEventId(), "customHandler", viewId));
+        recordEvent(new Event("customHandler", viewId));
         handle.showToast(R.string.main_invoked, Toast.LENGTH_SHORT);
         commit(state.delay);
     }
@@ -248,23 +242,23 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();
             if (info == null) {
-                recordEvent(new Event(getEventId(), intent.getAction(), "OFFLINE"));
+                recordEvent(new Event(intent.getAction(), "OFFLINE"));
             } else {
-                recordEvent(new Event(getEventId(), intent.getAction(), info.getTypeName()));
+                recordEvent(new Event(intent.getAction(), info.getTypeName()));
             }
         } else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
             switch (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)) {
                 case BatteryManager.BATTERY_PLUGGED_USB:
-                    recordEvent(new Event(getEventId(), intent.getAction(), "USB"));
+                    recordEvent(new Event(intent.getAction(), "USB"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_AC:
-                    recordEvent(new Event(getEventId(), intent.getAction(), "AC"));
+                    recordEvent(new Event(intent.getAction(), "AC"));
                     break;
                 case BatteryManager.BATTERY_PLUGGED_WIRELESS:
-                    recordEvent(new Event(getEventId(), intent.getAction(), "WIRELESS"));
+                    recordEvent(new Event(intent.getAction(), "WIRELESS"));
                     break;
                 default:
-                    recordEvent(new Event(getEventId(), intent.getAction(), "N/A"));
+                    recordEvent(new Event(intent.getAction(), "N/A"));
                     break;
             }
         }
