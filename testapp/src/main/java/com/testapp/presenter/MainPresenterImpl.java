@@ -29,13 +29,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.testapp.common.EventType.UI;
 
 public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
     private final AppState appState;
-    private final AtomicInteger lastEventId = new AtomicInteger();
+    private final AtomicLong lastEventId = new AtomicLong();
     private final ConnectivityManager connectivityManager;
     private SimpleDateFormat format;
     private ScheduledFuture<?> timer;
@@ -46,7 +46,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
-    private int getEventId() {
+    private long getEventId() {
         return lastEventId.incrementAndGet();
     }
 

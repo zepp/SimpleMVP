@@ -57,7 +57,7 @@ public class MainState extends MvpState {
         return result;
     }
 
-    public Event getEventById(int eventId) {
+    public Event getEventById(long eventId) {
         for (Event event : events) {
             if (event.id == eventId) {
                 return event;

@@ -2,17 +2,28 @@ package com.testapp.common;
 
 import java.util.Date;
 
-public class Event {
-    public final String thread = Thread.currentThread().getName();
-    public final Date timestamp = new Date();
-    public final EventType type;
-    public final int id;
-    public final String handler;
-    public final int view;
-    public final String broadcast;
-    public final String info;
+import io.objectbox.annotation.Convert;
+import io.objectbox.annotation.Entity;
+import io.objectbox.annotation.Id;
+import io.objectbox.converter.PropertyConverter;
 
-    public Event(EventType type, int id, String handler, int view) {
+@Entity
+public class Event {
+    public String thread = Thread.currentThread().getName();
+    public Date timestamp = new Date();
+    @Convert(converter = EventTypeConverter.class, dbType = Integer.class)
+    public EventType type;
+    @Id(assignable = true)
+    public long id;
+    public String handler;
+    public int view;
+    public String broadcast;
+    public String info;
+
+    public Event() {
+    }
+
+    public Event(EventType type, long id, String handler, int view) {
         this.type = type;
         this.id = id;
         this.handler = handler;
@@ -21,7 +32,7 @@ public class Event {
         this.info = null;
     }
 
-    public Event(EventType type, int id, String handler) {
+    public Event(EventType type, long id, String handler) {
         this.type = type;
         this.id = id;
         this.handler = handler;
@@ -30,7 +41,7 @@ public class Event {
         this.info = null;
     }
 
-    public Event(int id, String handler, int view) {
+    public Event(long id, String handler, int view) {
         this.type = EventType.UI;
         this.id = id;
         this.handler = handler;
@@ -39,7 +50,7 @@ public class Event {
         this.info = null;
     }
 
-    public Event(int id, String broadcast, String info) {
+    public Event(long id, String broadcast, String info) {
         this.type = EventType.BROADCAST;
         this.id = id;
         this.handler = "onBroadcastReceived";
@@ -54,5 +65,17 @@ public class Event {
                 "type=" + type +
                 ", handler='" + handler + '\'' +
                 '}';
+    }
+
+    public static class EventTypeConverter implements PropertyConverter<EventType, Integer> {
+        @Override
+        public EventType convertToEntityProperty(Integer databaseValue) {
+            return EventType.values()[databaseValue];
+        }
+
+        @Override
+        public Integer convertToDatabaseValue(EventType entityProperty) {
+            return entityProperty.ordinal();
+        }
     }
 }
