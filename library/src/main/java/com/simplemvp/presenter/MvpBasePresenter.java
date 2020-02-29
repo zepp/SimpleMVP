@@ -191,7 +191,9 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     /**
      * This method is run when {@link #commit} method is about to finish it's work
      */
+    @CallSuper
     protected void afterCommit() {
+        state.afterCommit();
     }
 
     /**

@@ -38,6 +38,9 @@ public abstract class MvpState implements Cloneable {
         return revision;
     }
 
+    public void afterCommit() {
+    }
+
     @Override
     public synchronized MvpState clone() throws CloneNotSupportedException {
         MvpState state = (MvpState) super.clone();

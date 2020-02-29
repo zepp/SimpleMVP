@@ -264,10 +264,4 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         }
         commit(state.delay);
     }
-
-    @Override
-    protected void afterCommit() {
-        state.isEventAdded = false;
-        state.isEvaluated = false;
-    }
 }

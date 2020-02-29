@@ -146,6 +146,12 @@ public class MainState extends MvpState {
     }
 
     @Override
+    public void afterCommit() {
+        isEventAdded = false;
+        isEvaluated = false;
+    }
+
+    @Override
     public String toString() {
         return "MainState{" +
                 "delay=" + delay +
