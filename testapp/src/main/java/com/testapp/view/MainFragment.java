@@ -86,6 +86,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
         expression.addTextChangedListener(newTextWatcher(expression));
         eval.setOnClickListener(v -> {
             imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+            v.setEnabled(false);
             getMvpListener().onClick(v);
         });
         reqPermissions.setOnClickListener(v ->
