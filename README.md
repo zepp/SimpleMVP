@@ -96,9 +96,12 @@ Also there are following methods to submit and schedule tasks:
 Presenter does not hold strong reference to connected view. It collects `MvpViewHandle` instance that encapsulates weak reference to view so if view is suddenly destroyed (`onDestroy` method is not invoked) then presenter disconnects itself from a such view. Presenter interacts with a view using `MvpViewHandle` class reference that provides following methods:
 
 * `getArguments()` returns an argument bundle
-* `showToast()` shows a toast with a specified text
-* `showSnackBar()` show a snackbar with a specified text and action (optional)
-* `finish()` is called when view should be closed
+* `showToast()` to show a toast with a specified text
+* `showSnackBar()` to show a snackbar with a specified text and action (optional)
+* `startActivity()` to start a new activity
+* `startActivityForResult()` to start an activity for result (calling view **must** be an activity)
+* `showDialog()` to show a dialog
+* `finish()` to finish the calling view
 
 `MvpViewHandle` is passed to all default handlers. It is a best practice when custom handler is added.
 
@@ -125,11 +128,13 @@ If view has a menu then `getMenuId()` method should be overridden to provide men
 Also `onFirstStateChange` method is a safe place to setup listeners and watchers. There are several ways to do it:
 
 * using `getMvpListener()` method
-* using `newTextWatcher()`, `newQueryTextListener()`, `newOnPageChangeListener()` methods  
+* using `newTextWatcher()`, `newQueryTextListener()`, `newOnPageChangeListener()`, `getMvpClickListener()` methods  
 
 `getMvpListener()` method returns unified listener that is suitable for most cases. It handles clicks, checks and so on (see details in `MvpListener` interface declaration).
 
 `newTextWatcher()` creates watcher that handles text changes of `EditText` view. `newQueryTextListener()` creates listener that handles `SearchView` text change. `newOnPageChangeListener()` creates listener that handles page selection of `ViewPager`. All these listeners and watcher are implicitly unregistered when view is stopped.
+
+`getMvpClickListener()` method returns click listener that disables a view after click. It is handy in some cases to prevent user from starting multiple async operations.
 
 `onInitPresenter` method is called when presenter initialization is required (view has been just created and has no presenter instance reference). `MvpPresenterManager` reference is passed to this method to instantiate new presenter or lookup existing presenter by ID. Typically parent view creates presenter instance which ID is shared with child views. `MvpFragment` and `MvpDialogFragment` have `initArguments` method to initialize arguments bundle with presenter ID. `MvpDialogFragment` looks up for presenter instance implicitly.
 
