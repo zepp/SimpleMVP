@@ -58,6 +58,13 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     Context getContext();
 
     /**
+     * This method returns root {@link View view} of the current {@link MvpView}
+     *
+     * @return
+     */
+    View getView();
+
+    /**
      * This method return view's arguments that were supplied in constructor or factory method.
      *
      * @return {@link Bundle Bundle} reference
@@ -70,6 +77,16 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @return presenter
      */
     P getPresenter();
+
+    /**
+     * This method is called during view initialization (typically in {@link android.app.Activity#onCreate(Bundle) onCreate}
+     * or in {@link android.support.v4.app.Fragment#onCreate(Bundle) onCreate}) to created a new presenter
+     * instance
+     *
+     * @param manager {@link MvpPresenterManager MvpPresenterManager} instance
+     * @return new presenter instance
+     */
+    P onInitPresenter(MvpPresenterManager manager);
 
     /**
      * This method is called when state is changed and view should update its state
@@ -93,34 +110,24 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     MvpViewHandle<S> getViewHandle();
 
     /**
+     * Method to be called when {@link MvpView MvpView} is no longer needed and should be closed
+     */
+    void finish();
+
+    /**
+     * This method shows a dialog using view {@link android.support.v4.app.FragmentManager} and {@link Context}
+     *
+     * @param dialog dialog fragment to be shown
+     */
+    void showDialog(DialogFragment dialog);
+
+    /**
      * This methods returns universal listener that combines a lot of {@link View View} listeners to
      * handle various events
      *
      * @return
      */
     MvpListener getMvpListener();
-
-    /**
-     * This method returns root {@link View view} of the current {@link MvpView}
-     *
-     * @return
-     */
-    View getView();
-
-    /**
-     * This method is called during view initialization (typically in {@link android.app.Activity#onCreate(Bundle) onCreate}
-     * or in {@link android.support.v4.app.Fragment#onCreate(Bundle) onCreate}) to created a new presenter
-     * instance
-     *
-     * @param manager {@link MvpPresenterManager MvpPresenterManager} instance
-     * @return new presenter instance
-     */
-    P onInitPresenter(MvpPresenterManager manager);
-
-    /**
-     * Method to be called when {@link MvpView MvpView} is no longer needed and should be closed
-     */
-    void finish();
 
     /**
      * This method returns new {@link android.text.TextWatcher TextWatcher} for provided view to
@@ -150,9 +157,10 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     ViewPager.OnPageChangeListener newOnPageChangeListener(ViewPager view);
 
     /**
-     * This method shows a dialog using view {@link android.support.v4.app.FragmentManager} and {@link Context}
+     * This method returns listener that implements {@link View.OnClickListener} to handle view clicks
      *
-     * @param dialog dialog fragment to be shown
+     * @param isAutoLocking disable view instance after click
+     * @return {@link View.OnClickListener} instance
      */
-    void showDialog(DialogFragment dialog);
+    View.OnClickListener getMvpClickListener(boolean isAutoLocking);
 }

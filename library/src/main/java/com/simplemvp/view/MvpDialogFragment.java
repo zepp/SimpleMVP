@@ -123,6 +123,15 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
+    public View.OnClickListener getMvpClickListener(boolean isAutoLocking) {
+        if (isAutoLocking) {
+            return new MvpClickListener<>(getViewHandle(), getPresenter(), true);
+        } else {
+            return getMvpListener();
+        }
+    }
+
+    @Override
     public void showDialog(DialogFragment dialog) {
         dialog.show(getFragmentManager(), dialog.getClass().getSimpleName());
     }
