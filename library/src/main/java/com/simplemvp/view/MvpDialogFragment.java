@@ -123,7 +123,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
-    public View.OnClickListener getMvpClickListener(boolean isAutoLocking) {
+    public View.OnClickListener newMvpClickListener(boolean isAutoLocking) {
         if (isAutoLocking) {
             return new MvpClickListener<>(getViewHandle(), getPresenter(), true);
         } else {

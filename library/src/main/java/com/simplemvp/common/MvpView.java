@@ -162,5 +162,5 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @param isAutoLocking disable view instance after click
      * @return {@link View.OnClickListener} instance
      */
-    View.OnClickListener getMvpClickListener(boolean isAutoLocking);
+    View.OnClickListener newMvpClickListener(boolean isAutoLocking);
 }
