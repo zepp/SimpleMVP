@@ -27,7 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public final class MvpPresenterManager extends ContextWrapper {
     private static volatile MvpPresenterManager instance;
     private final String tag = getClass().getSimpleName();
-    private final Map<Integer, MvpPresenter<?>> map;
+    private final Map<Integer, Wrapper<?>> map;
     private final ScheduledExecutorService scheduledExecutor;
     private volatile ExecutorService executor;
     private volatile Consumer<Throwable> errorHandler;
@@ -78,10 +78,11 @@ public final class MvpPresenterManager extends ContextWrapper {
      */
     public <S extends MvpState, P extends MvpBasePresenter<S>, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends P> pClass, Class<S> sClass) {
         S state = newState(sClass);
-        I presenter = ProxyHandler.newProxy(newPresenter(pClass, sClass, state));
-        map.put(presenter.getId(), presenter);
+        P presenter = newPresenter(pClass, sClass, state);
+        I proxy = ProxyHandler.newProxy(presenter);
+        map.put(presenter.getId(), new Wrapper<>(presenter, proxy));
         Log.d(tag, "new presenter: " + presenter);
-        return presenter;
+        return proxy;
     }
 
     /**
@@ -89,11 +90,11 @@ public final class MvpPresenterManager extends ContextWrapper {
      *
      * @param presenterId presenter Id
      * @param <S>         state type
-     * @param <P>         presenter type
+     * @param <I>         presenter type
      * @return presenter of desired type
      */
-    public <S extends MvpState, P extends MvpPresenter<S>> P getPresenterInstance(int presenterId) {
-        return (P) map.get(presenterId);
+    public <S extends MvpState, I extends MvpPresenter<S>> I getPresenterInstance(int presenterId) {
+        return (I) map.get(presenterId).proxy;
     }
 
     /**
@@ -124,6 +125,16 @@ public final class MvpPresenterManager extends ContextWrapper {
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             Log.e(tag, "error: ", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private class Wrapper<S extends MvpState> {
+        final MvpBasePresenter<S> presenter;
+        final MvpPresenter<S> proxy;
+
+        Wrapper(MvpBasePresenter<S> presenter, MvpPresenter<S> proxy) {
+            this.presenter = presenter;
+            this.proxy = proxy;
         }
     }
 }
