@@ -76,6 +76,11 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     @Override
     public void onStateChanged(MainState state) {
         search.setVisibility(state.currentPage == FRAGMENT_EVENTS ? View.VISIBLE : View.GONE);
+        if (state.currentPage == FRAGMENT_EVENTS) {
+            clearAll.show();
+        } else {
+            clearAll.hide();
+        }
     }
 
     @Override
