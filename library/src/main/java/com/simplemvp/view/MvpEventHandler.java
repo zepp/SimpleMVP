@@ -95,11 +95,6 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         queryTextListeners.clear();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    public void onDestroyed() {
-        view.getLifecycle().removeObserver(this);
-    }
-
     /**
      * This method enables or disables event processing. Event is {@link MvpViewHandle} method call.
      *
