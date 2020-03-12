@@ -61,6 +61,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(getMenuId() != 0);
         int presenterId = savedInstanceState == null ? 0 : getPresenterId(savedInstanceState);
         manager = MvpPresenterManager.getInstance(getContext());
         if (presenterId == 0) {
