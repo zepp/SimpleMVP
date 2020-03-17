@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Pavel A. Sokolov
+ * Copyright (c) 2019-2020 Pavel A. Sokolov
  */
 
 package com.simplemvp.common;
@@ -58,30 +58,30 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     Context getContext();
 
     /**
-     * This method returns root {@link View view} of the current {@link MvpView}
+     * This method returns root {@link View} of the current {@link MvpView}
      *
      * @return
      */
     View getView();
 
     /**
-     * This method return view's arguments that were supplied in constructor or factory method.
+     * This method returns view's arguments that were supplied in constructor or factory method.
      *
-     * @return {@link Bundle Bundle} reference
+     * @return {@link Bundle Bundle} instance
      */
     Bundle getArguments();
 
     /**
-     * This method returns presenter which current view is attached to
+     * This method returns presenter which the current view is attached to
      *
      * @return presenter
      */
     P getPresenter();
 
     /**
-     * This method is called during view initialization (typically in {@link android.app.Activity#onCreate(Bundle) onCreate}
-     * or in {@link android.support.v4.app.Fragment#onCreate(Bundle) onCreate}) to created a new presenter
-     * instance
+     * This method is called during view initialization (typically from {@link android.app.Activity#onCreate(Bundle) onCreate}
+     * or {@link android.support.v4.app.Fragment#onCreate(Bundle) onCreate}) to created a new presenter
+     * instance or look up for existing one.
      *
      * @param manager {@link MvpPresenterManager MvpPresenterManager} instance
      * @return new presenter instance
@@ -89,35 +89,40 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     P onInitPresenter(MvpPresenterManager manager);
 
     /**
-     * This method is called when state is changed and view should update its state
+     * This method is called when state has been changed and view should update itself. Also this
+     * method is invoked when menu has been invalidated.
      *
      * @param state new state
      */
     void onStateChanged(S state);
 
     /**
-     * This method is called once after activity/fragment startup
+     * This method is called after view (activity or fragment) becomes ready to handle changes.
+     * View is ready when it has been resumed and menu has been inflated if view has one.
+     * If view is paused or stopped and placed to a back stack then this method is called again when
+     * view is resumed.
      *
-     * @param state current presenter state
+     * @param state current state
      */
     void onFirstStateChange(S state);
 
     /**
-     * This method returns handle of current MVP view
+     * This method returns {@link MvpViewHandle} of the current view to be passed in any
+     * {@link MvpPresenter} handler.
      *
-     * @return view implementation
+     * @return {@link MvpViewHandle} instance
      */
     MvpViewHandle<S> getViewHandle();
 
     /**
-     * Method to be called when {@link MvpView MvpView} is no longer needed and should be closed
+     * This method terminates current view.
      */
     void finish();
 
     /**
      * This method shows a dialog using view {@link android.support.v4.app.FragmentManager} and {@link Context}
      *
-     * @param dialog dialog fragment to be shown
+     * @param dialog dialog fragment instance to be shown
      */
     void showDialog(DialogFragment dialog);
 

@@ -61,11 +61,11 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         } else {
             if (annotatedMethods.contains(method)) {
                 if (isMainThread(Thread.currentThread())) {
-                    return invoke(eventHandler, method, args);
+                    return handle(eventHandler, method, args);
                 } else {
                     handler.post(() -> {
                         try {
-                            invoke(eventHandler, method, args);
+                            handle(eventHandler, method, args);
                         } catch (Exception e) {
                             Log.e(tag, "error: ", e);
                         }
@@ -78,11 +78,11 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         }
     }
 
-    private Object invoke(MvpEventHandler<S> handler, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
-        if (handler.isResumed()) {
+    private Object handle(MvpEventHandler<S> handler, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        if (handler.isParentViewReady()) {
             return method.invoke(handler, args);
         } else {
-            handler.postEvent(() -> method.invoke(handler, args));
+            handler.submitEvent(() -> method.invoke(handler, args));
             return null;
         }
     }

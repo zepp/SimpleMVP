@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Pavel A. Sokolov
+ * Copyright (c) 2019-2020 Pavel A. Sokolov
  */
 
 package com.simplemvp.common;
@@ -9,12 +9,12 @@ package com.simplemvp.common;
  */
 public abstract class MvpState implements Cloneable {
     /**
-     * revision number of the state
+     * revision number that represents how much time state has been cloned.
      */
     private int revision;
 
     /**
-     * flag that indicates that object is changed
+     * flag that indicates that state has been changed
      */
     private boolean isChanged = false;
 

@@ -45,6 +45,17 @@ import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * This class is encapsulated by parent {@link MvpView} implementation. {@link MvpView} and {@link MvpPresenter}
+ * implementations delegate event processing to this class. It is represented as a {@link MvpListener}
+ * for a {@link MvpView} or as a {@link MvpViewHandle} for a {@link MvpPresenter}.
+ * There is an internal event queue that collects events that comes from a {@link MvpPresenter}
+ * implementation since a {@link MvpView} implementation has a lifecycle and can not handle state
+ * changes anytime. Since this class implements {@link MvpListener} interface it implicitly invokes
+ * {@link MvpPresenter} handlers.
+ *
+ * @param <S> state type
+ */
 class MvpEventHandler<S extends MvpState> extends ContextWrapper
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
     private final static String tag = MvpEventHandler.class.getSimpleName();
@@ -73,7 +84,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
         isResumed.set(true);
-        onEnabledResumed();
+        onEnabledOrResumed();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -96,7 +107,8 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     }
 
     /**
-     * This method enables or disables event processing. Event is {@link MvpViewHandle} method call.
+     * This method enables or disables event processing. Typically {@link MvpView} implementation
+     * disables {@link MvpEventHandler} until menu is inflated.
      *
      * @param enabled true to enable event processing
      * @return true if state is changed
@@ -104,16 +116,18 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     boolean setEnabled(boolean enabled) {
         boolean isChanged = isEnabled.compareAndSet(!enabled, enabled);
         if (isChanged) {
-            onEnabledResumed();
+            onEnabledOrResumed();
         }
         return isChanged;
     }
 
     /**
-     * This method is called when view is resumed or event processing is enabled
+     * This method is called when parent {@link MvpView} has been resumed or event processing is
+     * enabled. It drains event queue or posts last saved state in case of parent {@link MvpView}
+     * is ready.
      */
-    private void onEnabledResumed() {
-        if (isResumed()) {
+    private void onEnabledOrResumed() {
+        if (isParentViewReady()) {
             if (events.isEmpty()) {
                 postLastState();
             } else {
@@ -122,16 +136,30 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         }
     }
 
-    boolean isResumed() {
+    /**
+     * This predicate checks if parent {@link MvpView} implementation is ready to handle state changes.
+     * {@link MvpView} becomes ready to handle state changes when it has been resumed and menu is
+     * inflated. Typically parent {@link MvpView} enables event processing after menu is prepared.
+     *
+     * @return true in case of view is ready, false otherwise
+     */
+    boolean isParentViewReady() {
         return isEnabled.get() && isResumed.get();
     }
 
+    /**
+     * Typically this method is called by parent {@link MvpView} implementation internally
+     * to update itself. It is suitable in cases when menu has been invalidated and so on.
+     */
     void postLastState() {
         if (state != null) {
             post(state);
         }
     }
 
+    /**
+     * This method drains event queue when parent view becomes ready to handle state changes.
+     */
     private void drainEvents() {
         try {
             while (!events.isEmpty()) {
@@ -142,7 +170,12 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         }
     }
 
-    void postEvent(Callable<?> event) {
+    /**
+     * This method is invoked by proxy to submit event for execution
+     *
+     * @param event {@link Callable} instance
+     */
+    void submitEvent(Callable<?> event) {
         events.add(event);
     }
 

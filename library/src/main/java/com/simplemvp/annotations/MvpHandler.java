@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Pavel A. Sokolov
+ * Copyright (c) 2019-2020 Pavel A. Sokolov
  */
 
 package com.simplemvp.annotations;
@@ -17,7 +17,8 @@ import java.lang.annotation.Target;
 public @interface MvpHandler {
 
     /**
-     * if true, runs handler using mode otherwise in the main thread
+     * if true run handler using {@link java.util.concurrent.ExecutorService} otherwise
+     * invoke handler directly on the main thread.
      */
     boolean executor() default true;
 }
