@@ -9,10 +9,11 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpViewHandle;
 import com.simplemvp.presenter.MvpBasePresenter;

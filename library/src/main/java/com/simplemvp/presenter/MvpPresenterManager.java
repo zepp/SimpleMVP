@@ -7,8 +7,9 @@ package com.simplemvp.presenter;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.support.v4.util.Consumer;
 import android.util.Log;
+
+import androidx.core.util.Consumer;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;

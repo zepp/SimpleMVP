@@ -4,17 +4,18 @@
 
 package com.simplemvp.common;
 
-import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.MenuRes;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.SearchView;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.MenuRes;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.viewpager.widget.ViewPager;
 
 import com.simplemvp.presenter.MvpPresenterManager;
 
@@ -79,8 +80,8 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     P getPresenter();
 
     /**
-     * This method is called during view initialization (typically from {@link android.app.Activity#onCreate(Bundle) onCreate}
-     * or {@link android.support.v4.app.Fragment#onCreate(Bundle) onCreate}) to created a new presenter
+     * This method is called during view initialization (typically from {@link com.simplemvp.view.MvpActivity#onCreate(Bundle)}
+     * or {@link com.simplemvp.view.MvpFragment#onCreate(Bundle)}) to created a new presenter
      * instance or look up for existing one.
      *
      * @param manager {@link MvpPresenterManager MvpPresenterManager} instance
@@ -120,7 +121,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     void finish();
 
     /**
-     * This method shows a dialog using view {@link android.support.v4.app.FragmentManager} and {@link Context}
+     * This method shows a dialog using view {@link androidx.fragment.app.FragmentManager} and {@link Context}
      *
      * @param dialog dialog fragment instance to be shown
      */
@@ -144,20 +145,20 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     TextWatcher newTextWatcher(EditText view);
 
     /**
-     * This method returns new {@link android.support.v7.widget.SearchView.OnQueryTextListener OnQueryTextListener}
+     * This method returns new {@link androidx.appcompat.widget.SearchView.OnQueryTextListener}
      * to handle text change.
      *
-     * @param view {@link android.support.v7.widget.SearchView SearchView} instance
+     * @param view {@link SearchView} instance
      * @return new listener instance
      */
     SearchView.OnQueryTextListener newQueryTextListener(SearchView view);
 
     /**
-     * This method new {@link android.support.v4.view.ViewPager.OnPageChangeListener OnPageChangeListener}
-     * to handle page change of {@link ViewPager}
+     * This method new {@link androidx.viewpager.widget.ViewPager.OnPageChangeListener}
+     * to handle page change of {@link androidx.viewpager.widget.ViewPager}
      *
-     * @param view {@link ViewPager} instance
-     * @return {@link android.support.v4.view.ViewPager.OnPageChangeListener OnPageChangeListener} instance
+     * @param view {@link androidx.viewpager.widget.ViewPager} instance
+     * @return {@link androidx.viewpager.widget.ViewPager.OnPageChangeListener OnPageChangeListener} instance
      */
     ViewPager.OnPageChangeListener newOnPageChangeListener(ViewPager view);
 

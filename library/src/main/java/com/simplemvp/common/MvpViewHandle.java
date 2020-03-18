@@ -5,9 +5,10 @@ package com.simplemvp.common;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.StringRes;
-import android.support.v4.app.DialogFragment;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.DialogFragment;
 
 /**
  * This interface describes interface to be used by presenter to interact with MvpView
@@ -69,29 +70,29 @@ public interface MvpViewHandle<S extends MvpState> {
     void showToast(@StringRes int resId, int duration);
 
     /**
-     * This method shows {@link android.support.design.widget.Snackbar} using root view as parent view
+     * This method shows {@link com.google.android.material.snackbar.Snackbar} using root view as parent view
      *
      * @param text     text to be shown
-     * @param duration How long to display text. Either {@link android.support.design.widget.Snackbar#LENGTH_SHORT}
-     *                 or {@link android.support.design.widget.Snackbar#LENGTH_LONG}
+     * @param duration How long to display text. Either {@link com.google.android.material.snackbar.Snackbar#LENGTH_SHORT}
+     *                 or {@link com.google.android.material.snackbar.Snackbar#LENGTH_LONG}
      */
     void showSnackBar(String text, int duration);
 
     /**
-     * This method shows {@link android.support.design.widget.Snackbar} using root view as parent view
+     * This method shows {@link com.google.android.material.snackbar.Snackbar} using root view as parent view
      *
      * @param res      string ID to be shown
-     * @param duration How long to display text. Either {@link android.support.design.widget.Snackbar#LENGTH_SHORT}
-     *                 or {@link android.support.design.widget.Snackbar#LENGTH_LONG}
+     * @param duration How long to display text. Either {@link com.google.android.material.snackbar.Snackbar#LENGTH_SHORT}
+     *                 or {@link com.google.android.material.snackbar.Snackbar#LENGTH_LONG}
      */
     void showSnackBar(@StringRes int res, int duration);
 
     /**
-     * This method shows {@link android.support.design.widget.Snackbar} using root view as parent view
+     * This method shows {@link com.google.android.material.snackbar.Snackbar} using root view as parent view
      *
      * @param text     string ID to be shown
-     * @param duration How long to display text. Either {@link android.support.design.widget.Snackbar#LENGTH_SHORT}
-     *                 or {@link android.support.design.widget.Snackbar#LENGTH_LONG}
+     * @param duration How long to display text. Either {@link com.google.android.material.snackbar.Snackbar#LENGTH_SHORT}
+     *                 or {@link com.google.android.material.snackbar.Snackbar#LENGTH_LONG}
      * @param action   action title to be displayed
      */
     void showSnackBar(String text, int duration, String action);
@@ -116,7 +117,7 @@ public interface MvpViewHandle<S extends MvpState> {
 
     /**
      * This method shows dialog using compat fragment manager.
-     *  @param dialog {@link DialogFragment dialog} to be shown
+     *  @param dialog {@link DialogFragment} to be shown
      *
      */
     void showDialog(DialogFragment dialog);

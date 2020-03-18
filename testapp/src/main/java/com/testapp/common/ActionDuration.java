@@ -1,7 +1,8 @@
 package com.testapp.common;
 
-import android.support.design.widget.Snackbar;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 public enum ActionDuration {
     LongDuration(Toast.LENGTH_LONG, Snackbar.LENGTH_LONG, "Long"),

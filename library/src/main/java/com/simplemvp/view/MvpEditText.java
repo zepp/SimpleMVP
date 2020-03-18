@@ -5,10 +5,11 @@
 package com.simplemvp.view;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatEditText;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatEditText;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -4,15 +4,15 @@
 
 package com.simplemvp.view;
 
-import android.support.v7.widget.SearchView;
+import androidx.appcompat.widget.SearchView;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpViewHandle;
 
 /**
- * This class implements {@link android.support.v7.widget.SearchView.OnQueryTextListener OnQueryTextListener}
- * interface to handle events from {@link android.support.v7.widget.SearchView SearchView} view.
+ * This class implements {@link SearchView.OnQueryTextListener}
+ * interface to handle events from {@link SearchView} view.
  * It invokes {@link MvpPresenter#onTextChanged onTextChanged} method after a short delay. Delay
  * should prevent frequent method invocation if user pressed a button and holds it for period of time.
  *

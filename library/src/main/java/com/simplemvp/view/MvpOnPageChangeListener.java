@@ -1,6 +1,6 @@
 package com.simplemvp.view;
 
-import android.support.v4.view.ViewPager;
+import androidx.viewpager.widget.ViewPager;
 
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;

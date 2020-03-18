@@ -1,11 +1,12 @@
 package com.testapp.view;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.Group;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.Group;
 
 import com.simplemvp.view.MvpDialogFragment;
 import com.testapp.R;

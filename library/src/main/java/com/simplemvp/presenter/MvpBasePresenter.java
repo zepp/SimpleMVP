@@ -4,18 +4,19 @@
 
 package com.simplemvp.presenter;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.annotation.CallSuper;
-import android.support.v4.util.Consumer;
 import android.util.Log;
 import android.view.DragEvent;
+
+import androidx.annotation.CallSuper;
+import androidx.core.util.Consumer;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import com.simplemvp.common.Executable;
 import com.simplemvp.common.MvpPresenter;

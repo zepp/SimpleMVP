@@ -5,13 +5,14 @@
 package com.simplemvp.common;
 
 import android.content.Intent;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.SearchView;
 import android.view.DragEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 
 import com.simplemvp.presenter.MvpBasePresenter;
 
@@ -109,7 +110,7 @@ public interface MvpPresenter<S extends MvpState> {
 
     /**
      * This method handles item selection of {@link android.widget.AdapterView} or any other suitable
-     * view like a {@link android.support.v7.widget.RecyclerView} but in this case you have to invoke
+     * view like a {@link androidx.recyclerview.widget.RecyclerView} but in this case you have to invoke
      * {@link MvpPresenter#onItemSelected(MvpViewHandle, int, Object)} manually.
      * See {@link MvpListener} for details. Use {@link MvpView#getMvpListener()} to connect certain
      * view to the handler.
