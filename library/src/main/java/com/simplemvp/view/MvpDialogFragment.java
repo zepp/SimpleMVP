@@ -39,8 +39,8 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     private final static String PRESENTER_ID = "presenter-id";
     protected final String tag = getClass().getSimpleName();
     protected MvpEventHandler<S> eventHandler;
+    @NonNull
     protected P presenter;
-    private MvpPresenterManager manager;
 
     protected Bundle initArguments(int presenterId) {
         Bundle args = new Bundle();
@@ -57,7 +57,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         int presenterId = savedInstanceState == null ? 0 : getPresenterId(savedInstanceState);
-        manager = MvpPresenterManager.getInstance(getContext());
+        MvpPresenterManager manager = MvpPresenterManager.getInstance(getContext());
         if (presenterId == 0) {
             presenter = onInitPresenter(manager);
         } else {
@@ -89,7 +89,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
-    public void onFirstStateChange(S state) {
+    public void onFirstStateChange(@NonNull S state) {
         Log.d(tag, "onFirstStateChange(" + state + ")");
     }
 
@@ -99,31 +99,37 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
+    @NonNull
     public MvpViewHandle<S> getViewHandle() {
         return eventHandler.getProxy();
     }
 
     @Override
+    @NonNull
     public MvpListener getMvpListener() {
         return eventHandler;
     }
 
     @Override
-    public TextWatcher newTextWatcher(EditText view) {
+    @NonNull
+    public TextWatcher newTextWatcher(@NonNull EditText view) {
         return eventHandler.newTextWatcher(view);
     }
 
     @Override
-    public SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
+    @NonNull
+    public SearchView.OnQueryTextListener newQueryTextListener(@NonNull SearchView view) {
         return eventHandler.newQueryTextListener(view);
     }
 
     @Override
-    public ViewPager.OnPageChangeListener newOnPageChangeListener(ViewPager view) {
+    @NonNull
+    public ViewPager.OnPageChangeListener newOnPageChangeListener(@NonNull ViewPager view) {
         return eventHandler.newOnPageChangeListener(view);
     }
 
     @Override
+    @NonNull
     public View.OnClickListener newMvpClickListener(boolean isAutoLocking) {
         if (isAutoLocking) {
             return new MvpClickListener<>(getViewHandle(), getPresenter(), true);
@@ -133,11 +139,12 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
-    public void showDialog(DialogFragment dialog) {
+    public void showDialog(@NonNull DialogFragment dialog) {
         dialog.show(getFragmentManager(), dialog.getClass().getSimpleName());
     }
 
     @Override
+    @NonNull
     public P getPresenter() {
         return presenter;
     }
@@ -152,7 +159,8 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
-    public P onInitPresenter(MvpPresenterManager manager) {
+    @NonNull
+    public P onInitPresenter(@NonNull MvpPresenterManager manager) {
         if (getArguments() == null) {
             throw new RuntimeException("presenter ID is not supplied");
         } else {

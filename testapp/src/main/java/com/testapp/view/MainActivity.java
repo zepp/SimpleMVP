@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -46,6 +47,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     }
 
     @Override
+    @NonNull
     public MainPresenter onInitPresenter(MvpPresenterManager manager) {
         return manager.newPresenterInstance(MainPresenterImpl.class, MainState.class);
     }
@@ -75,7 +77,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     }
 
     @Override
-    public void onStateChanged(MainState state) {
+    public void onStateChanged(@NonNull MainState state) {
         search.setVisibility(state.currentPage == FRAGMENT_EVENTS ? View.VISIBLE : View.GONE);
         if (state.currentPage == FRAGMENT_EVENTS) {
             clearAll.show();
@@ -85,7 +87,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     }
 
     @Override
-    public void onFirstStateChange(MainState state) {
+    public void onFirstStateChange(@NonNull MainState state) {
         super.onFirstStateChange(state);
         clearAll.setOnClickListener(getMvpListener());
         search.setOnQueryTextListener(newQueryTextListener(search));
@@ -129,7 +131,7 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     private static class OnPageSelected implements ViewPager.OnPageChangeListener {
         private final Consumer<Integer> consumer;
 
-        public OnPageSelected(Consumer<Integer> consumer) {
+        OnPageSelected(Consumer<Integer> consumer) {
             this.consumer = consumer;
         }
 

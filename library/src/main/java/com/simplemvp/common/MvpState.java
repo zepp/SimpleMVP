@@ -4,6 +4,8 @@
 
 package com.simplemvp.common;
 
+import androidx.annotation.NonNull;
+
 /**
  * Base class that describes state of presenter & view
  */
@@ -42,6 +44,7 @@ public abstract class MvpState implements Cloneable {
     }
 
     @Override
+    @NonNull
     public synchronized MvpState clone() throws CloneNotSupportedException {
         MvpState state = (MvpState) super.clone();
         revision++;

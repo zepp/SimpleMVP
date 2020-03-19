@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
 
 import com.simplemvp.common.MvpPresenter;
@@ -28,7 +29,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public final class MvpPresenterManager extends ContextWrapper {
     private static volatile MvpPresenterManager instance;
     private final String tag = getClass().getSimpleName();
-    private final Map<Integer, Wrapper<?>> map;
+    private final Map<Integer, Composite<?>> map;
     private final ScheduledExecutorService scheduledExecutor;
     private volatile ExecutorService executor;
     private volatile Consumer<Throwable> errorHandler;
@@ -52,19 +53,22 @@ public final class MvpPresenterManager extends ContextWrapper {
         return instance;
     }
 
-    public void initialize(ExecutorService executor, Consumer<Throwable> handler) {
+    public void initialize(@NonNull ExecutorService executor, @NonNull Consumer<Throwable> handler) {
         this.executor = executor;
         this.errorHandler = handler;
     }
 
+    @NonNull
     ExecutorService getExecutor() {
         return executor;
     }
 
+    @NonNull
     ScheduledExecutorService getScheduledExecutor() {
         return scheduledExecutor;
     }
 
+    @NonNull
     Consumer<Throwable> getErrorHandler() {
         return errorHandler;
     }
@@ -77,11 +81,12 @@ public final class MvpPresenterManager extends ContextWrapper {
      * @param sClass class of state
      * @return new presenter
      */
+    @NonNull
     public <S extends MvpState, P extends MvpBasePresenter<S>, I extends MvpPresenter<S>> I newPresenterInstance(Class<? extends P> pClass, Class<S> sClass) {
         S state = newState(sClass);
         P presenter = newPresenter(pClass, sClass, state);
         I proxy = ProxyHandler.newProxy(presenter);
-        map.put(presenter.getId(), new Wrapper<>(presenter, proxy));
+        map.put(presenter.getId(), new Composite<>(presenter, proxy));
         Log.d(tag, "new presenter: " + presenter);
         return proxy;
     }
@@ -94,8 +99,13 @@ public final class MvpPresenterManager extends ContextWrapper {
      * @param <I>         presenter type
      * @return presenter of desired type
      */
+    @NonNull
     public <S extends MvpState, I extends MvpPresenter<S>> I getPresenterInstance(int presenterId) {
-        return (I) map.get(presenterId).proxy;
+        Composite<S> composite = (Composite<S>) map.get(presenterId);
+        if (composite == null) {
+            throw new RuntimeException("presenter instance not found");
+        }
+        return (I) composite.proxy;
     }
 
     /**
@@ -103,7 +113,7 @@ public final class MvpPresenterManager extends ContextWrapper {
      *
      * @param presenter instance to be released if one has no attached views
      */
-    public void releasePresenter(MvpPresenter<?> presenter) {
+    public void releasePresenter(@NonNull MvpPresenter<?> presenter) {
         if (presenter.isDisconnected()) {
             if (map.remove(presenter.getId()) != null) {
                 Log.d(tag, "release presenter: " + presenter);
@@ -129,11 +139,11 @@ public final class MvpPresenterManager extends ContextWrapper {
         }
     }
 
-    private class Wrapper<S extends MvpState> {
+    private static class Composite<S extends MvpState> {
         final MvpBasePresenter<S> presenter;
         final MvpPresenter<S> proxy;
 
-        Wrapper(MvpBasePresenter<S> presenter, MvpPresenter<S> proxy) {
+        Composite(MvpBasePresenter<S> presenter, MvpPresenter<S> proxy) {
             this.presenter = presenter;
             this.proxy = proxy;
         }

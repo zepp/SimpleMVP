@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.DialogFragment;
 
@@ -37,7 +38,7 @@ public interface MvpViewHandle<S extends MvpState> {
      *
      * @param state
      */
-    void post(S state);
+    void post(@NonNull S state);
 
     /**
      * This method terminates parent view
@@ -96,7 +97,7 @@ public interface MvpViewHandle<S extends MvpState> {
      *
      * @param intent {@link Intent intent} instance
      */
-    void startActivity(Intent intent);
+    void startActivity(@NonNull Intent intent);
 
     /**
      * Launch an activity for which you would like a result when it finished. This method invokes
@@ -106,12 +107,12 @@ public interface MvpViewHandle<S extends MvpState> {
      * @param requestCode If >= 0, this code will be returned in onActivityResult() when the
      *                    activity exits.
      */
-    void startActivityForResult(Intent intent, int requestCode);
+    void startActivityForResult(@NonNull Intent intent, int requestCode);
 
     /**
      * This method shows dialog using compat fragment manager.
      *  @param dialog {@link DialogFragment} to be shown
      *
      */
-    void showDialog(DialogFragment dialog);
+    void showDialog(@NonNull DialogFragment dialog);
 }

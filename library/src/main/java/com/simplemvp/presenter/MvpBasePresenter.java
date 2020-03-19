@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.DragEvent;
 
 import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -78,7 +79,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * @param view {@link MvpViewHandle MvpViewHandle} to connect to
      */
     @Override
-    public final synchronized void connect(MvpView<S, ?> view) {
+    public final synchronized void connect(@NonNull MvpView<S, ?> view) {
         boolean isFirst = handles.isEmpty();
         MvpViewHandle<S> handle = view.getViewHandle();
         if (handles.put(view.getMvpId(), handle) == null) {
@@ -98,7 +99,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     @Override
-    public final void disconnect(MvpView<S, ?> view) {
+    public final void disconnect(@NonNull MvpView<S, ?> view) {
         disconnectById(view.getMvpId());
         view.getLifecycle().removeObserver(observer);
     }
@@ -294,51 +295,51 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @CallSuper
     @Override
-    public void onActivityResult(MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(@NonNull MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data) {
         Log.d(tag, "onActivityResult(" + requestCode + ", " + resultCode + ", " + data + ")");
     }
 
     @CallSuper
     @Override
-    public void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, Map<String, Integer> permissions) {
+    public void onRequestPermissionsResult(@NonNull MvpViewHandle<S> handle, int requestCode, @NonNull Map<String, Integer> permissions) {
         Log.d(tag, "onRequestPermissionsResult(" + requestCode + ", " + permissions.keySet());
     }
 
     @CallSuper
     @Override
-    public void onViewClicked(MvpViewHandle<S> handle, int viewId) {
+    public void onViewClicked(@NonNull MvpViewHandle<S> handle, int viewId) {
         Log.d(tag, "onViewClicked(" + getResources().getResourceName(viewId) + ")");
     }
 
     @CallSuper
     @Override
-    public void onItemSelected(MvpViewHandle<S> handle, int viewId, Object item) {
+    public void onItemSelected(@NonNull MvpViewHandle<S> handle, int viewId, Object item) {
         Log.d(tag, "onItemSelected(" + getResources().getResourceName(viewId) + ", " + item + ")");
     }
 
     @CallSuper
     @Override
-    public void onTextChanged(MvpViewHandle<S> handle, int viewId, String text) {
+    public void onTextChanged(@NonNull MvpViewHandle<S> handle, int viewId, String text) {
         Log.d(tag, "onTextChanged(" + getResources().getResourceName(viewId) + ", " + text + ")");
     }
 
     @Override
-    public void onCheckedChanged(MvpViewHandle<S> handle, int viewId, boolean isChecked) {
+    public void onCheckedChanged(@NonNull MvpViewHandle<S> handle, int viewId, boolean isChecked) {
         Log.d(tag, "onCheckedChanged(" + getResources().getResourceName(viewId) + ", " + isChecked + ")");
     }
 
     @Override
-    public void onRadioCheckedChanged(MvpViewHandle<S> handle, int radioViewId, int viewId) {
+    public void onRadioCheckedChanged(@NonNull MvpViewHandle<S> handle, int radioViewId, int viewId) {
         Log.d(tag, "onRadioCheckedChanged(" + getResources().getResourceName(radioViewId) + ", " + viewId + ")");
     }
 
     @Override
-    public void onDrag(MvpViewHandle<S> handle, int viewId, DragEvent event) {
+    public void onDrag(@NonNull MvpViewHandle<S> handle, int viewId, DragEvent event) {
         Log.d(tag, "onDrag(" + getResources().getResourceName(viewId) + ", " + event + ")");
     }
 
     @Override
-    public void onProgressChanged(MvpViewHandle<S> handle, int viewId, int progress) {
+    public void onProgressChanged(@NonNull MvpViewHandle<S> handle, int viewId, int progress) {
         Log.d(tag, "onProgressChanged(" + getResources().getResourceName(viewId) + ", " + progress + ")");
     }
 
@@ -361,11 +362,11 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     /**
      * This method is called when broadcast intent is received.
-     *  @param intent {@link Intent} instance
+     * @param intent {@link Intent} instance
      * @param result
      */
     @CallSuper
-    protected void onBroadcastReceived(Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
+    protected void onBroadcastReceived(@NonNull Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
         Log.d(tag, "onBroadcastReceived(" + intent + ")");
     }
 
@@ -375,10 +376,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * values and subscribes to necessary events.
      *
      * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
-     * @param arguments
+     * @param arguments {@link Bundle} that keeps arguments attached to a view
      */
     @CallSuper
-    protected void onFirstViewConnected(MvpViewHandle<S> handle, Bundle arguments) throws Exception {
+    protected void onFirstViewConnected(@NonNull MvpViewHandle<S> handle, @NonNull Bundle arguments) throws Exception {
         Log.d(tag, "onFirstViewConnected(" + getResources().getResourceName(handle.getLayoutId()) + ")");
     }
 
@@ -386,10 +387,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * This method is called when fresh view is connected to a presenter.
      *
      * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
-     * @param arguments
+     * @param arguments {@link Bundle} that keeps arguments attached to a view
      */
     @CallSuper
-    protected void onViewConnected(MvpViewHandle<S> handle, Bundle arguments) throws Exception {
+    protected void onViewConnected(@NonNull MvpViewHandle<S> handle, @NonNull Bundle arguments) throws Exception {
         Log.d(tag, "onViewConnected(" + getResources().getResourceName(handle.getLayoutId()) + ")");
     }
 

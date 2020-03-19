@@ -45,7 +45,7 @@ public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
-    public void onFirstStateChange(MainState state) {
+    public void onFirstStateChange(@NonNull MainState state) {
         super.onFirstStateChange(state);
         startStop.setOnClickListener(getMvpListener());
         startStop.setImageDrawable(getResources()
@@ -53,7 +53,7 @@ public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
-    public void onStateChanged(MainState state) {
+    public void onStateChanged(@NonNull MainState state) {
         progress.setProgress(state.progress);
         text.setText(state.getTextProgress());
         if (state.isTimerStateChanged()) {
@@ -63,6 +63,7 @@ public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
+    @NonNull
     public MainPresenter onInitPresenter(MvpPresenterManager manager) {
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }

@@ -46,14 +46,14 @@ public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
-    public void onFirstStateChange(MainState state) {
+    public void onFirstStateChange(@NonNull MainState state) {
         super.onFirstStateChange(state);
         eventsAdapter.setListener(pair ->
                 presenter.onItemSelected(getViewHandle(), pair.first.getId(), pair.second));
     }
 
     @Override
-    public void onStateChanged(MainState state) {
+    public void onStateChanged(@NonNull MainState state) {
         List<Event> items = state.getFilteredEvents();
         eventsAdapter.setEvents(items);
         if (state.isEventAdded) {
@@ -62,6 +62,7 @@ public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
+    @NonNull
     public MainPresenter onInitPresenter(MvpPresenterManager manager) {
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }

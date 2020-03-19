@@ -12,6 +12,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -73,7 +74,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onFirstViewConnected(MvpViewHandle<MainState> handle, Bundle arguments) throws Exception {
+    protected void onFirstViewConnected(@NonNull MvpViewHandle<MainState> handle, @NonNull Bundle arguments) throws Exception {
         super.onFirstViewConnected(handle, arguments);
         state.setEvents(eventBox.getAll());
         recordEvent(new Event(UI, "onFirstViewConnected", handle.getLayoutId()));
@@ -82,7 +83,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onViewConnected(MvpViewHandle<MainState> handle, Bundle arguments) throws Exception {
+    protected void onViewConnected(@NonNull MvpViewHandle<MainState> handle, @NonNull Bundle arguments) throws Exception {
         super.onViewConnected(handle, arguments);
         if (handle.getLayoutId() != R.layout.dialog_event_info) {
             recordEvent(new Event(UI, "onViewConnected", handle.getLayoutId()));
@@ -120,7 +121,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onTextChanged(MvpViewHandle<MainState> handle, int viewId, String text) {
+    public void onTextChanged(@NonNull MvpViewHandle<MainState> handle, int viewId, String text) {
         super.onTextChanged(handle, viewId, text);
         if (viewId == R.id.main_search) {
             state.setSearchPattern(text.toLowerCase());
@@ -137,7 +138,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onViewClicked(MvpViewHandle<MainState> handle, int viewId) {
+    public void onViewClicked(@NonNull MvpViewHandle<MainState> handle, int viewId) {
         super.onViewClicked(handle, viewId);
         if (viewId == R.id.clear_all) {
             state.clearEvents();
@@ -174,7 +175,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onItemSelected(MvpViewHandle<MainState> handle, int viewId, Object item) {
+    public void onItemSelected(@NonNull MvpViewHandle<MainState> handle, int viewId, Object item) {
         super.onItemSelected(handle, viewId, item);
         if (viewId == R.id.event_delete) {
             Event event = (Event) item;
@@ -195,7 +196,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onCheckedChanged(MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
+    public void onCheckedChanged(@NonNull MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
         recordEvent(new Event("onCheckedChanged", viewId));
         if (viewId == R.id.settings_connectivity) {
@@ -214,7 +215,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onProgressChanged(MvpViewHandle<MainState> handle, int viewId, int progress) {
+    public void onProgressChanged(@NonNull MvpViewHandle<MainState> handle, int viewId, int progress) {
         super.onProgressChanged(handle, viewId, progress);
         recordEvent(new Event("onProgressChanged", viewId));
         state.setDelay(progress * 100);
@@ -223,7 +224,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onRequestPermissionsResult(MvpViewHandle<MainState> handle, int requestCode, Map<String, Integer> permissions) {
+    public void onRequestPermissionsResult(@NonNull MvpViewHandle<MainState> handle, int requestCode, @NonNull Map<String, Integer> permissions) {
         super.onRequestPermissionsResult(handle, requestCode, permissions);
         recordEvent(new Event("onRequestPermissionsResult", handle.getLayoutId()));
         state.setWriteGranted(permissions.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -239,7 +240,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onBroadcastReceived(Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
+    protected void onBroadcastReceived(@NonNull Intent intent, BroadcastReceiver.PendingResult result) throws Exception {
         super.onBroadcastReceived(intent, result);
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();

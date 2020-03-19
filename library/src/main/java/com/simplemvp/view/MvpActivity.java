@@ -45,15 +45,15 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     private final static String PRESENTER_ID = "presenter-id";
     protected final String tag = getClass().getSimpleName();
     protected MvpEventHandler<S> eventHandler;
+    @NonNull
     protected P presenter;
-    private MvpPresenterManager manager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         int presenterId = savedInstanceState == null ? 0 : savedInstanceState.getInt(PRESENTER_ID);
         setContentView(getLayoutId());
-        manager = MvpPresenterManager.getInstance(this);
+        MvpPresenterManager manager = MvpPresenterManager.getInstance(this);
         if (presenterId == 0) {
             presenter = onInitPresenter(manager);
         } else {
@@ -66,7 +66,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(PRESENTER_ID, presenter.getId());
     }
@@ -99,7 +99,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
-    public void onFirstStateChange(S state) {
+    public void onFirstStateChange(@NonNull S state) {
         Log.d(tag, "onFirstStateChange(" + state + ")");
     }
 
@@ -109,21 +109,25 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
+    @NonNull
     public MvpViewHandle<S> getViewHandle() {
         return eventHandler.getProxy();
     }
 
     @Override
+    @NonNull
     public MvpListener getMvpListener() {
         return eventHandler;
     }
 
     @Override
+    @NonNull
     public View getView() {
         return getWindow().getDecorView().getRootView();
     }
 
     @Override
+    @NonNull
     public Context getContext() {
         return getBaseContext();
     }
@@ -134,21 +138,25 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
-    public TextWatcher newTextWatcher(EditText view) {
+    @NonNull
+    public TextWatcher newTextWatcher(@NonNull EditText view) {
         return eventHandler.newTextWatcher(view);
     }
 
     @Override
-    public SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
+    @NonNull
+    public SearchView.OnQueryTextListener newQueryTextListener(@NonNull SearchView view) {
         return eventHandler.newQueryTextListener(view);
     }
 
     @Override
-    public ViewPager.OnPageChangeListener newOnPageChangeListener(ViewPager view) {
+    @NonNull
+    public ViewPager.OnPageChangeListener newOnPageChangeListener(@NonNull ViewPager view) {
         return eventHandler.newOnPageChangeListener(view);
     }
 
     @Override
+    @NonNull
     public View.OnClickListener newMvpClickListener(boolean isAutoLocking) {
         if (isAutoLocking) {
             return new MvpClickListener<>(getViewHandle(), getPresenter(), true);
@@ -158,11 +166,12 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
-    public void showDialog(DialogFragment dialog) {
+    public void showDialog(@NonNull DialogFragment dialog) {
         dialog.show(getSupportFragmentManager(), dialog.getClass().getSimpleName());
     }
 
     @Override
+    @NonNull
     public P getPresenter() {
         return presenter;
     }

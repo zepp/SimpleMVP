@@ -71,7 +71,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private MvpViewHandle<S> proxy;
     private S state;
 
-    MvpEventHandler(MvpView<S, ?> view, MvpPresenter<S> presenter) {
+    MvpEventHandler(@NonNull MvpView<S, ?> view, @NonNull MvpPresenter<S> presenter) {
         super(view.getContext());
         this.view = view;
         this.presenter = presenter;
@@ -183,6 +183,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         return isFirstStateChange.getAndSet(false);
     }
 
+    @NonNull
     MvpViewHandle<S> getProxy() {
         if (proxy == null) {
             proxy = newProxy();
@@ -254,21 +255,24 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         presenter.onRequestPermissionsResult(getProxy(), requestCode, perms);
     }
 
-    TextWatcher newTextWatcher(EditText view) {
+    @NonNull
+    TextWatcher newTextWatcher(@NonNull EditText view) {
         Log.d(tag, "new text watcher for view: " + view);
         MvpTextWatcher<S> watcher = new MvpTextWatcher<>(getProxy(), presenter, view);
         textWatchers.add(watcher);
         return watcher;
     }
 
-    SearchView.OnQueryTextListener newQueryTextListener(SearchView view) {
+    @NonNull
+    SearchView.OnQueryTextListener newQueryTextListener(@NonNull SearchView view) {
         Log.d(tag, "new query text listener for view: " + view);
         MvpOnQueryTextListener<S> listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view);
         queryTextListeners.add(listener);
         return listener;
     }
 
-    ViewPager.OnPageChangeListener newOnPageChangeListener(ViewPager view) {
+    @NonNull
+    ViewPager.OnPageChangeListener newOnPageChangeListener(@NonNull ViewPager view) {
         Log.d(tag, "new page change lster for view: " + view);
         MvpOnPageChangeListener<S> listener = new MvpOnPageChangeListener<>(getProxy(), presenter, view);
         pageChangeListeners.add(listener);
@@ -287,7 +291,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     @Override
     @MvpHandler
-    public void post(S state) {
+    public void post(@NonNull S state) {
         if (isFirstStateChange()) {
             view.onFirstStateChange(state);
         }
@@ -303,7 +307,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     @Override
     @MvpHandler
-    public void showDialog(DialogFragment dialog) {
+    public void showDialog(@NonNull DialogFragment dialog) {
         view.showDialog(dialog);
     }
 
@@ -333,24 +337,24 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @Override
     @MvpHandler
     public void showToast(String text, int duration) {
-        Toast.makeText(view.getContext(), text, duration).show();
+        Toast.makeText(getBaseContext(), text, duration).show();
     }
 
     @Override
     @MvpHandler
     public void showToast(int resId, int duration) {
-        Toast.makeText(view.getContext(), resId, duration).show();
+        Toast.makeText(getBaseContext(), resId, duration).show();
     }
 
     @Override
     @MvpHandler
-    public void startActivity(Intent intent) {
-        view.getContext().startActivity(intent);
+    public void startActivity(@NonNull Intent intent) {
+        getBaseContext().startActivity(intent);
     }
 
     @Override
     @MvpHandler
-    public void startActivityForResult(Intent intent, int requestCode) {
+    public void startActivityForResult(@NonNull Intent intent, int requestCode) {
         if (view instanceof AppCompatActivity) {
             ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
         } else {

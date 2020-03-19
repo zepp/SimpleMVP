@@ -73,7 +73,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
-    public void onFirstStateChange(MainState state) {
+    public void onFirstStateChange(@NonNull MainState state) {
         super.onFirstStateChange(state);
         showToast.setOnClickListener(getMvpListener());
         showSnackBar.setOnClickListener(getMvpListener());
@@ -96,7 +96,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
-    public void onStateChanged(MainState state) {
+    public void onStateChanged(@NonNull MainState state) {
         showToast.setEnabled(!state.text.isEmpty());
         showSnackBar.setEnabled(!state.text.isEmpty());
         writeGranted.setChecked(state.isWriteGranted);
@@ -107,6 +107,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
     }
 
     @Override
+    @NonNull
     public MainPresenter onInitPresenter(MvpPresenterManager manager) {
         return manager.getPresenterInstance(getPresenterId(getArguments()));
     }

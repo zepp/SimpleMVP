@@ -86,7 +86,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param resultCode  The integer result code returned by the child activity through its setResult().
      * @param data        An Intent, which can return result data to the caller (various data can be attached
      */
-    void onActivityResult(MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data);
+    void onActivityResult(@NonNull MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data);
 
     /**
      * This method has the same purpose as the {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])}
@@ -96,7 +96,7 @@ public interface MvpPresenter<S extends MvpState> {
      *                    {@link com.simplemvp.view.MvpActivity#requestPermissions(String[], int)}
      * @param permissions map that represents result for the certain permission
      */
-    void onRequestPermissionsResult(MvpViewHandle<S> handle, int requestCode, Map<String, Integer> permissions);
+    void onRequestPermissionsResult(@NonNull MvpViewHandle<S> handle, int requestCode, @NonNull Map<String, Integer> permissions);
 
     /**
      * This method handles {@link View} clicks and {@link android.view.MenuItem} selection.
@@ -107,7 +107,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param handle {@link MvpViewHandle} instance
      * @param viewId view's ID
      */
-    void onViewClicked(MvpViewHandle<S> handle, @IdRes int viewId);
+    void onViewClicked(@NonNull MvpViewHandle<S> handle, @IdRes int viewId);
 
     /**
      * This method handles item selection of {@link android.widget.AdapterView} or any other suitable
@@ -131,7 +131,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param viewId    view's ID
      * @param isChecked check state
      */
-    void onCheckedChanged(MvpViewHandle<S> handle, @IdRes int viewId, boolean isChecked);
+    void onCheckedChanged(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, boolean isChecked);
 
     /**
      * This method handles item selection of {@link android.widget.RadioGroup}.
@@ -142,7 +142,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param radioViewId {@link android.widget.RadioGroup} view instance ID
      * @param viewId      checked button ID
      */
-    void onRadioCheckedChanged(MvpViewHandle<S> handle, @IdRes int radioViewId, @IdRes int viewId);
+    void onRadioCheckedChanged(@NonNull MvpViewHandle<S> handle, @IdRes int radioViewId, @IdRes int viewId);
 
     /**
      * This method handles text changes of {@link android.widget.EditText} or
@@ -154,7 +154,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param viewId view's ID
      * @param text   new text
      */
-    void onTextChanged(MvpViewHandle<S> handle, @IdRes int viewId, String text);
+    void onTextChanged(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, String text);
 
     /**
      * This method handles {@link View.OnDragListener#onDrag(View, DragEvent)} callback.
@@ -165,7 +165,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param viewId view's ID
      * @param event  {@link DragEvent} instance
      */
-    void onDrag(MvpViewHandle<S> handle, @IdRes int viewId, DragEvent event);
+    void onDrag(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, DragEvent event);
 
     /**
      * This method handles events of {@link android.widget.SeekBar}
@@ -179,5 +179,5 @@ public interface MvpPresenter<S extends MvpState> {
      *                 {@link ProgressBar#setMax(int)}, respectively. (The default values for
      *                 min is 0 and max is 100.)
      */
-    void onProgressChanged(MvpViewHandle<S> handle, @IdRes int viewId, int progress);
+    void onProgressChanged(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, int progress);
 }

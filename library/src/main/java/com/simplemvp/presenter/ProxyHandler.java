@@ -5,6 +5,8 @@ package com.simplemvp.presenter;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
@@ -61,6 +63,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         }
     }
 
+    @NonNull
     static <S extends MvpState, P extends MvpPresenter<S>> P newProxy(MvpBasePresenter<S> presenter) {
         return (P) Proxy.newProxyInstance(presenter.getClass().getClassLoader(),
                 getAllImplementedInterfaces(presenter.getClass()), new ProxyHandler<>(presenter));

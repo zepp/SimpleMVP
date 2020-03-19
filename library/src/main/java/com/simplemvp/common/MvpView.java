@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.MenuRes;
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LifecycleOwner;
@@ -56,6 +57,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @return {@link Context}
      */
+    @NonNull
     Context getContext();
 
     /**
@@ -63,6 +65,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @return
      */
+    @NonNull
     View getView();
 
     /**
@@ -77,6 +80,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @return presenter
      */
+    @NonNull
     P getPresenter();
 
     /**
@@ -87,7 +91,8 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @param manager {@link MvpPresenterManager MvpPresenterManager} instance
      * @return new presenter instance
      */
-    P onInitPresenter(MvpPresenterManager manager);
+    @NonNull
+    P onInitPresenter(@NonNull MvpPresenterManager manager);
 
     /**
      * This method is called when state has been changed and view should update itself. Also this
@@ -95,7 +100,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @param state new state
      */
-    void onStateChanged(S state);
+    void onStateChanged(@NonNull S state);
 
     /**
      * This method is called after view (activity or fragment) becomes ready to handle changes.
@@ -105,7 +110,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @param state current state
      */
-    void onFirstStateChange(S state);
+    void onFirstStateChange(@NonNull S state);
 
     /**
      * This method returns {@link MvpViewHandle} of the current view to be passed in any
@@ -113,6 +118,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @return {@link MvpViewHandle} instance
      */
+    @NonNull
     MvpViewHandle<S> getViewHandle();
 
     /**
@@ -125,7 +131,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @param dialog dialog fragment instance to be shown
      */
-    void showDialog(DialogFragment dialog);
+    void showDialog(@NonNull DialogFragment dialog);
 
     /**
      * This methods returns universal listener that combines a lot of {@link View View} listeners to
@@ -133,6 +139,7 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      *
      * @return
      */
+    @NonNull
     MvpListener getMvpListener();
 
     /**
@@ -142,7 +149,8 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @param view {@link EditText} instance
      * @return new listener instance
      */
-    TextWatcher newTextWatcher(EditText view);
+    @NonNull
+    TextWatcher newTextWatcher(@NonNull EditText view);
 
     /**
      * This method returns new {@link androidx.appcompat.widget.SearchView.OnQueryTextListener}
@@ -151,7 +159,8 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @param view {@link SearchView} instance
      * @return new listener instance
      */
-    SearchView.OnQueryTextListener newQueryTextListener(SearchView view);
+    @NonNull
+    SearchView.OnQueryTextListener newQueryTextListener(@NonNull SearchView view);
 
     /**
      * This method new {@link androidx.viewpager.widget.ViewPager.OnPageChangeListener}
@@ -160,7 +169,8 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @param view {@link androidx.viewpager.widget.ViewPager} instance
      * @return {@link androidx.viewpager.widget.ViewPager.OnPageChangeListener OnPageChangeListener} instance
      */
-    ViewPager.OnPageChangeListener newOnPageChangeListener(ViewPager view);
+    @NonNull
+    ViewPager.OnPageChangeListener newOnPageChangeListener(@NonNull ViewPager view);
 
     /**
      * This method returns listener that implements {@link View.OnClickListener} to handle view clicks
@@ -168,5 +178,6 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @param isAutoLocking disable view instance after click
      * @return {@link View.OnClickListener} instance
      */
+    @NonNull
     View.OnClickListener newMvpClickListener(boolean isAutoLocking);
 }
