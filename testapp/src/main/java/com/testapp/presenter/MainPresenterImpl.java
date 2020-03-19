@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
@@ -72,8 +73,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onFirstViewConnected(MvpViewHandle<MainState> handle) throws Exception {
-        super.onFirstViewConnected(handle);
+    protected void onFirstViewConnected(MvpViewHandle<MainState> handle, Bundle arguments) throws Exception {
+        super.onFirstViewConnected(handle, arguments);
         state.setEvents(eventBox.getAll());
         recordEvent(new Event(UI, "onFirstViewConnected", handle.getLayoutId()));
         state.setWriteGranted(ContextCompat.checkSelfPermission(getBaseContext(),
@@ -81,8 +82,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onViewConnected(MvpViewHandle<MainState> handle) throws Exception {
-        super.onViewConnected(handle);
+    protected void onViewConnected(MvpViewHandle<MainState> handle, Bundle arguments) throws Exception {
+        super.onViewConnected(handle, arguments);
         if (handle.getLayoutId() != R.layout.dialog_event_info) {
             recordEvent(new Event(UI, "onViewConnected", handle.getLayoutId()));
             commit();

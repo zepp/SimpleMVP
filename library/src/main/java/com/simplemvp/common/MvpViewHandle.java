@@ -33,13 +33,6 @@ public interface MvpViewHandle<S extends MvpState> {
     int getLayoutId();
 
     /**
-     * Method to access arguments reference
-     *
-     * @return {@link MvpView} arguments
-     */
-    Bundle getArguments();
-
-    /**
      * This method posts new state to parent view
      *
      * @param state

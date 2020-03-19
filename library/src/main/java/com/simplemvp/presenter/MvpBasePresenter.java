@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
 
@@ -81,12 +82,13 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         boolean isFirst = handles.isEmpty();
         MvpViewHandle<S> handle = view.getViewHandle();
         if (handles.put(view.getMvpId(), handle) == null) {
+            Bundle arguments = view.getArguments() == null ? new Bundle() : new Bundle(view.getArguments());
             submit(() -> {
                 if (isFirst) {
                     parentId = handle.getMvpId();
-                    onFirstViewConnected(handle);
+                    onFirstViewConnected(handle, arguments);
                 }
-                onViewConnected(handle);
+                onViewConnected(handle, arguments);
                 handle.post(cloneState());
             });
         } else {
@@ -373,9 +375,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * values and subscribes to necessary events.
      *
      * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
+     * @param arguments
      */
     @CallSuper
-    protected void onFirstViewConnected(MvpViewHandle<S> handle) throws Exception {
+    protected void onFirstViewConnected(MvpViewHandle<S> handle, Bundle arguments) throws Exception {
         Log.d(tag, "onFirstViewConnected(" + getResources().getResourceName(handle.getLayoutId()) + ")");
     }
 
@@ -383,9 +386,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      * This method is called when fresh view is connected to a presenter.
      *
      * @param handle {@link MvpViewHandle MvpViewHandle} interface reference
+     * @param arguments
      */
     @CallSuper
-    protected void onViewConnected(MvpViewHandle<S> handle) throws Exception {
+    protected void onViewConnected(MvpViewHandle<S> handle, Bundle arguments) throws Exception {
         Log.d(tag, "onViewConnected(" + getResources().getResourceName(handle.getLayoutId()) + ")");
     }
 

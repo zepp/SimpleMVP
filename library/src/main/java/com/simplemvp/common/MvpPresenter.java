@@ -26,7 +26,8 @@ import java.util.Map;
 public interface MvpPresenter<S extends MvpState> {
     /**
      * This method is called by a {@link MvpView} implementation to connect to a presenter instance.
-     * {@link MvpBasePresenter#onFirstViewConnected(MvpViewHandle)} and {@link MvpBasePresenter#onViewConnected(MvpViewHandle)}
+     * {@link MvpBasePresenter#onFirstViewConnected(MvpViewHandle, android.os.Bundle)} and
+     * {@link MvpBasePresenter#onViewConnected(MvpViewHandle, android.os.Bundle)}
      * are submitted for execution after this method call by {@link MvpBasePresenter}.
      * {@link com.simplemvp.view.MvpFragment}, {@link com.simplemvp.view.MvpDialogFragment} and
      * {@link com.simplemvp.view.MvpActivity} call this method internally.

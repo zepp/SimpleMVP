@@ -6,7 +6,6 @@ package com.simplemvp.view;
 
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.os.Bundle;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.DragEvent;
@@ -284,11 +283,6 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @Override
     public int getLayoutId() {
         return view.getLayoutId();
-    }
-
-    @Override
-    public Bundle getArguments() {
-        return view.getArguments() == null ? new Bundle() : new Bundle(view.getArguments());
     }
 
     @Override
