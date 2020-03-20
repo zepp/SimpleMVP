@@ -50,11 +50,9 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         int presenterId = savedInstanceState == null ? 0 : savedInstanceState.getInt(PRESENTER_ID);
-        setContentView(getLayoutId());
         MvpPresenterManager manager = MvpPresenterManager.getInstance(this);
-        if (presenterId == 0) {
+        if (presenterId == 0 || !manager.checkPresenterInstance(presenterId)) {
             presenter = onInitPresenter(manager);
         } else {
             presenter = manager.getPresenterInstance(presenterId);
@@ -63,12 +61,15 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         eventHandler.initialize();
         eventHandler.setEnabled(getMenuId() == 0);
         presenter.connect(this);
+        // onCreate recreates child fragments so presenter should be instantiated at first
+        super.onCreate(savedInstanceState);
+        setContentView(getLayoutId());
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putInt(PRESENTER_ID, presenter.getId());
+        super.onSaveInstanceState(outState);
     }
 
     @Override

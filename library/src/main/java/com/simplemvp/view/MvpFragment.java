@@ -65,7 +65,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         setHasOptionsMenu(getMenuId() != 0);
         int presenterId = savedInstanceState == null ? 0 : getPresenterId(savedInstanceState);
         MvpPresenterManager manager = MvpPresenterManager.getInstance(getContext());
-        if (presenterId == 0) {
+        if (presenterId == 0 || !manager.checkPresenterInstance(presenterId)) {
             presenter = onInitPresenter(manager);
         } else {
             presenter = manager.getPresenterInstance(presenterId);
@@ -84,9 +84,8 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        // do not call super.onSaveInstanceState to avoid saving views state
-        outState.clear();
         outState.putInt(PRESENTER_ID, presenter.getId());
+        super.onSaveInstanceState(outState);
     }
 
     @Override

@@ -109,6 +109,16 @@ public final class MvpPresenterManager extends ContextWrapper {
     }
 
     /**
+     * This method checks that presenter with provided ID is instantiated
+     *
+     * @param presenterId presenter id
+     * @return true if presenter exists
+     */
+    public boolean checkPresenterInstance(int presenterId) {
+        return map.containsKey(presenterId);
+    }
+
+    /**
      * This method releases presenter instance to be garbage collected
      *
      * @param presenter instance to be released if one has no attached views

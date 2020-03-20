@@ -77,9 +77,8 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        // do not call super.onSaveInstanceState to avoid saving views state
-        outState.clear();
         outState.putInt(PRESENTER_ID, presenter.getId());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
