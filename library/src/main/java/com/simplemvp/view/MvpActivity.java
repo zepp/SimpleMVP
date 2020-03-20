@@ -185,6 +185,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         presenter.onActivityResult(getViewHandle(), requestCode, resultCode, data);
     }
 
