@@ -1,4 +1,20 @@
+apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.android.library'
+
+publish {
+
+    def groupProjectID = 'com.simplemvp'
+    def artifactProjectID = 'simplemvp'
+    def publishVersionID = '1.0'
+
+    userOrg = 'zeppa'
+    repoName = 'SimpleMVP'
+    groupId = groupProjectID
+    artifactId = artifactProjectID
+    publishVersion = publishVersionID
+    desc = 'Another implementation of MVP for Android'
+    website = 'https://github.com/zepp/SimpleMVP'
+}
 
 android {
     compileSdkVersion 28
