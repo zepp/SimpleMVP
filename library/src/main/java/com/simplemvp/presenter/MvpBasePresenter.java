@@ -99,24 +99,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     @Override
-    public final void disconnect(@NonNull MvpView<S, ?> view) {
-        disconnectById(view.getMvpId());
-        view.getLifecycle().removeObserver(observer);
-    }
-
-    @Override
-    public final void disconnect(int id) {
-        disconnectById(id);
-    }
-
-    /**
-     * This method is called by a view to disconnect oneself from presenter when view is about to be
-     * destroyed. This method call is mandatory otherwise presenter will not be stopped and acquired
-     * resources will not be released.
-     *
-     * @param id ID
-     */
-    private synchronized void disconnectById(int id) {
+    public final synchronized void disconnect(@NonNull MvpView<S, ?> view) {
         if (handles.remove(id) != null) {
             if (handles.isEmpty()) {
                 executor.submit(() -> {
@@ -130,6 +113,18 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                 });
             }
         }
+        view.getLifecycle().removeObserver(observer);
+    }
+
+    @Override
+    public final void disconnectLazy(int id) {
+        submit(() -> {
+            if (handles.remove(id) != null) {
+                if (handles.isEmpty()) {
+                    onLastViewDisconnected();
+                }
+            }
+        });
     }
 
     /**

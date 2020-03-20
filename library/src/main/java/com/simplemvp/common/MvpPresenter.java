@@ -53,7 +53,7 @@ public interface MvpPresenter<S extends MvpState> {
      *
      * @param id view's ID
      */
-    void disconnect(int id);
+    void disconnectLazy(int id);
 
     /**
      * This method checks that presenter has no connected views. It is used internally by

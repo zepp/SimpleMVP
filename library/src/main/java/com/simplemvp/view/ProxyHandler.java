@@ -56,7 +56,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MvpEventHandler<S> eventHandler = this.eventHandler.get();
         if (eventHandler == null) {
-            presenter.disconnect(viewId);
+            presenter.disconnectLazy(viewId);
             return null;
         } else {
             if (annotatedMethods.contains(method)) {
