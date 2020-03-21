@@ -81,8 +81,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
         toastText.setText(state.text);
         toastText.setSelection(state.text.length());
         durationSpinner.setOnItemSelectedListener(getMvpListener());
-        durationSpinner.setAdapter(new SpinnerAdapter(getContext(), new ActionDuration[]{
-                ActionDuration.LongDuration, ActionDuration.ShortDuration}));
+        durationSpinner.setAdapter(new SpinnerAdapter(getContext(), ActionDuration.values()));
         expression.setText(state.expression);
         expression.addTextChangedListener(newTextWatcher(expression));
         eval.setOnClickListener(v -> {
