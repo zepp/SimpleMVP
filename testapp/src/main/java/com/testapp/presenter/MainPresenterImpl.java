@@ -218,7 +218,9 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     public void onProgressChanged(@NonNull MvpViewHandle<MainState> handle, int viewId, int progress) {
         super.onProgressChanged(handle, viewId, progress);
         recordEvent(new Event("onProgressChanged", viewId));
-        state.setDelay(progress * 100);
+        if (viewId == R.id.settings_delay) {
+            state.setDelay(progress * 100);
+        }
         commit(state.delay);
     }
 
