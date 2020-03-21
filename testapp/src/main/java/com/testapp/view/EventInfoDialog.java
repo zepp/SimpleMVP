@@ -57,7 +57,7 @@ public class EventInfoDialog extends MvpDialogFragment<MainPresenter, MainState>
     }
 
     @Override
-    public void onFirstStateChange(MainState state) {
+    public void onFirstStateChange(@NonNull MainState state) {
         super.onFirstStateChange(state);
         Event event = state.getEventById(getArguments().getLong(EVENT_ID));
         title.setText(event.handler);
@@ -77,6 +77,6 @@ public class EventInfoDialog extends MvpDialogFragment<MainPresenter, MainState>
     }
 
     @Override
-    public void onStateChanged(MainState state) {
+    public void onStateChanged(@NonNull MainState state) {
     }
 }
