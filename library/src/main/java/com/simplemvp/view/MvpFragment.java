@@ -70,7 +70,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         } else {
             presenter = manager.getPresenterInstance(presenterId);
         }
-        eventHandler = new MvpEventHandler<>(this, presenter);
+        eventHandler = new MvpEventHandler<>(this, savedInstanceState);
         eventHandler.initialize();
         eventHandler.setEnabled(getMenuId() == 0);
         presenter.connect(this);
@@ -85,6 +85,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(PRESENTER_ID, presenter.getId());
+        eventHandler.saveId(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -117,7 +118,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public int getMvpId() {
-        return hashCode();
+        return eventHandler.getId();
     }
 
     @Override

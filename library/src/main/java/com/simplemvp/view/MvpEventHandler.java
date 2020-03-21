@@ -6,6 +6,7 @@ package com.simplemvp.view;
 
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.DragEvent;
@@ -44,6 +45,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is encapsulated by parent {@link MvpView} implementation. {@link MvpView} and {@link MvpPresenter}
@@ -58,7 +60,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 class MvpEventHandler<S extends MvpState> extends ContextWrapper
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
+    private final static String INSTANCE_ID = "mvp-event-handler-id";
     private final static String tag = MvpEventHandler.class.getSimpleName();
+    private final static AtomicInteger lastId = new AtomicInteger();
+    private final int id;
     private final MvpView<S, ?> view;
     private final MvpPresenter<S> presenter;
     private final Queue<Callable<?>> events = new LinkedList<>();
@@ -71,10 +76,23 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private MvpViewHandle<S> proxy;
     private S state;
 
-    MvpEventHandler(@NonNull MvpView<S, ?> view, @NonNull MvpPresenter<S> presenter) {
+    MvpEventHandler(@NonNull MvpView<S, ?> view, Bundle savedState) {
         super(view.getContext());
+        this.id = getId(savedState);
         this.view = view;
-        this.presenter = presenter;
+        this.presenter = view.getPresenter();
+    }
+
+    private static int getId(Bundle bundle) {
+        return bundle == null ? lastId.incrementAndGet() : bundle.getInt(INSTANCE_ID);
+    }
+
+    void saveId(Bundle bundle) {
+        bundle.putInt(INSTANCE_ID, id);
+    }
+
+    int getId() {
+        return id;
     }
 
     void initialize() {

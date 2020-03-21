@@ -63,7 +63,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
         } else {
             presenter = manager.getPresenterInstance(presenterId);
         }
-        eventHandler = new MvpEventHandler<>(this, presenter);
+        eventHandler = new MvpEventHandler<>(this, savedInstanceState);
         eventHandler.initialize();
         eventHandler.setEnabled(getMenuId() == 0);
         presenter.connect(this);
@@ -78,6 +78,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(PRESENTER_ID, presenter.getId());
+        eventHandler.saveId(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -94,7 +95,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
 
     @Override
     public int getMvpId() {
-        return hashCode();
+        return eventHandler.getId();
     }
 
     @Override

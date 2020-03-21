@@ -80,8 +80,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      */
     @Override
     public final synchronized void connect(@NonNull MvpView<S, ?> view) {
-        boolean isFirst = handles.isEmpty();
         MvpViewHandle<S> handle = view.getViewHandle();
+        boolean isFirst = handles.isEmpty();
         if (handles.put(view.getMvpId(), handle) == null) {
             Bundle arguments = view.getArguments() == null ? new Bundle() : new Bundle(view.getArguments());
             submit(() -> {
@@ -100,7 +100,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @Override
     public final synchronized void disconnect(@NonNull MvpView<S, ?> view) {
-        if (handles.remove(id) != null) {
+        if (handles.remove(view.getMvpId()) != null) {
             if (handles.isEmpty()) {
                 executor.submit(() -> {
                     synchronized (this) {
