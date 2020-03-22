@@ -5,6 +5,7 @@
 package com.simplemvp.common;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.view.View;
@@ -132,6 +133,14 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      * @param dialog dialog fragment instance to be shown
      */
     void showDialog(@NonNull DialogFragment dialog);
+
+    /**
+     * This method starts activity for result
+     *
+     * @param intent      {@link Intent} instance
+     * @param requestCode request code
+     */
+    void startActivityForResult(@NonNull Intent intent, int requestCode);
 
     /**
      * This methods returns universal listener that combines a lot of {@link View View} listeners to

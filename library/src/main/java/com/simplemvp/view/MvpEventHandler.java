@@ -20,7 +20,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Lifecycle;
@@ -76,7 +76,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private MvpViewHandle<S> proxy;
     private S state;
 
-    MvpEventHandler(@NonNull MvpView<S, ?> view, Bundle savedState) {
+    MvpEventHandler(@NonNull MvpView<S, ?> view, @Nullable Bundle savedState) {
         super(view.getContext());
         this.id = getId(savedState);
         this.view = view;
@@ -87,7 +87,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         return bundle == null ? lastId.incrementAndGet() : bundle.getInt(INSTANCE_ID);
     }
 
-    void saveId(Bundle bundle) {
+    void saveId(@NonNull Bundle bundle) {
         bundle.putInt(INSTANCE_ID, id);
     }
 
@@ -364,19 +364,16 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         Toast.makeText(getBaseContext(), resId, duration).show();
     }
 
+    // This method must be overridden to be annotated with @MvpHandler
     @Override
     @MvpHandler
     public void startActivity(@NonNull Intent intent) {
-        getBaseContext().startActivity(intent);
+        super.startActivity(intent);
     }
 
     @Override
     @MvpHandler
     public void startActivityForResult(@NonNull Intent intent, int requestCode) {
-        if (view instanceof AppCompatActivity) {
-            ((AppCompatActivity) view).startActivityForResult(intent, requestCode);
-        } else {
-            throw new RuntimeException("only activity can start activity for result");
-        }
+        view.startActivityForResult(intent, requestCode);
     }
 }
