@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -70,9 +69,9 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private final List<MvpTextWatcher<S>> textWatchers = new ArrayList<>();
     private final List<MvpOnQueryTextListener<S>> queryTextListeners = new ArrayList<>();
     private final List<MvpOnPageChangeListener<S>> pageChangeListeners = new ArrayList<>();
-    private final AtomicBoolean isFirstStateChange = new AtomicBoolean(true);
-    private final AtomicBoolean isEnabled = new AtomicBoolean();
-    private final AtomicBoolean isResumed = new AtomicBoolean();
+    private boolean isFirstStateChange = true;
+    private boolean isEnabled;
+    private boolean isResumed;
     private MvpViewHandle<S> proxy;
     private S state;
 
@@ -101,18 +100,18 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResumed() {
-        isResumed.set(true);
+        isResumed = true;
         onEnabledOrResumed();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPaused() {
-        isResumed.set(false);
+        isResumed = false;
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void onStopped() {
-        isFirstStateChange.set(true);
+        isFirstStateChange = true;
         for (MvpTextWatcher<S> watcher : textWatchers) {
             watcher.unregister();
         }
@@ -132,8 +131,9 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
      * @return true if state is changed
      */
     boolean setEnabled(boolean enabled) {
-        boolean isChanged = isEnabled.compareAndSet(!enabled, enabled);
+        boolean isChanged = isEnabled != enabled;
         if (isChanged) {
+            isEnabled = enabled;
             onEnabledOrResumed();
         }
         return isChanged;
@@ -162,7 +162,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
      * @return true in case of view is ready, false otherwise
      */
     boolean isParentViewReady() {
-        return isEnabled.get() && isResumed.get();
+        return isEnabled && isResumed;
     }
 
     /**
@@ -198,7 +198,9 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     }
 
     private boolean isFirstStateChange() {
-        return isFirstStateChange.getAndSet(false);
+        boolean result = isFirstStateChange;
+        isFirstStateChange = false;
+        return result;
     }
 
     @NonNull
