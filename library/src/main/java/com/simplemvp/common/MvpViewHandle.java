@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.Map;
+
 /**
  * This interface describes interface to be used by presenter to interact with MvpView
  *
@@ -115,4 +117,13 @@ public interface MvpViewHandle<S extends MvpState> {
      *
      */
     void showDialog(@NonNull DialogFragment dialog);
+
+    /**
+     * This method requests permissions on behalf of view
+     *
+     * @param permissions The requested permissions. Must me non-null and not empty.
+     * @param requestCode Application specific request code to match with a result reported to
+     *                    {@link com.simplemvp.presenter.MvpBasePresenter#onRequestPermissionsResult(MvpViewHandle, int, Map)}.
+     */
+    void requestPermissions(@NonNull String[] permissions, int requestCode);
 }

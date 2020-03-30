@@ -374,12 +374,18 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @Override
     @MvpHandler
     public void startActivity(@NonNull Intent intent) {
-        super.startActivity(intent);
+        view.startActivity(intent);
     }
 
     @Override
     @MvpHandler
     public void startActivityForResult(@NonNull Intent intent, int requestCode) {
         view.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    @MvpHandler
+    public void requestPermissions(@NonNull String[] permissions, int requestCode) {
+        view.requestPermissions(permissions, requestCode);
     }
 }

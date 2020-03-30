@@ -21,6 +21,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.simplemvp.presenter.MvpPresenterManager;
 
+import java.util.Map;
+
 /**
  * This interface specifies a generic MVP view
  *
@@ -135,12 +137,30 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
     void showDialog(@NonNull DialogFragment dialog);
 
     /**
-     * This method starts activity for result
+     * This method starts activity for result (take a look at
+     * {@link com.simplemvp.view.MvpActivity#startActivityForResult(Intent, int)} for details)
      *
      * @param intent      {@link Intent} instance
      * @param requestCode request code
      */
     void startActivityForResult(@NonNull Intent intent, int requestCode);
+
+    /**
+     * This method starts activity
+     *
+     * @param intent {@link Intent} instance
+     */
+    void startActivity(@NonNull Intent intent);
+
+    /**
+     * Requests permissions from user (take a look at for
+     * {@link com.simplemvp.view.MvpActivity#requestPermissions(String[], int)} details)
+     *
+     * @param permissions The requested permissions. Must me non-null and not empty.
+     * @param requestCode Application specific request code to match with a result reported to
+     *                    {@link com.simplemvp.presenter.MvpBasePresenter#onRequestPermissionsResult(MvpViewHandle, int, Map)}.
+     */
+    void requestPermissions(@NonNull String[] permissions, int requestCode);
 
     /**
      * This methods returns universal listener that combines a lot of {@link View View} listeners to
