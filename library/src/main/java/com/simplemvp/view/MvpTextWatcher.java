@@ -20,7 +20,7 @@ import com.simplemvp.common.MvpViewHandle;
  *
  * @param <S> state type
  */
-class MvpTextWatcher<S extends MvpState> implements TextWatcher {
+class MvpTextWatcher<S extends MvpState> implements TextWatcher, DisposableListener {
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
     private final EditText view;
@@ -46,7 +46,8 @@ class MvpTextWatcher<S extends MvpState> implements TextWatcher {
         presenter.onTextChanged(handle, view.getId(), s.toString());
     }
 
-    void unregister() {
+    @Override
+    public void dispose() {
         view.removeTextChangedListener(this);
     }
 }

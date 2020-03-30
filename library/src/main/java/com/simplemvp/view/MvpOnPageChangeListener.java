@@ -6,7 +6,7 @@ import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpViewHandle;
 
-public class MvpOnPageChangeListener<S extends MvpState> implements ViewPager.OnPageChangeListener {
+public class MvpOnPageChangeListener<S extends MvpState> implements ViewPager.OnPageChangeListener, DisposableListener {
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
     private final ViewPager view;
@@ -31,7 +31,8 @@ public class MvpOnPageChangeListener<S extends MvpState> implements ViewPager.On
     public void onPageScrollStateChanged(int i) {
     }
 
-    void unregister() {
+    @Override
+    public void dispose() {
         view.removeOnPageChangeListener(this);
     }
 }

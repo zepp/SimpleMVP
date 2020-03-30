@@ -154,11 +154,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     @NonNull
     public View.OnClickListener newMvpClickListener(boolean isAutoLocking) {
-        if (isAutoLocking) {
-            return new MvpClickListener<>(getViewHandle(), getPresenter(), true);
-        } else {
-            return getMvpListener();
-        }
+        return eventHandler.newMvpClickListener(isAutoLocking);
     }
 
     @Override

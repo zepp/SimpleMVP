@@ -66,9 +66,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private final MvpView<S, ?> view;
     private final MvpPresenter<S> presenter;
     private final Queue<Callable<?>> events = new LinkedList<>();
-    private final List<MvpTextWatcher<S>> textWatchers = new ArrayList<>();
-    private final List<MvpOnQueryTextListener<S>> queryTextListeners = new ArrayList<>();
-    private final List<MvpOnPageChangeListener<S>> pageChangeListeners = new ArrayList<>();
+    private final List<DisposableListener> listeners = new ArrayList<>();
     private boolean isFirstStateChange = true;
     private boolean isEnabled;
     private boolean isResumed;
@@ -112,15 +110,10 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void onStopped() {
         isFirstStateChange = true;
-        for (MvpTextWatcher<S> watcher : textWatchers) {
-            watcher.unregister();
+        for (DisposableListener listener : listeners) {
+            listener.dispose();
         }
-        textWatchers.clear();
-        for (MvpOnPageChangeListener<S> listener : pageChangeListeners) {
-            listener.unregister();
-        }
-        pageChangeListeners.clear();
-        queryTextListeners.clear();
+        listeners.clear();
     }
 
     /**
@@ -279,7 +272,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     TextWatcher newTextWatcher(@NonNull EditText view) {
         Log.d(tag, "new text watcher for view: " + view);
         MvpTextWatcher<S> watcher = new MvpTextWatcher<>(getProxy(), presenter, view);
-        textWatchers.add(watcher);
+        listeners.add(watcher);
         return watcher;
     }
 
@@ -287,7 +280,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     SearchView.OnQueryTextListener newQueryTextListener(@NonNull SearchView view) {
         Log.d(tag, "new query text listener for view: " + view);
         MvpOnQueryTextListener<S> listener = new MvpOnQueryTextListener<>(getProxy(), presenter, view);
-        queryTextListeners.add(listener);
+        listeners.add(listener);
         return listener;
     }
 
@@ -295,8 +288,19 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     ViewPager.OnPageChangeListener newOnPageChangeListener(@NonNull ViewPager view) {
         Log.d(tag, "new page change lster for view: " + view);
         MvpOnPageChangeListener<S> listener = new MvpOnPageChangeListener<>(getProxy(), presenter, view);
-        pageChangeListeners.add(listener);
+        listeners.add(listener);
         return listener;
+    }
+
+    @NonNull
+    View.OnClickListener newMvpClickListener(boolean isAutoLocking) {
+        if (isAutoLocking) {
+            MvpClickListener<S> listener = new MvpClickListener<>(getProxy(), presenter, true);
+            listeners.add(listener);
+            return listener;
+        } else {
+            return this;
+        }
     }
 
     @Override

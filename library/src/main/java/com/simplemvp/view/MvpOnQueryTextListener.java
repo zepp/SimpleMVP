@@ -18,7 +18,7 @@ import com.simplemvp.common.MvpViewHandle;
  *
  * @param <S> state type
  */
-class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTextListener {
+class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTextListener, DisposableListener {
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
     private final SearchView view;
@@ -38,5 +38,9 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
     public boolean onQueryTextChange(String s) {
         presenter.onTextChanged(handle, view.getId(), s);
         return false;
+    }
+
+    @Override
+    public void dispose() {
     }
 }

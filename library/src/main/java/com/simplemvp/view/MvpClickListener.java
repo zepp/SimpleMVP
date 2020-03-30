@@ -6,7 +6,7 @@ import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpViewHandle;
 
-class MvpClickListener<S extends MvpState> implements View.OnClickListener {
+class MvpClickListener<S extends MvpState> implements View.OnClickListener, DisposableListener {
     private final boolean isAutoLocking;
     private final MvpViewHandle<S> handle;
     private final MvpPresenter<S> presenter;
@@ -21,5 +21,9 @@ class MvpClickListener<S extends MvpState> implements View.OnClickListener {
     public void onClick(View v) {
         v.setEnabled(!isAutoLocking);
         presenter.onViewClicked(handle, v.getId());
+    }
+
+    @Override
+    public void dispose() {
     }
 }
