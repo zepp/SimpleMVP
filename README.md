@@ -99,7 +99,8 @@ Presenter does not hold strong reference to connected view. It collects `MvpView
 * `showToast()` to show a toast with a specified text
 * `showSnackBar()` to show a snackbar with a specified text and action (optional)
 * `startActivity()` to start a new activity
-* `startActivityForResult()` to start an activity for result (calling view **must** be an activity)
+* `startActivityForResult()` to start an activity for result
+* `requestPermissions()` to request permissions
 * `showDialog()` to show a dialog
 * `finish()` to finish the calling view
 
