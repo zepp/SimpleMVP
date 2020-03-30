@@ -24,6 +24,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
@@ -155,6 +156,12 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @NonNull
     public View.OnClickListener newMvpClickListener(boolean isAutoLocking) {
         return eventHandler.newMvpClickListener(isAutoLocking);
+    }
+
+    @NonNull
+    @Override
+    public TabLayout.OnTabSelectedListener newTabLayoutListener(TabLayout view) {
+        return eventHandler.newTabLayoutListener(view);
     }
 
     @Override

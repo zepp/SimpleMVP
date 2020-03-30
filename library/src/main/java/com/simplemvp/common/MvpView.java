@@ -19,6 +19,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.simplemvp.presenter.MvpPresenterManager;
 
 import java.util.Map;
@@ -209,4 +210,13 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      */
     @NonNull
     View.OnClickListener newMvpClickListener(boolean isAutoLocking);
+
+    /**
+     * This methods creates new listener for provided view to handle tab selection.
+     *
+     * @param view {@link TabLayout} view instance
+     * @return {@link TabLayout.OnTabSelectedListener} instance
+     */
+    @NonNull
+    TabLayout.OnTabSelectedListener newTabLayoutListener(TabLayout view);
 }

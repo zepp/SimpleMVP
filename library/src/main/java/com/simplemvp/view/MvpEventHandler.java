@@ -29,6 +29,7 @@ import androidx.lifecycle.OnLifecycleEvent;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
@@ -301,6 +302,13 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         } else {
             return this;
         }
+    }
+
+    @NonNull
+    TabLayout.OnTabSelectedListener newTabLayoutListener(TabLayout view) {
+        MvpTabLayoutListener<S> listener = new MvpTabLayoutListener<>(getProxy(), presenter, view);
+        listeners.add(listener);
+        return listener;
     }
 
     @Override
