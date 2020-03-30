@@ -168,6 +168,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                                     " " + getString(R.string.timer_duration) + " " + state.getTextProgress(),
                             Snackbar.LENGTH_LONG, getString(R.string.main_snackbar_action));
                 }
+            } else if (viewId == R.id.request_permissions) {
+                handle.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
             }
         }
         commit(state.delay);

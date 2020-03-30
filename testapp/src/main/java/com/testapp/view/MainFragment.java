@@ -1,7 +1,6 @@
 package com.testapp.view;
 
 
-import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -89,8 +88,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
             v.setEnabled(false);
             getMvpListener().onClick(v);
         });
-        reqPermissions.setOnClickListener(v ->
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0));
+        reqPermissions.setOnClickListener(getMvpListener());
         invoke.setOnClickListener(v -> presenter.customHandler(getViewHandle(), v.getId()));
     }
 
