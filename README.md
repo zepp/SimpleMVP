@@ -129,11 +129,11 @@ If view has a menu then `getMenuId()` method should be overridden to provide men
 Also `onFirstStateChange` method is a safe place to setup listeners and watchers. There are several ways to do it:
 
 * using `getMvpListener()` method
-* using `newTextWatcher()`, `newQueryTextListener()`, `newOnPageChangeListener()`, `getMvpClickListener()` methods  
+* using `newTextWatcher()`, `newQueryTextListener()`, `newOnPageChangeListener()`, `newTabLayoutListener()`, `getMvpClickListener()` methods  
 
 `getMvpListener()` method returns unified listener that is suitable for most cases. It handles clicks, checks and so on (see details in `MvpListener` interface declaration).
 
-`newTextWatcher()` creates watcher that handles text changes of `EditText` view. `newQueryTextListener()` creates listener that handles `SearchView` text change. `newOnPageChangeListener()` creates listener that handles page selection of `ViewPager`. All these listeners and watcher are implicitly unregistered when view is stopped.
+`newTextWatcher()` creates watcher that handles text changes of `EditText` view. `newQueryTextListener()` creates listener that handles `SearchView` text change. `newOnPageChangeListener()` creates listener that handles page selection of `ViewPager`, `newTabLayoutListener()` creates listener to handle `TabLayout` tab selection. All these listeners and watcher are implicitly unregistered when view is stopped.
 
 `getMvpClickListener()` method returns click listener that disables a view after click. It is handy in some cases to prevent user from starting multiple async operations.
 
