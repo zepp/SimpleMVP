@@ -24,7 +24,7 @@ public class MvpOnPageChangeListener<S extends MvpState> implements ViewPager.On
 
     @Override
     public void onPageSelected(int i) {
-        presenter.onItemSelected(handle, view.getId(), i);
+        presenter.onPositionChanged(handle, view.getId(), i);
     }
 
     @Override

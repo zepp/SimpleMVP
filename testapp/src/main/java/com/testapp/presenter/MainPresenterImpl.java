@@ -185,13 +185,22 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             state.removeEvent(event);
         } else if (viewId == R.id.event_layout) {
             handle.showDialog(EventInfoDialog.newInstance(getId(), ((Event) item).id));
-        } else if (viewId == R.id.view_pager) {
-            state.setCurrentPage((int) item);
         } else {
             recordEvent(new Event("onItemSelected", viewId));
             if (viewId == R.id.duration_spinner) {
                 state.setDuration((ActionDuration) item);
             }
+        }
+        commit(state.delay);
+    }
+
+    @Override
+    @MvpHandler
+    public void onPositionChanged(MvpViewHandle<MainState> handle, int viewId, int position) {
+        super.onPositionChanged(handle, viewId, position);
+        recordEvent(new Event("onPositionChanged", viewId));
+        if (viewId == R.id.view_pager) {
+            state.setCurrentPage(position);
         }
         commit(state.delay);
     }

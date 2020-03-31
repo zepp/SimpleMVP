@@ -123,6 +123,16 @@ public interface MvpPresenter<S extends MvpState> {
     void onItemSelected(MvpViewHandle<S> handle, @IdRes int viewId, Object item);
 
     /**
+     * This method handles selection of {@link androidx.viewpager.widget.ViewPager} page or
+     * {@link com.google.android.material.tabs.TabLayout} tab
+     *
+     * @param handle   {@link MvpViewHandle} instance
+     * @param viewId   view's ID
+     * @param position selected item position
+     */
+    void onPositionChanged(MvpViewHandle<S> handle, @IdRes int viewId, int position);
+
+    /**
      * This method handles check selection of {@link android.widget.CompoundButton}.
      * See {@link MvpListener} for details. Use {@link MvpView#getMvpListener()} to connect certain
      * view to the handler.

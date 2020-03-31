@@ -29,7 +29,7 @@ class MvpTabLayoutListener<S extends MvpState> implements TabLayout.OnTabSelecte
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        presenter.onItemSelected(handle, view.getId(), tab.getPosition());
+        presenter.onPositionChanged(handle, view.getId(), tab.getPosition());
     }
 
     @Override

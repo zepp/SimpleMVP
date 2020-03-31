@@ -42,5 +42,6 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
 
     @Override
     public void dispose() {
+        view.setOnQueryTextListener(null);
     }
 }

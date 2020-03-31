@@ -314,6 +314,12 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @CallSuper
     @Override
+    public void onPositionChanged(MvpViewHandle<S> handle, int viewId, int position) {
+        Log.d(tag, "onPositionChanged(" + getResources().getResourceName(viewId) + ", " + position + ")");
+    }
+
+    @CallSuper
+    @Override
     public void onTextChanged(@NonNull MvpViewHandle<S> handle, int viewId, String text) {
         Log.d(tag, "onTextChanged(" + getResources().getResourceName(viewId) + ", " + text + ")");
     }
