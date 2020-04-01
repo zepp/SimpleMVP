@@ -12,7 +12,6 @@ import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
@@ -73,20 +72,14 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MvpHandler handler = handlers.get(method.getName());
         if (handler == null) {
-            return invoke(method, args);
+            return presenter.callSync(() -> method.invoke(presenter, args));
         } else {
             if (handler.executor()) {
                 presenter.submit(() -> method.invoke(presenter, args));
             } else {
-                return invoke(method, args);
+                return presenter.callSync(() -> method.invoke(presenter, args));
             }
         }
         return null;
-    }
-
-    private Object invoke(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
-        synchronized (presenter) {
-            return method.invoke(presenter, args);
-        }
     }
 }

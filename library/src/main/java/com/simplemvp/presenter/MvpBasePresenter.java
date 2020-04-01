@@ -28,6 +28,7 @@ import com.simplemvp.common.MvpViewHandle;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -263,6 +264,22 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
                 futures.remove(executable);
             }
         }
+    }
+
+    /**
+     * This method is used by {@link ProxyHandler} to call presenter methods in synchronized context
+     *
+     * @param callable {@link Callable} instance
+     * @param <T>      type of returned argument
+     * @return result of {@link Callable#call()}
+     */
+    synchronized <T> T callSync(Callable<T> callable) {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            errorHandler.accept(e);
+        }
+        return null;
     }
 
     /**
