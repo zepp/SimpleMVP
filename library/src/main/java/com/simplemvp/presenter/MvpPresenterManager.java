@@ -114,7 +114,7 @@ public final class MvpPresenterManager extends ContextWrapper {
      * @param presenterId presenter id
      * @return true if presenter exists
      */
-    public boolean checkPresenterInstance(int presenterId) {
+    public boolean isPresenterExist(int presenterId) {
         return map.containsKey(presenterId);
     }
 

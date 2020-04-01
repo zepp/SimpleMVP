@@ -59,7 +59,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
         super.onCreate(savedInstanceState);
         int presenterId = savedInstanceState == null ? 0 : getPresenterId(savedInstanceState);
         MvpPresenterManager manager = MvpPresenterManager.getInstance(getContext());
-        if (presenterId == 0) {
+        if (presenterId == 0 || !manager.isPresenterExist(presenterId)) {
             presenter = onInitPresenter(manager);
         } else {
             presenter = manager.getPresenterInstance(presenterId);

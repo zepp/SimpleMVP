@@ -66,7 +66,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         setHasOptionsMenu(getMenuId() != 0);
         int presenterId = savedInstanceState == null ? 0 : getPresenterId(savedInstanceState);
         MvpPresenterManager manager = MvpPresenterManager.getInstance(getContext());
-        if (presenterId == 0 || !manager.checkPresenterInstance(presenterId)) {
+        if (presenterId == 0 || !manager.isPresenterExist(presenterId)) {
             presenter = onInitPresenter(manager);
         } else {
             presenter = manager.getPresenterInstance(presenterId);

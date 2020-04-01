@@ -53,7 +53,7 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         int presenterId = savedInstanceState == null ? 0 : savedInstanceState.getInt(PRESENTER_ID);
         MvpPresenterManager manager = MvpPresenterManager.getInstance(this);
-        if (presenterId == 0 || !manager.checkPresenterInstance(presenterId)) {
+        if (presenterId == 0 || !manager.isPresenterExist(presenterId)) {
             presenter = onInitPresenter(manager);
         } else {
             presenter = manager.getPresenterInstance(presenterId);
