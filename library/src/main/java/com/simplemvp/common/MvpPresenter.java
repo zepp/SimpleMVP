@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 
 import com.simplemvp.presenter.MvpBasePresenter;
@@ -120,7 +121,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param viewId view's ID
      * @param item selected item
      */
-    void onItemSelected(MvpViewHandle<S> handle, @IdRes int viewId, Object item);
+    void onItemSelected(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, @Nullable Object item);
 
     /**
      * This method handles selection of {@link androidx.viewpager.widget.ViewPager} page or
@@ -130,7 +131,7 @@ public interface MvpPresenter<S extends MvpState> {
      * @param viewId   view's ID
      * @param position selected item position
      */
-    void onPositionChanged(MvpViewHandle<S> handle, @IdRes int viewId, int position);
+    void onPositionChanged(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, int position);
 
     /**
      * This method handles check selection of {@link android.widget.CompoundButton}.

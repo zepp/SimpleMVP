@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -177,14 +178,18 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onItemSelected(@NonNull MvpViewHandle<MainState> handle, int viewId, Object item) {
+    public void onItemSelected(@NonNull MvpViewHandle<MainState> handle, int viewId, @Nullable Object item) {
         super.onItemSelected(handle, viewId, item);
         if (viewId == R.id.event_delete) {
-            Event event = (Event) item;
-            eventBox.remove(event.id);
-            state.removeEvent(event);
+            if (item instanceof Event) {
+                Event event = (Event) item;
+                eventBox.remove(event.id);
+                state.removeEvent(event);
+            }
         } else if (viewId == R.id.event_layout) {
-            handle.showDialog(EventInfoDialog.newInstance(getId(), ((Event) item).id));
+            if (item instanceof Event) {
+                handle.showDialog(EventInfoDialog.newInstance(getId(), ((Event) item).id));
+            }
         } else {
             recordEvent(new Event("onItemSelected", viewId));
             if (viewId == R.id.duration_spinner) {
@@ -196,7 +201,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
-    public void onPositionChanged(MvpViewHandle<MainState> handle, int viewId, int position) {
+    public void onPositionChanged(@NonNull MvpViewHandle<MainState> handle, int viewId, int position) {
         super.onPositionChanged(handle, viewId, position);
         recordEvent(new Event("onPositionChanged", viewId));
         if (viewId == R.id.view_pager) {

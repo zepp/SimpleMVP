@@ -15,6 +15,7 @@ import android.view.DragEvent;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -325,13 +326,13 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @CallSuper
     @Override
-    public void onItemSelected(@NonNull MvpViewHandle<S> handle, int viewId, Object item) {
+    public void onItemSelected(@NonNull MvpViewHandle<S> handle, int viewId, @Nullable Object item) {
         Log.d(tag, "onItemSelected(" + getResources().getResourceName(viewId) + ", " + item + ")");
     }
 
     @CallSuper
     @Override
-    public void onPositionChanged(MvpViewHandle<S> handle, int viewId, int position) {
+    public void onPositionChanged(@NonNull MvpViewHandle<S> handle, int viewId, int position) {
         Log.d(tag, "onPositionChanged(" + getResources().getResourceName(viewId) + ", " + position + ")");
     }
 
