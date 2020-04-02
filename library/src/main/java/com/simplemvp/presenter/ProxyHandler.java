@@ -72,14 +72,15 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MvpHandler handler = handlers.get(method.getName());
         if (handler == null) {
-            return presenter.callSync(() -> method.invoke(presenter, args));
+            // exception has to be rethrown otherwise return value unboxing error happens
+            return presenter.callSync(() -> method.invoke(presenter, args), true);
         } else {
             if (handler.executor()) {
                 presenter.submit(() -> method.invoke(presenter, args));
             } else {
-                return presenter.callSync(() -> method.invoke(presenter, args));
+                presenter.callSync(() -> method.invoke(presenter, args), false);
             }
+            return null;
         }
-        return null;
     }
 }

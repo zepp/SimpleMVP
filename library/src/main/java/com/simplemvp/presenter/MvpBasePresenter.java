@@ -102,18 +102,16 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @Override
     public final synchronized void disconnect(@NonNull MvpView<S, ?> view) {
-        if (handles.remove(view.getMvpId()) != null) {
-            if (handles.isEmpty()) {
-                executor.submit(() -> {
-                    synchronized (this) {
-                        try {
-                            onLastViewDisconnected();
-                        } catch (Exception e) {
-                            errorHandler.accept(e);
-                        }
+        if (handles.remove(view.getMvpId()) != null && handles.isEmpty()) {
+            executor.submit(() -> {
+                synchronized (this) {
+                    try {
+                        onLastViewDisconnected();
+                    } catch (Exception e) {
+                        errorHandler.accept(e);
                     }
-                });
-            }
+                }
+            });
         }
         view.getLifecycle().removeObserver(observer);
     }
@@ -121,10 +119,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @Override
     public final void disconnectLazy(int id) {
         submit(() -> {
-            if (handles.remove(id) != null) {
-                if (handles.isEmpty()) {
-                    onLastViewDisconnected();
-                }
+            if (handles.remove(id) != null && handles.isEmpty()) {
+                onLastViewDisconnected();
             }
         });
     }
@@ -270,15 +266,19 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     /**
      * This method is used by {@link ProxyHandler} to call presenter methods in synchronized context
      *
-     * @param callable {@link Callable} instance
      * @param <T>      type of returned argument
+     * @param callable {@link Callable} instance
+     * @param isThrow throw exception on error
      * @return result of {@link Callable#call()}
      */
-    synchronized <T> T callSync(Callable<T> callable) {
+    synchronized <T> T callSync(Callable<T> callable, boolean isThrow) {
         try {
             return callable.call();
         } catch (Exception e) {
             errorHandler.accept(e);
+            if (isThrow) {
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }
