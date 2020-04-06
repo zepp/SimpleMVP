@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +36,8 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
     private Button reqPermissions;
     private CheckBox writeGranted;
     private Button invoke;
+    private Button select;
+    private TextView fileName;
 
     public MainFragment() {
         // Required empty public constructor
@@ -60,15 +63,17 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        toastText = view.findViewById(R.id.toast_text);
-        showToast = view.findViewById(R.id.show_toast);
-        showSnackBar = view.findViewById(R.id.show_snackbar);
-        durationSpinner = view.findViewById(R.id.duration_spinner);
-        expression = view.findViewById(R.id.expression);
-        eval = view.findViewById(R.id.eval);
-        reqPermissions = view.findViewById(R.id.request_permissions);
-        writeGranted = view.findViewById(R.id.write_granted);
-        invoke = view.findViewById(R.id.custom_handler_invoke);
+        toastText = view.findViewById(R.id.main_toast_text);
+        showToast = view.findViewById(R.id.main_show_toast);
+        showSnackBar = view.findViewById(R.id.main_show_snackbar);
+        durationSpinner = view.findViewById(R.id.main_duration_spinner);
+        expression = view.findViewById(R.id.main_expression);
+        eval = view.findViewById(R.id.main_eval);
+        reqPermissions = view.findViewById(R.id.main_request_permissions);
+        writeGranted = view.findViewById(R.id.main_write_granted);
+        invoke = view.findViewById(R.id.main_custom_handler_invoke);
+        select = view.findViewById(R.id.main_select);
+        fileName = view.findViewById(R.id.main_selected_file);
     }
 
     @Override
@@ -90,6 +95,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
         });
         reqPermissions.setOnClickListener(getMvpListener());
         invoke.setOnClickListener(v -> presenter.customHandler(getViewHandle(), v.getId()));
+        select.setOnClickListener(getMvpListener());
     }
 
     @Override
@@ -101,6 +107,7 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
             expression.setTextNoWatchers(state.expression);
         }
         eval.setEnabled(!state.expression.isEmpty());
+        fileName.setText(state.fileName);
     }
 
     @Override

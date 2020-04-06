@@ -13,14 +13,14 @@
         android:padding="8dp">
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_start"
+            android:id="@+id/main_guide_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_begin="@dimen/margin_start" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_end"
+            android:id="@+id/main_guide_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -28,158 +28,198 @@
 
 
         <EditText
-            android:id="@+id/toast_text"
+            android:id="@+id/main_toast_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_top"
             android:ems="10"
             android:imeOptions="actionDone"
             android:inputType="textPersonName"
-            app:layout_constraintEnd_toStartOf="@id/duration_spinner"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
+            app:layout_constraintEnd_toStartOf="@id/main_duration_spinner"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Name" />
 
         <Spinner
-            android:id="@+id/duration_spinner"
+            android:id="@+id/main_duration_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            app:layout_constraintBottom_toBottomOf="@id/toast_text"
-            app:layout_constraintEnd_toStartOf="@+id/guide_end"
-            app:layout_constraintStart_toEndOf="@+id/toast_text"
-            app:layout_constraintTop_toTopOf="@+id/toast_text" />
+            app:layout_constraintBottom_toBottomOf="@id/main_toast_text"
+            app:layout_constraintEnd_toStartOf="@+id/main_guide_end"
+            app:layout_constraintStart_toEndOf="@+id/main_toast_text"
+            app:layout_constraintTop_toTopOf="@+id/main_toast_text" />
 
         <Button
-            android:id="@+id/show_toast"
+            android:id="@+id/main_show_toast"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/main_toast"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
-            app:layout_constraintTop_toBottomOf="@id/toast_text" />
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_toast_text" />
 
         <Button
-            android:id="@+id/show_snackbar"
+            android:id="@+id/main_show_snackbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:text="@string/main_snackbar"
-            app:layout_constraintStart_toEndOf="@id/show_toast"
-            app:layout_constraintTop_toTopOf="@id/show_toast" />
+            app:layout_constraintStart_toEndOf="@id/main_show_toast"
+            app:layout_constraintTop_toTopOf="@id/main_show_toast" />
 
         <View
-            android:id="@+id/separator_1"
+            android:id="@+id/main_separator_1"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/margin_top"
             android:background="@drawable/shape_rectangle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/show_toast" />
+            app:layout_constraintTop_toBottomOf="@id/main_show_toast" />
 
         <TextView
-            android:id="@+id/expression_title"
+            android:id="@+id/main_expression_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_top"
             android:layout_marginEnd="24dp"
             android:text="@string/main_expression"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/guide_start"
-            app:layout_constraintTop_toBottomOf="@id/separator_1" />
+            app:layout_constraintStart_toStartOf="@id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_separator_1" />
 
         <com.simplemvp.view.MvpEditText
-            android:id="@+id/expression"
+            android:id="@+id/main_expression"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:imeOptions="actionDone"
-            android:singleLine="true"
-            app:layout_constraintEnd_toStartOf="@+id/eval"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
-            app:layout_constraintTop_toBottomOf="@id/expression_title" />
+            android:maxLines="1"
+            app:layout_constraintEnd_toStartOf="@+id/main_eval"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_expression_title" />
 
         <ImageButton
-            android:id="@+id/eval"
+            android:id="@+id/main_eval"
             style="@style/OvalImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_chip"
-            app:layout_constraintBottom_toBottomOf="@id/expression"
-            app:layout_constraintEnd_toStartOf="@+id/guide_end"
-            app:layout_constraintTop_toTopOf="@+id/expression" />
+            app:layout_constraintBottom_toBottomOf="@id/main_expression"
+            app:layout_constraintEnd_toStartOf="@+id/main_guide_end"
+            app:layout_constraintTop_toTopOf="@+id/main_expression" />
 
         <View
-            android:id="@+id/separator_2"
+            android:id="@+id/main_separator_2"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/margin_top"
             android:background="@drawable/shape_rectangle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/expression" />
+            app:layout_constraintTop_toBottomOf="@id/main_expression" />
 
         <TextView
-            android:id="@+id/permission_title"
+            android:id="@+id/main_permission_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_top"
             android:text="@string/main_permissions"
-            app:layout_constraintEnd_toStartOf="@+id/guide_end"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
-            app:layout_constraintTop_toBottomOf="@id/separator_2" />
+            app:layout_constraintEnd_toStartOf="@+id/main_guide_end"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_separator_2" />
 
         <Button
-            android:id="@+id/request_permissions"
+            android:id="@+id/main_request_permissions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/main_perm_request"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
-            app:layout_constraintTop_toBottomOf="@id/permission_title" />
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_permission_title" />
 
         <CheckBox
-            android:id="@+id/write_granted"
+            android:id="@+id/main_write_granted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:enabled="false"
             android:text="@string/main_write_perms"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
-            app:layout_constraintTop_toBottomOf="@+id/request_permissions" />
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@+id/main_request_permissions" />
 
         <View
-            android:id="@+id/separator_3"
+            android:id="@+id/main_separator_3"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/margin_top"
             android:background="@drawable/shape_rectangle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/write_granted" />
+            app:layout_constraintTop_toBottomOf="@id/main_write_granted" />
 
         <TextView
-            android:id="@+id/custom_handler_title"
+            android:id="@+id/main_custom_handler_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_top"
             android:text="@string/main_custom_handler_title"
-            app:layout_constraintEnd_toStartOf="@+id/guide_end"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
-            app:layout_constraintTop_toBottomOf="@id/separator_3" />
+            app:layout_constraintEnd_toStartOf="@+id/main_guide_end"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_separator_3" />
 
         <Button
-            android:id="@+id/custom_handler_invoke"
+            android:id="@+id/main_custom_handler_invoke"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="@dimen/margin_bottom"
-            android:text="@string/main_custom_handler"
+            android:text="@string/main_custom_invoke"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_custom_handler_title" />
+
+        <View
+            android:id="@+id/main_separator_4"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_top"
+            android:background="@drawable/shape_rectangle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/main_custom_handler_invoke" />
+
+        <TextView
+            android:id="@+id/main_select_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_top"
+            android:text="@string/main_activity_result"
+            app:layout_constraintEnd_toStartOf="@+id/main_guide_end"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_separator_4" />
+
+        <Button
+            android:id="@+id/main_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/main_select_file"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@id/main_select_title" />
+
+        <TextView
+            android:id="@+id/main_selected_file"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp"
+            android:maxLines="1"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guide_start"
-            app:layout_constraintTop_toBottomOf="@id/custom_handler_title" />
+            app:layout_constraintEnd_toStartOf="@+id/main_guide_end"
+            app:layout_constraintStart_toStartOf="@+id/main_guide_start"
+            app:layout_constraintTop_toBottomOf="@+id/main_select"
+            tools:text="file.txt" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

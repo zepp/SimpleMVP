@@ -23,6 +23,7 @@ public class MainState extends MvpState {
     public int currentPage;
     public int progress;
     public boolean isStarted;
+    public String fileName = "";
 
     public void setText(String text) {
         setChanged(!this.text.equals(text));
@@ -136,6 +137,11 @@ public class MainState extends MvpState {
 
     public boolean isTimerStateChanged() {
         return (progress == 0 && isStarted) || (progress > 0 && !isStarted);
+    }
+
+    public void setFileName(String fileName) {
+        setChanged(!this.fileName.equals(fileName));
+        this.fileName = fileName;
     }
 
     @Override

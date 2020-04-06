@@ -1,6 +1,7 @@
 package com.testapp.presenter;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -41,6 +42,7 @@ import io.objectbox.BoxStore;
 import static com.testapp.common.EventType.UI;
 
 public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
+    private final static int SELECT_FILE_CODE = 1;
     private final AppState appState;
     private final ConnectivityManager connectivityManager;
     private final BoxStore store;
@@ -128,9 +130,9 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             state.setSearchPattern(text.toLowerCase());
         } else {
             recordEvent(new Event("onTextChanged", viewId));
-            if (viewId == R.id.toast_text) {
+            if (viewId == R.id.main_toast_text) {
                 state.setText(text);
-            } else if (viewId == R.id.expression) {
+            } else if (viewId == R.id.main_expression) {
                 state.setExpression(text.trim(), false);
             }
         }
@@ -146,12 +148,12 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             eventBox.removeAll();
         } else {
             recordEvent(new Event("onViewClicked", viewId));
-            if (viewId == R.id.show_toast) {
+            if (viewId == R.id.main_show_toast) {
                 handle.showToast(state.text, state.duration.getToastDuration());
-            } else if (viewId == R.id.show_snackbar) {
+            } else if (viewId == R.id.main_show_snackbar) {
                 handle.showSnackBar(state.text, state.duration.getSnackBarDuration(),
                         getString(R.string.main_snackbar_action));
-            } else if (viewId == R.id.eval) {
+            } else if (viewId == R.id.main_eval) {
                 state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()), true);
             } else if (viewId == R.id.action_settings) {
                 handle.showDialog(SettingsDialog.newInstance(getId()));
@@ -169,9 +171,26 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                                     " " + getString(R.string.timer_duration) + " " + state.getTextProgress(),
                             Snackbar.LENGTH_LONG, getString(R.string.main_snackbar_action));
                 }
-            } else if (viewId == R.id.request_permissions) {
+            } else if (viewId == R.id.main_request_permissions) {
                 handle.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+            } else if (viewId == R.id.main_select) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                handle.startActivityForResult(Intent.createChooser(intent, getString(R.string.main_selector_dialog_title)),
+                        SELECT_FILE_CODE);
             }
+        }
+        commit(state.delay);
+    }
+
+    @MvpHandler
+    @Override
+    public void onActivityResult(@NonNull MvpViewHandle<MainState> handle, int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(handle, requestCode, resultCode, data);
+        recordEvent(new Event("onActivityResult", handle.getLayoutId()));
+        if (requestCode == SELECT_FILE_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            state.setFileName(data.getData().getLastPathSegment());
         }
         commit(state.delay);
     }
@@ -192,7 +211,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             }
         } else {
             recordEvent(new Event("onItemSelected", viewId));
-            if (viewId == R.id.duration_spinner) {
+            if (viewId == R.id.main_duration_spinner) {
                 state.setDuration((ActionDuration) item);
             }
         }

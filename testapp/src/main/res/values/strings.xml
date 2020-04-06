@@ -21,8 +21,11 @@
     <string name="main_perm_request">Request</string>
     <string name="main_write_perms">Write external storage</string>
     <string name="main_custom_handler_title">Custom handler</string>
-    <string name="main_custom_handler">Invoke</string>
+    <string name="main_custom_invoke">Invoke</string>
     <string name="main_invoked">Invoked</string>
+    <string name="main_activity_result">Activity result</string>
+    <string name="main_select_file">Select file</string>
+    <string name="main_selector_dialog_title">Select a file</string>
     <string name="info_timestamp">time</string>
     <string name="info_thread">thread</string>
     <string name="info_view">view</string>
