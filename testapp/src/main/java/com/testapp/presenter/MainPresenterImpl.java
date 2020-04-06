@@ -186,7 +186,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @MvpHandler
     @Override
-    public void onActivityResult(@NonNull MvpViewHandle<MainState> handle, int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(@NonNull MvpViewHandle<MainState> handle, int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(handle, requestCode, resultCode, data);
         recordEvent(new Event("onActivityResult", handle.getLayoutId()));
         if (requestCode == SELECT_FILE_CODE && resultCode == Activity.RESULT_OK && data != null) {

@@ -308,7 +308,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
 
     @CallSuper
     @Override
-    public void onActivityResult(@NonNull MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(@NonNull MvpViewHandle<S> handle, int requestCode, int resultCode, @Nullable Intent data) {
         Log.d(tag, "onActivityResult(" + requestCode + ", " + resultCode + ", " + data + ")");
     }
 

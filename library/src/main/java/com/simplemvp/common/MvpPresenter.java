@@ -79,22 +79,21 @@ public interface MvpPresenter<S extends MvpState> {
     void finish();
 
     /**
-     * This method has the same purpose as the {@link com.simplemvp.view.MvpActivity#onActivityResult(int, int, Intent)}
+     * This method has the same purpose as the {@link androidx.appcompat.app.AppCompatActivity#onActivityResult(int, int, Intent)}
      *
      * @param handle {@link MvpViewHandle} instance
-     * @param requestCode The integer request code originally supplied to startActivityForResult(),
+     * @param requestCode The integer request code originally supplied to {@link MvpViewHandle#startActivityForResult(Intent, int)},
      *                    allowing you to identify who this result came from.
      * @param resultCode  The integer result code returned by the child activity through its setResult().
      * @param data        An Intent, which can return result data to the caller (various data can be attached
      */
-    void onActivityResult(@NonNull MvpViewHandle<S> handle, int requestCode, int resultCode, Intent data);
+    void onActivityResult(@NonNull MvpViewHandle<S> handle, int requestCode, int resultCode, @Nullable Intent data);
 
     /**
-     * This method has the same purpose as the {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])}
+     * This method has the same purpose as the {@link androidx.appcompat.app.AppCompatActivity#onRequestPermissionsResult(int, String[], int[])}
      *
      * @param handle {@link MvpViewHandle} instance
-     * @param requestCode request code passed in {@link com.simplemvp.view.MvpFragment#requestPermissions(String[], int)} or
-     *                    {@link com.simplemvp.view.MvpActivity#requestPermissions(String[], int)}
+     * @param requestCode request code passed in {@link MvpViewHandle#requestPermissions(String[], int)}
      * @param permissions map that represents result for the certain permission
      */
     void onRequestPermissionsResult(@NonNull MvpViewHandle<S> handle, int requestCode, @NonNull Map<String, Integer> permissions);
