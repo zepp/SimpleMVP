@@ -143,7 +143,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
 
     @Override
     public void showDialog(@NonNull DialogFragment dialog) {
-        dialog.show(getFragmentManager(), dialog.getClass().getSimpleName());
+        dialog.show(requireFragmentManager(), dialog.getClass().getSimpleName());
     }
 
     @Override
@@ -153,7 +153,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     public void finish() {
-        getFragmentManager().beginTransaction().remove(this).commit();
+        requireFragmentManager().beginTransaction().remove(this).commit();
     }
 
     @Override
