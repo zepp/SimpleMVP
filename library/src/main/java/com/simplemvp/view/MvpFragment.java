@@ -113,6 +113,12 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     }
 
     @Override
+    public void onDestroyOptionsMenu() {
+        super.onDestroyOptionsMenu();
+        eventHandler.setEnabled(false);
+    }
+
+    @Override
     public void onFirstStateChange(@NonNull S state) {
         Log.d(tag, "onFirstStateChange(" + state + ")");
     }
