@@ -167,6 +167,16 @@ public interface MvpPresenter<S extends MvpState> {
     void onTextChanged(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, String text);
 
     /**
+     * This method handles input actions. Use {@link MvpView#getMvpListener()} to connect certain
+     * view to the handler.
+     *
+     * @param handle   {@link MvpViewHandle} instance
+     * @param viewId   view's ID
+     * @param actionId action ID {@link android.view.inputmethod.EditorInfo}
+     */
+    void onEditorAction(@NonNull MvpViewHandle<S> handle, @IdRes int viewId, int actionId);
+
+    /**
      * This method handles {@link View.OnDragListener#onDrag(View, DragEvent)} callback.
      * See {@link MvpListener} for details. Use {@link MvpView#getMvpListener()} to connect certain
      * view to the handler.

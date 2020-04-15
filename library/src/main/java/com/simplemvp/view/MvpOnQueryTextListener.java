@@ -4,6 +4,8 @@
 
 package com.simplemvp.view;
 
+import android.view.inputmethod.EditorInfo;
+
 import androidx.appcompat.widget.SearchView;
 
 import com.simplemvp.common.MvpPresenter;
@@ -31,6 +33,7 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextSubmit(String s) {
+        presenter.onEditorAction(handle, view.getId(), EditorInfo.IME_ACTION_SEND);
         return false;
     }
 

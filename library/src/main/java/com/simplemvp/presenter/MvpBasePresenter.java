@@ -342,6 +342,12 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         Log.d(tag, "onTextChanged(" + getResources().getResourceName(viewId) + ", " + text + ")");
     }
 
+    @CallSuper
+    @Override
+    public void onEditorAction(@NonNull MvpViewHandle<S> handle, int viewId, int actionId) {
+        Log.d(tag, "onEditorAction(" + getResources().getResourceName(viewId) + ", " + actionId + ")");
+    }
+
     @Override
     public void onCheckedChanged(@NonNull MvpViewHandle<S> handle, int viewId, boolean isChecked) {
         Log.d(tag, "onCheckedChanged(" + getResources().getResourceName(viewId) + ", " + isChecked + ")");

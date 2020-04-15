@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 /**
  * This interface extends a lot of standard Android listeners to define universal listener to be
@@ -17,5 +18,6 @@ import android.widget.SeekBar;
  */
 public interface MvpListener extends View.OnClickListener, MenuItem.OnMenuItemClickListener,
         CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener,
-        AdapterView.OnItemSelectedListener, View.OnDragListener, SeekBar.OnSeekBarChangeListener {
+        AdapterView.OnItemSelectedListener, View.OnDragListener, SeekBar.OnSeekBarChangeListener,
+        TextView.OnEditorActionListener {
 }
