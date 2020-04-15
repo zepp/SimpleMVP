@@ -66,7 +66,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
         }
         eventHandler = new MvpEventHandler<>(this, savedInstanceState);
         eventHandler.initialize();
-        eventHandler.setEnabled(getMenuId() == 0);
+        eventHandler.setEnabled(true);
         presenter.connect(this);
     }
 
@@ -157,7 +157,7 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
-    public int getMenuId() {
+    public final int getMenuId() {
         return 0;
     }
 
