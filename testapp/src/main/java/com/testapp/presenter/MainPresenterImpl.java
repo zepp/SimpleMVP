@@ -141,6 +141,14 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
 
     @Override
     @MvpHandler
+    public void onEditorAction(@NonNull MvpViewHandle<MainState> handle, int viewId, int actionId) {
+        super.onEditorAction(handle, viewId, actionId);
+        recordEvent(new Event("onEditorAction", viewId));
+        commit();
+    }
+
+    @Override
+    @MvpHandler
     public void onViewClicked(@NonNull MvpViewHandle<MainState> handle, int viewId) {
         super.onViewClicked(handle, viewId);
         if (viewId == R.id.clear_all) {
