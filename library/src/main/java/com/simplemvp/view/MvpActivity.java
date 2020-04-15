@@ -4,7 +4,6 @@
 
 package com.simplemvp.view;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -188,11 +187,14 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
         return true;
     }
 
-    @SuppressLint("MissingSuperCall")
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // top bits are used to encode the fragment index
-        presenter.onActivityResult(getViewHandle(), requestCode & 0xffff, resultCode, data);
+        if ((requestCode & 0xffff) == requestCode) {
+            presenter.onActivityResult(getViewHandle(), requestCode, resultCode, data);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
