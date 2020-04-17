@@ -33,7 +33,7 @@ class MvpOnQueryTextListener<S extends MvpState> implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextSubmit(String s) {
-        presenter.onEditorAction(handle, view.getId(), EditorInfo.IME_ACTION_SEND);
+        presenter.onEditorAction(handle, view.getId(), EditorInfo.IME_ACTION_SEARCH);
         return false;
     }
 
