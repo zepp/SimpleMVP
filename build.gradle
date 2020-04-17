@@ -6,12 +6,11 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.2'
 
-        classpath 'com.novoda:bintray-release:0.8.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
 
         classpath "io.objectbox:objectbox-gradle-plugin:$objectboxVersion"
     }
