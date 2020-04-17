@@ -50,21 +50,27 @@ public class MainState extends MvpState {
 
 ## Presenter
 
-Presenters is inherited from `MvpBasePresenter` class.  
+Presenter is inherited from `MvpBasePresenter` class.  
 
-Usually presenter reacts to various events coming from a model or Android system to modify state. Modified state is sent to all connected views after `commit()` method calls.
+Usually presenter reacts to various events coming from a model or Android system to modify state. Modified state is sent to all connected views after `commit()` method call.
 
 Multiple views can share single presenter so all related business logic is placed in a single class.
 
-Presenter handles various UI events such as:
+There are following methods to handle various UI events:
 
-* View clicks (`onViewClicked()` handler)
-* Item selection (`onItemSelected()` handler)
-* Text changes (`onTextChanged()` handler)
+* `onViewClicked()` handles a view clicks
+* `onTextChanged()` handles text changes of `EditText` and `SearchView` views 
+* `onEditorAction()` handles an input method actions
+* `onItemSelected()` handles an item selection of `Spinner` and `RecyclerView` views
+* `onCheckedChanged()` handles check change of `CompountButton` view and inherited classes
+* `onRadioCheckedChanged()` handles an item selection of `RadioGroup` view
+* `onProgressChanged()` handles a progress change of `SeekBar` and similar views 
+* `onActivityResult()` handles an activity result
+* `onRequestPermissionsResult()` handles a permission request result
 
 System events:
 
-* Broadcast intents (`onBroadcastReceived()` handler)
+* `onBroadcastReceived()` handles broadcast intents
 
 There are following methods that reflect presenter lifetime:
 
