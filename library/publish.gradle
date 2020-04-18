@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version '1.0'
+version project.android.defaultConfig.versionName
 group 'com.simplemvp'
 
 publishing {
@@ -41,7 +41,7 @@ bintray {
     // Default: false. Whether to override version artifacts already published
     override = false
     // Default: false. Whether version should be auto published after an upload
-    publish = false
+    publish = true
     pkg {
         repo = 'SimpleMVP' // the name of the repository you created on Bintray
         name = this.group + '.' + 'library' // the name of the package you created inside it
