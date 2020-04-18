@@ -215,6 +215,26 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
 * `RecyclerView` adapter must enable stable ID feature
 
 If `EditText` is updated from `onStateChanged` then endless cycle of `onTextChanged` and `onStateChanged` occurs. In other words there is no way to update `EditText` text without `MvpTextWatcher` invocation. It is better to set a text once from `onFirstStateChange` or use `MvpEditText` implementation that provides `setTextNoWatchers` method.    
+
+# Gradle
+
+Add maven repository to a project gradle file:
+
+```
+allprojects {
+    repositories {
+        maven {
+            url 'https://dl.bintray.com/zeppa/SimpleMVP'
+        }
+    }
+}
+```
+  
+add dependency to a module gradle file:
+
+```
+implementation 'com.simplemvp:library:1.0'
+```
   
 # Test application
 
