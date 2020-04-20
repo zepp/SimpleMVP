@@ -409,7 +409,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
      *              trimming the application may like to perform.
      */
     @CallSuper
-    protected void onTrimMemory(int level) {
+    protected void onTrimMemory(int level) throws Exception {
         Log.d(tag, "onTrimMemory(" + level + ")");
     }
 

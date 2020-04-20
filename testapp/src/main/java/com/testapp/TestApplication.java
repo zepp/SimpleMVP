@@ -28,15 +28,19 @@ public class TestApplication extends Application {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         executor = Executors.newSingleThreadExecutor();
         errorHandler = error -> {
-            notificationManager
-                    .notify(ERROR_NOTIFICATION_ID, getErrorNotification(error.getMessage()));
+            notificationManager.notify(ERROR_NOTIFICATION_ID,
+                    getErrorNotification(getCause(error).getMessage()));
             Log.e(tag, "error: ", error);
         };
         presenterManager = MvpPresenterManager.getInstance(this);
         presenterManager.initialize(executor, errorHandler);
     }
 
-    Notification getErrorNotification(String text) {
+    private Throwable getCause(Throwable e) {
+        return e.getCause() == null ? e : getCause(e.getCause());
+    }
+
+    private Notification getErrorNotification(String text) {
         NotificationCompat.Builder builder = getBuilder(true)
                 .setSmallIcon(R.drawable.ic_error)
                 .setContentTitle(getString(R.string.app_error))

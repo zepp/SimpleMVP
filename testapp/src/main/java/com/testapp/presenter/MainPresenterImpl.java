@@ -3,6 +3,7 @@ package com.testapp.presenter;
 import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -288,11 +289,13 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     }
 
     @Override
-    protected void onTrimMemory(int level) {
+    protected void onTrimMemory(int level) throws Exception {
         super.onTrimMemory(level);
         recordEvent(new Event(SYSTEM, "onTrimMemory"));
-        List<Event> events = state.events;
-        events.subList(0, events.size() - 10).clear();
+        if (level != ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+            List<Event> events = state.events;
+            events.subList(0, events.size() - 10).clear();
+        }
         commit(state.delay);
     }
 
