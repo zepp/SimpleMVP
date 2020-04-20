@@ -31,6 +31,7 @@ import com.testapp.view.SettingsDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -39,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
 
+import static com.testapp.common.EventType.LIFECYCLE;
+import static com.testapp.common.EventType.SYSTEM;
 import static com.testapp.common.EventType.UI;
 
 public class MainPresenterImpl extends MvpBasePresenter<MainState> implements MainPresenter {
@@ -97,7 +100,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @Override
     protected void onViewsActive() throws Exception {
         super.onViewsActive();
-        recordEvent(new Event(UI, "onViewsActive"));
+        recordEvent(new Event(LIFECYCLE, "onViewsActive"));
         if (appState.isTimerStarted()) {
             state.setProgress((int) ((System.currentTimeMillis() - appState.getTimerStartedTime()) / 1000));
             if (timer == null) {
@@ -111,14 +114,14 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     @Override
     protected void onViewsInactive() throws Exception {
         super.onViewsInactive();
-        recordEvent(new Event(UI, "onViewsInactive"));
+        recordEvent(new Event(LIFECYCLE, "onViewsInactive"));
         commit(state.delay);
     }
 
     @Override
     protected void onLastViewDisconnected() throws Exception {
         super.onLastViewDisconnected();
-        recordEvent(new Event(UI, "onLastViewDisconnected"));
+        recordEvent(new Event(LIFECYCLE, "onLastViewDisconnected"));
         store.close();
     }
 
@@ -281,6 +284,15 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     public void customHandler(MvpViewHandle<MainState> handle, int viewId) {
         recordEvent(new Event("customHandler", viewId));
         handle.showToast(R.string.main_invoked, Toast.LENGTH_SHORT);
+        commit(state.delay);
+    }
+
+    @Override
+    protected void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        recordEvent(new Event(SYSTEM, "onTrimMemory"));
+        List<Event> events = state.events;
+        events.subList(0, events.size() - 10).clear();
         commit(state.delay);
     }
 

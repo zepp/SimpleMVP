@@ -5,10 +5,12 @@
 package com.simplemvp.presenter;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
@@ -72,6 +74,10 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.receivers = new TreeMap<>();
         this.commit = scheduler.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
         this.futures = new TreeMap<>((o1, o2) -> o1.hashCode() - o2.hashCode());
+    }
+
+    void initialize() {
+        registerComponentCallbacks(new PresenterComponentCallbacks());
     }
 
     /**
@@ -396,6 +402,18 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     /**
+     * Called when the operating system has determined that it is a good time for a presenter to
+     * trim unneeded memory from its process. See {@link ComponentCallbacks2} for details.
+     *
+     * @param level The context of the trim, giving a hint of the amount of
+     *              trimming the application may like to perform.
+     */
+    @CallSuper
+    protected void onTrimMemory(int level) {
+        Log.d(tag, "onTrimMemory(" + level + ")");
+    }
+
+    /**
      * This method is called when master view is connected to current presenter. This method is to be
      * overridden to place initialization code that fills {@link MvpBasePresenter#state} with initial
      * values and subscribes to necessary events.
@@ -494,6 +512,21 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
             if (started.decrementAndGet() == 0) {
                 submit(MvpBasePresenter.this::onViewsInactive);
             }
+        }
+    }
+
+    private class PresenterComponentCallbacks implements ComponentCallbacks2 {
+        @Override
+        public void onTrimMemory(int level) {
+            submit(() -> MvpBasePresenter.this.onTrimMemory(level));
+        }
+
+        @Override
+        public void onConfigurationChanged(Configuration newConfig) {
+        }
+
+        @Override
+        public void onLowMemory() {
         }
     }
 }

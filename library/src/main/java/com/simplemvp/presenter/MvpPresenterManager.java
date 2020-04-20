@@ -86,6 +86,7 @@ public final class MvpPresenterManager extends ContextWrapper {
         S state = newState(sClass);
         P presenter = newPresenter(pClass, sClass, state);
         I proxy = ProxyHandler.newProxy(presenter);
+        presenter.initialize();
         map.put(presenter.getId(), new Composite<>(presenter, proxy));
         Log.d(tag, "new presenter: " + presenter);
         return proxy;

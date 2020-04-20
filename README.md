@@ -71,6 +71,7 @@ There are following methods to handle various UI events:
 System events:
 
 * `onBroadcastReceived()` handles broadcast intents
+* `onTrimMemory()` handles memory shortage event
 
 There are following methods that reflect presenter lifetime:
 
