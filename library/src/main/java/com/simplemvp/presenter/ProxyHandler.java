@@ -20,27 +20,27 @@ import java.util.TreeMap;
 
 class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final MvpBasePresenter<S> presenter;
-    private final Map<String, MvpHandler> handlers;
+    private final Map<Method, MvpHandler> handlers;
 
     private ProxyHandler(MvpBasePresenter<S> presenter) {
         this.presenter = presenter;
         this.handlers = getMethodAnnotations(presenter);
     }
 
-    private static <S extends MvpState> Map<String, MvpHandler> getMethodAnnotations(MvpPresenter<S> presenter) {
+    private static <S extends MvpState> Map<Method, MvpHandler> getMethodAnnotations(MvpPresenter<S> presenter) {
         String tag = presenter.getClass().getSimpleName();
-        Map<String, MvpHandler> result = new TreeMap<>();
+        Map<Method, MvpHandler> result = new TreeMap<>((o1, o2) -> o1.getName().compareTo(o2.getName()));
         for (Method method : presenter.getClass().getMethods()) {
             MvpHandler handler = method.getAnnotation(MvpHandler.class);
             if (handler != null) {
                 if (handler.executor()) {
                     if (method.getReturnType().equals(void.class) || method.getReturnType().equals(Void.class)) {
-                        result.put(method.getName(), handler);
+                        result.put(method, handler);
                     } else {
                         Log.w(tag, "@MvpHandler method " + method.getName() + " is ignored since return value is incorrect");
                     }
                 } else {
-                    result.put(method.getName(), handler);
+                    result.put(method, handler);
                 }
             }
         }
@@ -70,7 +70,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        MvpHandler handler = handlers.get(method.getName());
+        MvpHandler handler = handlers.get(method);
         if (handler == null) {
             // exception has to be rethrown otherwise return value unboxing error happens
             return presenter.callSync(() -> method.invoke(presenter, args), true);
