@@ -6,9 +6,7 @@ package com.simplemvp.view;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
-import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
 import com.simplemvp.common.MvpViewHandle;
@@ -18,14 +16,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final static String tag = ProxyHandler.class.getSimpleName();
     private final static Thread mainThread = Looper.getMainLooper().getThread();
     private final WeakReference<MvpEventHandler<S>> eventHandler;
-    private final Set<Method> annotatedMethods;
+    private final Map<Method, Proxify> annotations;
     private final MvpPresenter<S> presenter;
     private final Handler handler;
     private final int viewId;
@@ -33,7 +31,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     ProxyHandler(MvpEventHandler<S> eventHandler, MvpPresenter<S> presenter) {
         this.eventHandler = new WeakReference<>(eventHandler);
         this.presenter = presenter;
-        annotatedMethods = Collections.synchronizedSet(getAnnotatedMethods(eventHandler));
+        annotations = Collections.synchronizedMap(getAnnotatedMethods(eventHandler));
         handler = new Handler(Looper.getMainLooper());
         viewId = eventHandler.getMvpId();
     }
@@ -42,11 +40,12 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         return mainThread.equals(thread);
     }
 
-    private Set<Method> getAnnotatedMethods(MvpViewHandle<S> view) {
-        Set<Method> result = new TreeSet<>((o1, o2) -> o1.getName().compareTo(o2.getName()));
+    private Map<Method, Proxify> getAnnotatedMethods(MvpViewHandle<S> view) {
+        Map<Method, Proxify> result = new TreeMap<>((o1, o2) -> o1.getName().compareTo(o2.getName()));
         for (Method method : view.getClass().getMethods()) {
-            if (method.getAnnotation(MvpHandler.class) != null) {
-                result.add(method);
+            Proxify annotation = method.getAnnotation(Proxify.class);
+            if (annotation != null) {
+                result.put(method, annotation);
             }
         }
         return result;
@@ -55,11 +54,15 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MvpEventHandler<S> eventHandler = this.eventHandler.get();
+        Proxify annotation = annotations.get(method);
         if (eventHandler == null) {
             presenter.disconnectLazy(viewId);
+            if (annotation.alive()) {
+                throw new RuntimeException("view has been already destroyed");
+            }
             return null;
         } else {
-            if (annotatedMethods.contains(method)) {
+            if (annotation.looper()) {
                 if (isMainThread(Thread.currentThread())) {
                     return handle(eventHandler, method, args);
                 } else {
@@ -67,7 +70,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
                         try {
                             handle(eventHandler, method, args);
                         } catch (Exception e) {
-                            Log.e(tag, "error: ", e);
+                            throw new RuntimeException(e);
                         }
                     });
                     return null;

@@ -20,9 +20,10 @@
   public <init>(android.content.Context, ***);
   @MvpHandler public void * (...);
 }
+-keep class com.simplemvp.view.Proxify { *; }
 # some methods of this class are invoked using reflection
 -keepclassmembers class com.simplemvp.view.MvpEventHandler {
-  @MvpHandler public void * (...);
+  @Proxify public void * (...);
 }
 -keepclasseswithmembernames public class * extends com.simplemvp.view.MvpActivity {*; }
 -keepclasseswithmembernames public class * extends com.simplemvp.view.MvpFragment {*; }

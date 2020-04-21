@@ -32,7 +32,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
-import com.simplemvp.annotations.MvpHandler;
 import com.simplemvp.common.MvpListener;
 import com.simplemvp.common.MvpPresenter;
 import com.simplemvp.common.MvpState;
@@ -319,18 +318,20 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         return listener;
     }
 
+    @Proxify(looper = false)
     @Override
     public int getMvpId() {
         return view.getMvpId();
     }
 
+    @Proxify(looper = false)
     @Override
     public int getLayoutId() {
         return view.getLayoutId();
     }
 
+    @Proxify(alive = false)
     @Override
-    @MvpHandler
     public void post(@NonNull S state) {
         if (isFirstStateChange()) {
             view.onFirstStateChange(state);
@@ -339,32 +340,32 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         this.state = state;
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void finish() {
         view.finish();
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void showDialog(@NonNull DialogFragment dialog) {
         view.showDialog(dialog);
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void showSnackBar(String text, int duration) {
         Snackbar.make(view.getView(), text, duration).show();
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void showSnackBar(int res, int duration) {
         Snackbar.make(view.getView(), res, duration).show();
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void showSnackBar(String text, int duration, String action) {
         Snackbar bar = Snackbar.make(view.getView(), text, duration);
         bar.setAction(action, v -> {
@@ -374,33 +375,33 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         bar.show();
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void showToast(String text, int duration) {
         Toast.makeText(getBaseContext(), text, duration).show();
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void showToast(int resId, int duration) {
         Toast.makeText(getBaseContext(), resId, duration).show();
     }
 
-    // This method must be overridden to be annotated with @MvpHandler
+    // This method must be overridden to be annotated with @Proxify
+    @Proxify
     @Override
-    @MvpHandler
     public void startActivity(@NonNull Intent intent) {
         view.startActivity(intent);
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void startActivityForResult(@NonNull Intent intent, int requestCode) {
         view.startActivityForResult(intent, requestCode);
     }
 
+    @Proxify
     @Override
-    @MvpHandler
     public void requestPermissions(@NonNull String[] permissions, int requestCode) {
         view.requestPermissions(permissions, requestCode);
     }
