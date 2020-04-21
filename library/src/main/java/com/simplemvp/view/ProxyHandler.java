@@ -55,7 +55,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MvpEventHandler<S> eventHandler = this.eventHandler.get();
         Proxify annotation = annotations.get(method);
-        if (eventHandler == null) {
+        if (eventHandler == null || eventHandler.isParentViewDestroyed()) {
             presenter.disconnectLazy(viewId);
             if (annotation.alive()) {
                 throw new RuntimeException("view has been already destroyed");

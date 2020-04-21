@@ -72,6 +72,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private boolean isFirstStateChange = true;
     private boolean isEnabled;
     private boolean isResumed;
+    private boolean isDestroyed;
     private MvpViewHandle<S> proxy;
     private S state;
 
@@ -118,6 +119,11 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         listeners.clear();
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    public void onDestroy() {
+        isDestroyed = true;
+    }
+
     /**
      * This method enables or disables event processing. Typically {@link MvpView} implementation
      * disables {@link MvpEventHandler} until menu is inflated.
@@ -158,6 +164,10 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
      */
     boolean isParentViewReady() {
         return isEnabled && isResumed;
+    }
+
+    boolean isParentViewDestroyed() {
+        return isDestroyed;
     }
 
     /**
