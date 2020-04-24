@@ -20,23 +20,23 @@ public abstract class MvpState implements Cloneable {
      */
     private boolean isChanged = false;
 
-    public boolean isChanged() {
+    public final boolean isChanged() {
         return isChanged;
     }
 
-    public void setChanged(boolean isChanged) {
+    public final void setChanged(boolean isChanged) {
         this.isChanged |= isChanged;
     }
 
-    public void clearChanged() {
+    public final void clearChanged() {
         this.isChanged = false;
     }
 
-    public boolean isInitial() {
+    public final boolean isInitial() {
         return revision == 0;
     }
 
-    public int getRevision() {
+    public final int getRevision() {
         return revision;
     }
 
