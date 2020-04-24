@@ -78,7 +78,7 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
             if (handler.executor()) {
                 presenter.submit(() -> method.invoke(presenter, args));
             } else {
-                presenter.callSync(() -> method.invoke(presenter, args), false);
+                return presenter.callSync(() -> method.invoke(presenter, args), false);
             }
             return null;
         }
