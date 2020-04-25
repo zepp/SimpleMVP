@@ -4,6 +4,7 @@
 
 package com.simplemvp.view;
 
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -75,6 +77,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private boolean isDestroyed;
     private MvpViewHandle<S> proxy;
     private S state;
+    private InputMethodManager imm;
 
     MvpEventHandler(@NonNull MvpView<S, ?> view, @Nullable Bundle savedState) {
         super(view.getContext());
@@ -219,6 +222,13 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private MvpViewHandle<S> newProxy() {
         return (MvpViewHandle<S>) Proxy.newProxyInstance(getClass().getClassLoader(),
                 new Class<?>[]{MvpViewHandle.class}, new ProxyHandler(this, presenter));
+    }
+
+    private InputMethodManager getImm() {
+        if (imm == null) {
+            imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        }
+        return imm;
     }
 
     @Override
@@ -414,5 +424,11 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @Override
     public void requestPermissions(@NonNull String[] permissions, int requestCode) {
         view.requestPermissions(permissions, requestCode);
+    }
+
+    @Proxify
+    @Override
+    public void hideInputMethod(int viewId, int flags) {
+        getImm().hideSoftInputFromWindow(view.getView().findViewById(viewId).getWindowToken(), flags);
     }
 }

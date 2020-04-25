@@ -5,7 +5,9 @@ package com.simplemvp.common;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
@@ -126,4 +128,15 @@ public interface MvpViewHandle<S extends MvpState> {
      *                    {@link com.simplemvp.presenter.MvpBasePresenter#onRequestPermissionsResult(MvpViewHandle, int, Map)}.
      */
     void requestPermissions(@NonNull String[] permissions, int requestCode);
+
+    /**
+     * Request to hide the soft input window from the context of the window that is currently
+     * accepting input. See
+     * {@link android.view.inputmethod.InputMethodManager#hideSoftInputFromWindow(IBinder, int)}
+     * for details.
+     *
+     * @param viewId view's ID that requests to hide input method
+     * @param flags  flags
+     */
+    void hideInputMethod(@IdRes int viewId, int flags);
 }
