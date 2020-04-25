@@ -58,6 +58,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     private final Map<String, AsyncBroadcastReceiver> receivers;
     private final Consumer<Throwable> errorHandler;
     private final Map<Executable, Future<?>> futures;
+    private final PresenterComponentCallbacks componentCallbacks;
     private int parentId;
     private ScheduledFuture<?> commit;
 
@@ -74,10 +75,11 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
         this.receivers = new TreeMap<>();
         this.commit = scheduler.schedule(() -> null, 0, TimeUnit.MILLISECONDS);
         this.futures = new TreeMap<>((o1, o2) -> o1.hashCode() - o2.hashCode());
+        this.componentCallbacks = new PresenterComponentCallbacks();
     }
 
     void initialize() {
-        registerComponentCallbacks(new PresenterComponentCallbacks());
+        registerComponentCallbacks(componentCallbacks);
     }
 
     /**
@@ -464,6 +466,7 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @CallSuper
     protected void onLastViewDisconnected() throws Exception {
         Log.d(tag, "onLastViewDisconnected()");
+        unregisterComponentCallbacks(componentCallbacks);
         for (AsyncBroadcastReceiver receiver : receivers.values()) {
             unregisterReceiver(receiver);
         }
