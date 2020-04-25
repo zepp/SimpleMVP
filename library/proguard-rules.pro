@@ -13,6 +13,7 @@
 -keepnames public class com.simplemvp.presenter.MvpPresenterManager {
   public *;
 }
+-keepnames class * extends com.simplemvp.presenter.MvpFactory { *; }
 # keep presenter classes to trace errors
 -keepclasseswithmembernames public class * extends com.simplemvp.presenter.MvpBasePresenter { *; }
 # some methods of these classes can be invoked using reflection
