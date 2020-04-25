@@ -28,6 +28,7 @@ import com.testapp.common.ActionDuration;
 import com.testapp.common.Event;
 import com.testapp.common.MyObjectBox;
 import com.testapp.view.EventInfoDialog;
+import com.testapp.view.MainActivity;
 import com.testapp.view.SettingsDialog;
 
 import java.text.SimpleDateFormat;
@@ -237,6 +238,9 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         recordEvent(new Event("onPositionChanged", viewId));
         if (viewId == R.id.view_pager) {
             state.setCurrentPage(position);
+            if (position != MainActivity.FRAGMENT_MAIN) {
+                handle.hideInputMethod(viewId, 0);
+            }
         }
         commit(state.delay);
     }

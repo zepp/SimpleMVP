@@ -1,16 +1,13 @@
 package com.testapp.view;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -26,10 +23,9 @@ import com.testapp.presenter.MainPresenterImpl;
 import com.testapp.presenter.MainState;
 
 public class MainActivity extends MvpActivity<MainPresenter, MainState> {
-    private final static int FRAGMENT_TIMER = 0;
-    private final static int FRAGMENT_MAIN = 1;
-    private final static int FRAGMENT_EVENTS = 2;
-    private InputMethodManager imm;
+    public final static int FRAGMENT_TIMER = 0;
+    public final static int FRAGMENT_MAIN = 1;
+    public final static int FRAGMENT_EVENTS = 2;
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -55,7 +51,6 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = findViewById(R.id.view_pager);
@@ -63,11 +58,6 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         clearAll = findViewById(R.id.clear_all);
-        viewPager.addOnPageChangeListener(new OnPageSelected(i -> {
-            if (i != FRAGMENT_MAIN) {
-                imm.hideSoftInputFromWindow(viewPager.getApplicationWindowToken(), 0);
-            }
-        }));
     }
 
     @Override
@@ -125,29 +115,6 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         @Override
         public int getCount() {
             return 3;
-        }
-    }
-
-    private static class OnPageSelected implements ViewPager.OnPageChangeListener {
-        private final Consumer<Integer> consumer;
-
-        OnPageSelected(Consumer<Integer> consumer) {
-            this.consumer = consumer;
-        }
-
-        @Override
-        public void onPageScrolled(int i, float v, int i1) {
-
-        }
-
-        @Override
-        public void onPageSelected(int i) {
-            consumer.accept(i);
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int i) {
-
         }
     }
 }
