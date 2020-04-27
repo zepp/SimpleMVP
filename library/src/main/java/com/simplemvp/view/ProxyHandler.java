@@ -22,18 +22,18 @@ import java.util.TreeMap;
 class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final static String tag = ProxyHandler.class.getSimpleName();
     private final static Thread mainThread = Looper.getMainLooper().getThread();
-    private final WeakReference<MvpEventHandler<S>> eventHandler;
+    private final WeakReference<MvpDispatcher<S>> dispatcher;
     private final Map<Method, Proxify> annotations;
     private final MvpPresenter<S> presenter;
     private final Handler handler;
     private final int viewId;
 
-    ProxyHandler(MvpEventHandler<S> eventHandler, MvpPresenter<S> presenter) {
-        this.eventHandler = new WeakReference<>(eventHandler);
+    ProxyHandler(MvpDispatcher<S> dispatcher, MvpPresenter<S> presenter) {
+        this.dispatcher = new WeakReference<>(dispatcher);
         this.presenter = presenter;
-        annotations = Collections.synchronizedMap(getAnnotatedMethods(eventHandler));
+        annotations = Collections.synchronizedMap(getAnnotatedMethods(dispatcher));
         handler = new Handler(Looper.getMainLooper());
-        viewId = eventHandler.getMvpId();
+        viewId = dispatcher.getMvpId();
     }
 
     private static boolean isMainThread(Thread thread) {
@@ -53,9 +53,9 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        MvpEventHandler<S> eventHandler = this.eventHandler.get();
+        MvpDispatcher<S> dispatcher = this.dispatcher.get();
         Proxify annotation = annotations.get(method);
-        if (eventHandler == null || eventHandler.isParentViewDestroyed()) {
+        if (dispatcher == null || dispatcher.isParentViewDestroyed()) {
             presenter.disconnectLazy(viewId);
             if (annotation.alive()) {
                 throw new RuntimeException("view has been already destroyed");
@@ -64,11 +64,11 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         } else {
             if (annotation.looper()) {
                 if (isMainThread(Thread.currentThread())) {
-                    return handle(eventHandler, method, args);
+                    return handle(dispatcher, method, args);
                 } else {
                     handler.post(() -> {
                         try {
-                            handle(eventHandler, method, args);
+                            handle(dispatcher, method, args);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -76,16 +76,16 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
                     return null;
                 }
             } else {
-                return method.invoke(eventHandler, args);
+                return method.invoke(dispatcher, args);
             }
         }
     }
 
-    private Object handle(MvpEventHandler<S> handler, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
-        if (handler.isParentViewReady()) {
-            return method.invoke(handler, args);
+    private Object handle(MvpDispatcher<S> dispatcher, Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        if (dispatcher.isParentViewReady()) {
+            return method.invoke(dispatcher, args);
         } else {
-            handler.submitEvent(() -> method.invoke(handler, args));
+            dispatcher.submitEvent(() -> method.invoke(dispatcher, args));
             return null;
         }
     }

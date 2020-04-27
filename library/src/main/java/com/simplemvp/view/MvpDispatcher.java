@@ -61,10 +61,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @param <S> state type
  */
-class MvpEventHandler<S extends MvpState> extends ContextWrapper
+class MvpDispatcher<S extends MvpState> extends ContextWrapper
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
-    private final static String INSTANCE_ID = "mvp-event-handler-id";
-    private final static String tag = MvpEventHandler.class.getSimpleName();
+    private final static String INSTANCE_ID = "mvp-view-id";
+    private final static String tag = MvpDispatcher.class.getSimpleName();
     private final static AtomicInteger lastId = new AtomicInteger();
     private final int id;
     private final MvpView<S, ?> view;
@@ -79,7 +79,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     private S state;
     private InputMethodManager imm;
 
-    MvpEventHandler(@NonNull MvpView<S, ?> view, @Nullable Bundle savedState) {
+    MvpDispatcher(@NonNull MvpView<S, ?> view, @Nullable Bundle savedState) {
         super(view.getContext());
         this.id = getId(savedState);
         this.view = view;
@@ -90,7 +90,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
         return bundle == null ? lastId.incrementAndGet() : bundle.getInt(INSTANCE_ID);
     }
 
-    void saveId(@NonNull Bundle bundle) {
+    void saveState(@NonNull Bundle bundle) {
         bundle.putInt(INSTANCE_ID, id);
     }
 
@@ -129,7 +129,7 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     /**
      * This method enables or disables event processing. Typically {@link MvpView} implementation
-     * disables {@link MvpEventHandler} until menu is inflated.
+     * disables {@link MvpDispatcher} until menu is inflated.
      *
      * @param enabled true to enable event processing
      * @return true if state is changed

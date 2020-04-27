@@ -43,9 +43,9 @@ import com.simplemvp.presenter.MvpPresenterManager;
  */
 public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         extends Fragment implements MvpView<S, P> {
-    private final static String PRESENTER_ID = "presenter-id";
+    private final static String PRESENTER_ID = "mvp-presenter-id";
     protected final String tag = getClass().getSimpleName();
-    protected MvpEventHandler<S> eventHandler;
+    protected MvpDispatcher<S> dispatcher;
     @NonNull
     protected P presenter;
 
@@ -71,9 +71,9 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
         } else {
             presenter = manager.getPresenterInstance(presenterId);
         }
-        eventHandler = new MvpEventHandler<>(this, savedInstanceState);
-        eventHandler.initialize();
-        eventHandler.setEnabled(getMenuId() == 0);
+        dispatcher = new MvpDispatcher<>(this, savedInstanceState);
+        dispatcher.initialize();
+        dispatcher.setEnabled(getMenuId() == 0);
         presenter.connect(this);
     }
 
@@ -91,7 +91,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(PRESENTER_ID, presenter.getId());
-        eventHandler.saveId(outState);
+        dispatcher.saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -112,15 +112,15 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if (!eventHandler.setEnabled(true)) {
-            eventHandler.postLastState();
+        if (!dispatcher.setEnabled(true)) {
+            dispatcher.postLastState();
         }
     }
 
     @Override
     public void onDestroyOptionsMenu() {
         super.onDestroyOptionsMenu();
-        eventHandler.setEnabled(false);
+        dispatcher.setEnabled(false);
     }
 
     @Override
@@ -130,49 +130,49 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public int getMvpId() {
-        return eventHandler.getId();
+        return dispatcher.getId();
     }
 
     @Override
     @NonNull
     public MvpViewHandle<S> getViewHandle() {
-        return eventHandler.getProxy();
+        return dispatcher.getProxy();
     }
 
     @Override
     @NonNull
     public MvpListener getMvpListener() {
-        return eventHandler;
+        return dispatcher;
     }
 
     @Override
     @NonNull
     public TextWatcher newTextWatcher(@NonNull EditText view) {
-        return eventHandler.newTextWatcher(view);
+        return dispatcher.newTextWatcher(view);
     }
 
     @Override
     @NonNull
     public SearchView.OnQueryTextListener newQueryTextListener(@NonNull SearchView view) {
-        return eventHandler.newQueryTextListener(view);
+        return dispatcher.newQueryTextListener(view);
     }
 
     @Override
     @NonNull
     public ViewPager.OnPageChangeListener newOnPageChangeListener(@NonNull ViewPager view) {
-        return eventHandler.newOnPageChangeListener(view);
+        return dispatcher.newOnPageChangeListener(view);
     }
 
     @Override
     @NonNull
     public View.OnClickListener newMvpClickListener(boolean isAutoLocking) {
-        return eventHandler.newMvpClickListener(isAutoLocking);
+        return dispatcher.newMvpClickListener(isAutoLocking);
     }
 
     @NonNull
     @Override
     public TabLayout.OnTabSelectedListener newTabLayoutListener(TabLayout view) {
-        return eventHandler.newTabLayoutListener(view);
+        return dispatcher.newTabLayoutListener(view);
     }
 
     @Override
@@ -204,7 +204,7 @@ public abstract class MvpFragment<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        eventHandler.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        dispatcher.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

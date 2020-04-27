@@ -23,7 +23,7 @@
 }
 -keep class com.simplemvp.view.Proxify { *; }
 # some methods of this class are invoked using reflection
--keepclassmembers class com.simplemvp.view.MvpEventHandler {
+-keepclassmembers class com.simplemvp.view.MvpDispatcher {
   @Proxify public void * (...);
 }
 -keepclasseswithmembernames public class * extends com.simplemvp.view.MvpActivity {*; }
