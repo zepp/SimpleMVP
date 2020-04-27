@@ -374,20 +374,20 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
 
     @Proxify
     @Override
-    public void showSnackBar(String text, int duration) {
-        Snackbar.make(view.getView(), text, duration).show();
+    public void showSnackBar(int viewId, String text, int duration) {
+        Snackbar.make(view.findViewById(viewId), text, duration).show();
     }
 
     @Proxify
     @Override
-    public void showSnackBar(int res, int duration) {
-        Snackbar.make(view.getView(), res, duration).show();
+    public void showSnackBar(int viewId, int res, int duration) {
+        Snackbar.make(view.findViewById(viewId), res, duration).show();
     }
 
     @Proxify
     @Override
-    public void showSnackBar(String text, int duration, String action) {
-        Snackbar bar = Snackbar.make(view.getView(), text, duration);
+    public void showSnackBar(int viewId, String text, int duration, String action) {
+        Snackbar bar = Snackbar.make(view.findViewById(viewId), text, duration);
         bar.setAction(action, v -> {
             bar.dismiss();
             onClick(v);
@@ -429,6 +429,6 @@ class MvpEventHandler<S extends MvpState> extends ContextWrapper
     @Proxify
     @Override
     public void hideInputMethod(int viewId, int flags) {
-        getImm().hideSoftInputFromWindow(view.getView().findViewById(viewId).getWindowToken(), flags);
+        getImm().hideSoftInputFromWindow(view.findViewById(viewId).getWindowToken(), flags);
     }
 }

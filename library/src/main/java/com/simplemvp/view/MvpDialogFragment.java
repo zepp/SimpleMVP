@@ -77,6 +77,11 @@ public abstract class MvpDialogFragment<P extends MvpPresenter<S>, S
     }
 
     @Override
+    public <T extends View> T findViewById(int id) {
+        return getView().findViewById(id);
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(PRESENTER_ID, presenter.getId());
         eventHandler.saveId(outState);

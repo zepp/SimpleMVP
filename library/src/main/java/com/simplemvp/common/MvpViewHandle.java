@@ -68,32 +68,38 @@ public interface MvpViewHandle<S extends MvpState> {
     void showToast(@StringRes int resId, int duration);
 
     /**
-     * This method shows {@link com.google.android.material.snackbar.Snackbar} using root view as parent view
+     * This method shows {@link com.google.android.material.snackbar.Snackbar} on behalf of the view
+     * specified by {@code viewId}
      *
+     * @param viewId   view ID
      * @param text     text to be shown
      * @param duration How long to display text. Either {@link com.google.android.material.snackbar.Snackbar#LENGTH_SHORT}
      *                 or {@link com.google.android.material.snackbar.Snackbar#LENGTH_LONG}
      */
-    void showSnackBar(String text, int duration);
+    void showSnackBar(@IdRes int viewId, String text, int duration);
 
     /**
-     * This method shows {@link com.google.android.material.snackbar.Snackbar} using root view as parent view
+     * This method shows {@link com.google.android.material.snackbar.Snackbar} on behalf of the view
+     * specified by {@code viewId}
      *
+     * @param viewId   view ID
      * @param res      string ID to be shown
      * @param duration How long to display text. Either {@link com.google.android.material.snackbar.Snackbar#LENGTH_SHORT}
      *                 or {@link com.google.android.material.snackbar.Snackbar#LENGTH_LONG}
      */
-    void showSnackBar(@StringRes int res, int duration);
+    void showSnackBar(@IdRes int viewId, @StringRes int res, int duration);
 
     /**
-     * This method shows {@link com.google.android.material.snackbar.Snackbar} using root view as parent view
+     * This method shows {@link com.google.android.material.snackbar.Snackbar} on behalf of the view
+     * specified by {@code viewId}
      *
+     * @param viewId   view ID
      * @param text     string ID to be shown
      * @param duration How long to display text. Either {@link com.google.android.material.snackbar.Snackbar#LENGTH_SHORT}
      *                 or {@link com.google.android.material.snackbar.Snackbar#LENGTH_LONG}
      * @param action   action title to be displayed
      */
-    void showSnackBar(String text, int duration, String action);
+    void showSnackBar(int viewId, String text, int duration, String action);
 
     /**
      * This method starts new activity. It is a wrapper around {@link android.app.Activity#startActivity(Intent)}

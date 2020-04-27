@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
@@ -71,6 +72,15 @@ public interface MvpView<S extends MvpState, P extends MvpPresenter<S>> extends 
      */
     @NonNull
     View getView();
+
+    /**
+     * Finds a view that is identified by the {@code id}.
+     *
+     * @param id  {@code android:id} XML attribute
+     * @param <T> return type
+     * @return {@link View} instance
+     */
+    <T extends View> T findViewById(@IdRes int id);
 
     /**
      * This method returns view's arguments that were supplied in constructor or factory method.

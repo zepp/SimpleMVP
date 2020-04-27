@@ -164,7 +164,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
             if (viewId == R.id.main_show_toast) {
                 handle.showToast(state.text, state.duration.getToastDuration());
             } else if (viewId == R.id.main_show_snackbar) {
-                handle.showSnackBar(state.text, state.duration.getSnackBarDuration(),
+                handle.showSnackBar(viewId, state.text, state.duration.getSnackBarDuration(),
                         getString(R.string.main_snackbar_action));
             } else if (viewId == R.id.main_eval) {
                 state.setExpression(String.valueOf(new MathExpression(state.expression).evaluate()), true);
@@ -179,7 +179,7 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
                 } else {
                     appState.setTimerStarted(false);
                     stopTimer(timer);
-                    handle.showSnackBar(getString(R.string.timer_started_at) +
+                    handle.showSnackBar(viewId, getString(R.string.timer_started_at) +
                                     " " + format.format(new Date(appState.getTimerStartedTime())) +
                                     " " + getString(R.string.timer_duration) + " " + state.getTextProgress(),
                             Snackbar.LENGTH_LONG, getString(R.string.main_snackbar_action));
