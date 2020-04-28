@@ -88,6 +88,8 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         recordEvent(new Event(UI, "onFirstViewConnected", handle.getLayoutId()));
         state.setWriteGranted(ContextCompat.checkSelfPermission(getBaseContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        state.setSubscribedToConnectivity(appState.isConnectivity());
+        state.setSubscribedToPowerSupply(appState.isPowerSupply());
     }
 
     @Override
@@ -251,13 +253,19 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         super.onCheckedChanged(handle, viewId, isChecked);
         recordEvent(new Event("onCheckedChanged", viewId));
         if (viewId == R.id.settings_connectivity) {
-            if (!state.isSubscribedToConnectivity) {
+            appState.setConnectivity(isChecked);
+            if (isChecked) {
                 subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            } else {
+                unsubscribeFromBroadcast(ConnectivityManager.CONNECTIVITY_ACTION);
             }
             state.setSubscribedToConnectivity(isChecked);
         } else if (viewId == R.id.settings_power_supply) {
-            if (!state.isSubscribedToPowerSupply) {
+            appState.setPowerSupply(isChecked);
+            if (isChecked) {
                 subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            } else {
+                unsubscribeFromBroadcast(Intent.ACTION_BATTERY_CHANGED);
             }
             state.setSubscribedToPowerSupply(isChecked);
         }

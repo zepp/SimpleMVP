@@ -1,7 +1,6 @@
 package com.testapp.view;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -49,14 +48,11 @@ public class SettingsDialog extends MvpDialogFragment<MainPresenter, MainState> 
         powerSupply.setOnCheckedChangeListener(getMvpListener());
         delay.setOnSeekBarChangeListener(getMvpListener());
         delay.setProgress(state.delay / 100);
+        connectivity.setChecked(state.isSubscribedToConnectivity);
+        powerSupply.setChecked(state.isSubscribedToPowerSupply);
     }
 
     @Override
     public void onStateChanged(@NonNull MainState state) {
-        Log.d(tag, state.toString());
-        connectivity.setChecked(state.isSubscribedToConnectivity);
-        connectivity.setEnabled(!state.isSubscribedToConnectivity);
-        powerSupply.setChecked(state.isSubscribedToPowerSupply);
-        powerSupply.setEnabled(!state.isSubscribedToPowerSupply);
     }
 }
