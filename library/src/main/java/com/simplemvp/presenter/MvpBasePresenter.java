@@ -394,6 +394,18 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     }
 
     /**
+     * This method unregisters current presenter from broadcast intents with specified action.
+     *
+     * @param action {@link Intent#getAction()}
+     */
+    protected final synchronized void unsubscribeFromBroadcast(String action) {
+        AsyncBroadcastReceiver receiver = receivers.remove(action);
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+        }
+    }
+
+    /**
      * This method is called when broadcast intent is received.
      * @param intent {@link Intent} instance
      * @param result
