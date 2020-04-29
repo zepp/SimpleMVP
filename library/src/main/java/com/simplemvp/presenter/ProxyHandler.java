@@ -14,9 +14,11 @@ import com.simplemvp.common.MvpState;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 class ProxyHandler<S extends MvpState> implements InvocationHandler {
     private final MvpBasePresenter<S> presenter;
@@ -47,19 +49,17 @@ class ProxyHandler<S extends MvpState> implements InvocationHandler {
         return result;
     }
 
-    private static Class<?>[] concat(Class<?>[] first, Class<?>[] second) {
-        Class<?>[] both = Arrays.copyOf(first, first.length + second.length);
-        System.arraycopy(second, 0, both, first.length, second.length);
-        return both;
+    private static Set<Class<?>> getAllImplementedInterfaces_(Set<Class<?>> set, Class<?> clazz) {
+        Collections.addAll(set, clazz.getInterfaces());
+        if (!clazz.getSuperclass().equals(Object.class)) {
+            getAllImplementedInterfaces_(set, clazz.getSuperclass());
+        }
+        return set;
     }
 
     private static Class<?>[] getAllImplementedInterfaces(Class<?> clazz) {
-        Class<?>[] result = clazz.getInterfaces();
-        if (clazz.getSuperclass().equals(Object.class)) {
-            return result;
-        } else {
-            return concat(result, getAllImplementedInterfaces(clazz.getSuperclass()));
-        }
+        return getAllImplementedInterfaces_(new TreeSet<>((o1, o2) ->
+                o1.getName().compareTo(o2.getName())), clazz).toArray(new Class[0]);
     }
 
     @NonNull
