@@ -199,7 +199,13 @@ public abstract class MvpActivity<P extends MvpPresenter<S>, S extends MvpState>
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        dispatcher.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // top bits are used to encode the fragment index
+        if ((requestCode & 0xffff) == requestCode) {
+            dispatcher.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
     }
 
     @Override
