@@ -89,7 +89,13 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
         state.setWriteGranted(ContextCompat.checkSelfPermission(getBaseContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         state.setSubscribedToConnectivity(appState.isConnectivity());
+        if (state.isSubscribedToConnectivity) {
+            subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
         state.setSubscribedToPowerSupply(appState.isPowerSupply());
+        if (state.isSubscribedToPowerSupply) {
+            subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        }
     }
 
     @Override
@@ -252,22 +258,22 @@ public class MainPresenterImpl extends MvpBasePresenter<MainState> implements Ma
     public void onCheckedChanged(@NonNull MvpViewHandle<MainState> handle, int viewId, boolean isChecked) {
         super.onCheckedChanged(handle, viewId, isChecked);
         recordEvent(new Event("onCheckedChanged", viewId));
-        if (viewId == R.id.settings_connectivity) {
+        if (viewId == R.id.settings_connectivity && state.isSubscribedToConnectivity != isChecked) {
+            state.setSubscribedToConnectivity(isChecked);
             appState.setConnectivity(isChecked);
             if (isChecked) {
                 subscribeToBroadcast(new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
             } else {
                 unsubscribeFromBroadcast(ConnectivityManager.CONNECTIVITY_ACTION);
             }
-            state.setSubscribedToConnectivity(isChecked);
-        } else if (viewId == R.id.settings_power_supply) {
+        } else if (viewId == R.id.settings_power_supply && state.isSubscribedToPowerSupply != isChecked) {
+            state.setSubscribedToPowerSupply(isChecked);
             appState.setPowerSupply(isChecked);
             if (isChecked) {
                 subscribeToBroadcast(new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
             } else {
                 unsubscribeFromBroadcast(Intent.ACTION_BATTERY_CHANGED);
             }
-            state.setSubscribedToPowerSupply(isChecked);
         }
         commit(state.delay);
     }
