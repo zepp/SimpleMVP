@@ -92,11 +92,11 @@ public class MainActivity extends MvpActivity<MainPresenter, MainState> {
         @Override
         public Fragment getItem(int i) {
             if (i == FRAGMENT_MAIN) {
-                return MainFragment.newInstance(getPresenter().getId());
+                return MainFragment.newInstance();
             } else if (i == FRAGMENT_TIMER) {
-                return TimerFragment.newInstance(getPresenter().getId());
+                return TimerFragment.newInstance();
             } else {
-                return EventsFragment.newInstance(getPresenter().getId());
+                return EventsFragment.newInstance();
             }
         }
 

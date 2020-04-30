@@ -9,14 +9,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.simplemvp.presenter.MvpPresenterManager;
-import com.simplemvp.view.MvpFragment;
+import com.simplemvp.view.MvpHostedFragment;
 import com.testapp.R;
 import com.testapp.presenter.MainPresenter;
 import com.testapp.presenter.MainState;
 
 
-public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
+public class TimerFragment extends MvpHostedFragment<MainPresenter, MainState> {
     private CircleProgress progress;
     private TextView text;
     private ImageButton startStop;
@@ -25,10 +24,8 @@ public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
         // Required empty public constructor
     }
 
-    public static TimerFragment newInstance(int presenterId) {
-        TimerFragment fragment = new TimerFragment();
-        fragment.initArguments(presenterId);
-        return fragment;
+    public static TimerFragment newInstance() {
+        return new TimerFragment();
     }
 
     @Override
@@ -60,11 +57,5 @@ public class TimerFragment extends MvpFragment<MainPresenter, MainState> {
             startStop.setImageDrawable(getResources()
                     .getDrawable(state.isStarted ? R.drawable.ic_stop : R.drawable.ic_start));
         }
-    }
-
-    @Override
-    @NonNull
-    public MainPresenter onInitPresenter(MvpPresenterManager manager) {
-        return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 }

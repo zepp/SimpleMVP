@@ -8,8 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.simplemvp.presenter.MvpPresenterManager;
-import com.simplemvp.view.MvpFragment;
+import com.simplemvp.view.MvpHostedFragment;
 import com.testapp.R;
 import com.testapp.common.Event;
 import com.testapp.presenter.MainPresenter;
@@ -18,7 +17,7 @@ import com.testapp.presenter.MainState;
 import java.util.List;
 
 
-public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
+public class EventsFragment extends MvpHostedFragment<MainPresenter, MainState> {
     private RecyclerView events;
     private EventsAdapter eventsAdapter;
 
@@ -26,10 +25,8 @@ public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
         // Required empty public constructor
     }
 
-    public static EventsFragment newInstance(int presenterId) {
-        EventsFragment fragment = new EventsFragment();
-        fragment.initArguments(presenterId);
-        return fragment;
+    public static EventsFragment newInstance() {
+        return new EventsFragment();
     }
 
     @Override
@@ -59,11 +56,5 @@ public class EventsFragment extends MvpFragment<MainPresenter, MainState> {
         if (state.isEventAdded) {
             events.scrollToPosition(items.size() - 1);
         }
-    }
-
-    @Override
-    @NonNull
-    public MainPresenter onInitPresenter(MvpPresenterManager manager) {
-        return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 }

@@ -16,16 +16,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.simplemvp.presenter.MvpPresenterManager;
 import com.simplemvp.view.MvpEditText;
-import com.simplemvp.view.MvpFragment;
+import com.simplemvp.view.MvpHostedFragment;
 import com.testapp.R;
 import com.testapp.common.ActionDuration;
 import com.testapp.presenter.MainPresenter;
 import com.testapp.presenter.MainState;
 
 
-public class MainFragment extends MvpFragment<MainPresenter, MainState> {
+public class MainFragment extends MvpHostedFragment<MainPresenter, MainState> {
     private InputMethodManager imm;
     private Button showToast;
     private Button showSnackBar;
@@ -43,10 +42,8 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
         // Required empty public constructor
     }
 
-    public static MainFragment newInstance(int presenterId) {
-        MainFragment fragment = new MainFragment();
-        fragment.initArguments(presenterId);
-        return fragment;
+    public static MainFragment newInstance() {
+        return new MainFragment();
     }
 
     @Override
@@ -110,12 +107,6 @@ public class MainFragment extends MvpFragment<MainPresenter, MainState> {
         }
         eval.setEnabled(!state.expression.isEmpty());
         fileName.setText(state.fileName);
-    }
-
-    @Override
-    @NonNull
-    public MainPresenter onInitPresenter(MvpPresenterManager manager) {
-        return manager.getPresenterInstance(getPresenterId(getArguments()));
     }
 
     private static class SpinnerAdapter extends ArrayAdapter<ActionDuration> {
