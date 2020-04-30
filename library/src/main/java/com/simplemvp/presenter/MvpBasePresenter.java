@@ -309,9 +309,8 @@ public abstract class MvpBasePresenter<S extends MvpState> extends ContextWrappe
     @CallSuper
     @Override
     public void finish() {
-        for (MvpViewHandle<S> handle : handles.values()) {
-            handle.finish();
-        }
+        // finish only parent element to keep smooth animation
+        getParentHandle().finish();
     }
 
     @CallSuper
