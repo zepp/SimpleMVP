@@ -10,6 +10,7 @@
 
 -keep class com.simplemvp.annotations.* { *; }
 -keepnames public class com.simplemvp.common.* { *; }
+-keepnames public class * extends com.simplemvp.common.MvpState { *; }
 -keepnames public class com.simplemvp.presenter.MvpPresenterManager {
   public *;
 }
@@ -19,12 +20,12 @@
 # some methods of these classes can be invoked using reflection
 -keepclassmembers public class * extends com.simplemvp.presenter.MvpBasePresenter {
   public <init>(android.content.Context, ***);
-  @MvpHandler public void * (...);
+  @com.simplemvp.annotations.MvpHandler public <methods>;
 }
 -keep class com.simplemvp.view.Proxify { *; }
 # some methods of this class are invoked using reflection
 -keepclassmembers class com.simplemvp.view.MvpDispatcher {
-  @Proxify public void * (...);
+  @com.simplemvp.view.Proxify public <methods>;
 }
 -keepclasseswithmembernames public class * extends com.simplemvp.view.MvpActivity {*; }
 -keepclasseswithmembernames public class * extends com.simplemvp.view.MvpFragment {*; }
