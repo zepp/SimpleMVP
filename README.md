@@ -110,6 +110,7 @@ Presenter does not hold strong reference to connected view. It collects `MvpView
 * `requestPermissions()` to request permissions
 * `showDialog()` to show a dialog
 * `finish()` to finish the calling view
+* `hideInputMethod()` to hide software keyboard
 
 `MvpViewHandle` is passed to all default handlers. It is a best practice when custom handler is added.
 

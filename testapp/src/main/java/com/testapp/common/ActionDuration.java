@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 Pavel A. Sokolov
+ */
+
 package com.testapp.common;
 
 import android.widget.Toast;

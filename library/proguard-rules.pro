@@ -1,3 +1,5 @@
+# Copyright (c) 2020 Pavel A. Sokolov
+
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable

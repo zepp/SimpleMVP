@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2020 Pavel A. Sokolov
+ */
 package com.simplemvp.view;
 
 import android.view.View;
