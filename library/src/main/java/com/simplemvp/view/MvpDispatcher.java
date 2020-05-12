@@ -64,8 +64,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 class MvpDispatcher<S extends MvpState> extends ContextWrapper
         implements MvpViewHandle<S>, MvpListener, LifecycleObserver {
     private final static String INSTANCE_ID = "mvp-view-id";
-    private final static String tag = MvpDispatcher.class.getSimpleName();
     private final static AtomicInteger lastId = new AtomicInteger();
+    private final String tag;
     private final int id;
     private final MvpView<S, ?> view;
     private final MvpPresenter<S> presenter;
@@ -81,6 +81,7 @@ class MvpDispatcher<S extends MvpState> extends ContextWrapper
 
     MvpDispatcher(@NonNull MvpView<S, ?> view, @Nullable Bundle savedState) {
         super(view.getContext());
+        this.tag = view.getClass().getSimpleName();
         this.id = getId(savedState);
         this.view = view;
         this.presenter = view.getPresenter();
