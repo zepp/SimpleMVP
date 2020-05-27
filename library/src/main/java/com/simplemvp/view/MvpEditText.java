@@ -7,53 +7,45 @@ package com.simplemvp.view;
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
+import androidx.annotation.CallSuper;
 import androidx.appcompat.widget.AppCompatEditText;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * This class uses reflections to avoid watchers invocation when text is changed
  */
 public class MvpEditText extends AppCompatEditText {
-    private Field mListenersField;
-    private List<TextWatcher> mListeners = Collections.emptyList();
+    private TextWatcher mvpTextWatcher;
 
     public MvpEditText(Context context) {
         super(context);
-        initListenersField();
     }
 
     public MvpEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initListenersField();
     }
 
     public MvpEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initListenersField();
     }
 
-    private void initListenersField() {
-        try {
-            mListenersField = TextView.class.getDeclaredField("mListeners");
-            mListenersField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
+    @CallSuper
+    @Override
+    public void addTextChangedListener(TextWatcher watcher) {
+        super.addTextChangedListener(watcher);
+        if (watcher instanceof MvpTextWatcher && !watcher.equals(mvpTextWatcher)) {
+            mvpTextWatcher = watcher;
         }
     }
 
-    public void setTextNoWatchers(String text) {
-        try {
-            mListeners = (List<TextWatcher>) mListenersField.get(this);
-            mListenersField.set(this, new ArrayList<>());
-            setText(text);
-            setSelection(text == null || text.isEmpty() ? 0 : text.length());
-            mListenersField.set(this, mListeners);
-        } catch (IllegalAccessException e) {
+    public void setTextAvoidMvpWatcher(String text) {
+        if (mvpTextWatcher != null) {
+            removeTextChangedListener(mvpTextWatcher);
+        }
+        setText(text);
+        setSelection(text == null || text.isEmpty() ? 0 : text.length());
+        if (mvpTextWatcher != null) {
+            addTextChangedListener(mvpTextWatcher);
         }
     }
 }

@@ -107,7 +107,7 @@ public class MainFragment extends MvpHostedFragment<MainPresenter, MainState> {
         showSnackBar.setEnabled(!state.text.isEmpty());
         writeGranted.setChecked(state.isWriteGranted);
         if (state.isEvaluated) {
-            expression.setTextNoWatchers(state.expression);
+            expression.setTextAvoidMvpWatcher(state.expression);
         }
         eval.setEnabled(!state.expression.isEmpty());
         fileName.setText(state.fileName);
